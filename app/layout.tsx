@@ -129,6 +129,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className="h-full antialiased font-sans scroll-smooth">
       <head>
         <script
+          dangerouslySetInnerHTML={{
+            __html: "if(typeof globalThis.__name==='undefined'){globalThis.__name=function(t,v){try{Object.defineProperty(t,'name',{value:v,configurable:true})}catch(e){}return t};}if(typeof window!=='undefined'&&typeof window.__name==='undefined'){window.__name=globalThis.__name;}",
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
         />
