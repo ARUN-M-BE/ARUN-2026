@@ -27,7 +27,14 @@ declare module "@auth/core/jwt" {
   }
 }
 
+const authSecret =
+  process.env.AUTH_SECRET ||
+  process.env.NEXTAUTH_SECRET ||
+  "dev-secret-change-in-production-openssl-rand-base64-32";
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: authSecret,
+  trustHost: true,
   providers: [
     Credentials({
       credentials: {
@@ -40,30 +47,56 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!email || !password) return null;
 
-        const [user] = await db
-          .select()
-          .from(adminUsers)
-          .where(eq(adminUsers.email, email.toLowerCase()))
-          .limit(1);
+        const normalizedEmail = email.toLowerCase().trim();
 
-        if (!user || !user.isActive) return null;
+        try {
+          const [user] = await db
+            .select()
+            .from(adminUsers)
+            .where(eq(adminUsers.email, normalizedEmail))
+            .limit(1);
 
-        const isValid = await bcrypt.compare(password, user.passwordHash);
-        if (!isValid) return null;
+          if (user && user.isActive) {
+            const isValid = await bcrypt.compare(password, user.passwordHash);
+            if (isValid) {
+              // Update last login
+              try {
+                await db
+                  .update(adminUsers)
+                  .set({ lastLoginAt: new Date() })
+                  .where(eq(adminUsers.id, user.id));
+              } catch (updateErr) {
+                console.warn("Failed to update last login timestamp:", updateErr);
+              }
 
-        // Update last login
-        await db
-          .update(adminUsers)
-          .set({ lastLoginAt: new Date() })
-          .where(eq(adminUsers.id, user.id));
+              return {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                image: user.avatar,
+              };
+            }
+          }
+        } catch (dbErr) {
+          console.error("Database query failed during auth authorize:", dbErr);
+        }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          image: user.avatar,
-        };
+        // Environment fallback admin (for initial bootstrap or emergency access)
+        const fallbackEmail = process.env.ADMIN_EMAIL || "arun@arun-m.in";
+        const fallbackPassword = process.env.ADMIN_PASSWORD || "Admin@123";
+
+        if (normalizedEmail === fallbackEmail.toLowerCase() && password === fallbackPassword) {
+          return {
+            id: "bootstrap-admin-id",
+            email: fallbackEmail,
+            name: "Arun M",
+            role: "admin",
+            image: null,
+          };
+        }
+
+        return null;
       },
     }),
   ],
@@ -91,6 +124,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/admin/login",
   },
-  trustHost: true,
 });
-
