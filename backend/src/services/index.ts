@@ -397,3 +397,20 @@ export const AuditService = {
     return AuditRepository.findMany(opts);
   },
 };
+
+// ─── Neon Cloud Services Integration ─────────────────────
+export {
+  NEON_CONFIG,
+  neonDb,
+  getNeonPool,
+  checkNeonPostgres,
+  verifyNeonAuthToken,
+  checkNeonAuth,
+  uploadAsset as uploadNeonAsset,
+  listAssets as listNeonAssets,
+  deleteAsset as deleteNeonAsset,
+  checkNeonObjectStorage,
+  checkNeonRealtime,
+  checkAllNeonServices,
+} from "../../../lib/neon";
+

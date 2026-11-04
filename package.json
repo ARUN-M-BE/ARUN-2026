@@ -13,6 +13,7 @@
     "backend:dev": "tsx watch backend/src/server.ts",
     "backend:start": "tsx backend/src/server.ts",
     "backend:test": "tsx backend/tests/backend.test.ts",
+    "neon:test": "tsx scripts/test-neon-services.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
