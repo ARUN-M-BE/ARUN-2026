@@ -1,0 +1,58 @@
+{
+  "name": "Obsidian Cyber Cosmic Dark",
+  "id": "dark",
+  "colors": {
+    "background": "#04060b",
+    "foreground": "#f8fafc",
+    "card": "#0b101c",
+    "cardForeground": "#f8fafc",
+    "popover": "#0b101c",
+    "popoverForeground": "#f8fafc",
+    "primary": "#00f0ff",
+    "primaryForeground": "#04060b",
+    "secondary": "#101626",
+    "secondaryForeground": "#e2e8f0",
+    "muted": "#121a2d",
+    "mutedForeground": "#8ea1b8",
+    "accent": "#8b5cf6",
+    "accentForeground": "#ffffff",
+    "destructive": "#f43f5e",
+    "destructiveForeground": "#ffffff",
+    "border": "rgba(255, 255, 255, 0.09)",
+    "input": "rgba(255, 255, 255, 0.12)",
+    "ring": "#00f0ff"
+  },
+  "neon": {
+    "cyan": "#00f0ff",
+    "violet": "#8b5cf6",
+    "amber": "#f59e0b",
+    "pink": "#ff007f",
+    "emerald": "#10b981",
+    "glowCyan": "0 0 25px rgba(0, 240, 255, 0.5)",
+    "glowViolet": "0 0 25px rgba(139, 92, 246, 0.5)",
+    "glowAmber": "0 0 25px rgba(245, 158, 11, 0.5)"
+  },
+  "triGradients": {
+    "cyberAurora": {
+      "stops": ["#00f0ff", "#8b5cf6", "#f59e0b"],
+      "css": "linear-gradient(135deg, #00f0ff 0%, #8b5cf6 52%, #f59e0b 100%)",
+      "description": "Luminous Electric Cyan to Cyber Violet to Pulsar Amber"
+    },
+    "electricNebula": {
+      "stops": ["#ff007f", "#8b5cf6", "#00f0ff"],
+      "css": "linear-gradient(135deg, #ff007f 0%, #8b5cf6 50%, #00f0ff 100%)",
+      "description": "Hyper Neon Pink to Deep Violet to Laser Cyan"
+    },
+    "hyperMatrix": {
+      "stops": ["#10b981", "#00f0ff", "#8b5cf6"],
+      "css": "linear-gradient(135deg, #10b981 0%, #00f0ff 50%, #8b5cf6 100%)",
+      "description": "Emerald Dataflow to Electric Cyan to Royal Violet"
+    }
+  },
+  "glass": {
+    "background": "rgba(11, 16, 28, 0.74)",
+    "border": "rgba(0, 240, 255, 0.15)",
+    "backdropBlur": "20px",
+    "shadow": "0 0 35px -5px rgba(0, 240, 255, 0.18)"
+  }
+}

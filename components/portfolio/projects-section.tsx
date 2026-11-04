@@ -1,0 +1,406 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { TiltCard } from "@/components/ui/tilt-card";
+import {
+  FolderGit2,
+  ExternalLink,
+  Code2,
+  Search,
+  Star,
+  Layers,
+  Eye,
+  GitCompare,
+  Check,
+} from "lucide-react";
+import { useLanguage } from "@/context/languageContext";
+
+interface ProjectsSectionProps {
+  projects: any[];
+}
+
+export function ProjectsSection({ projects }: ProjectsSectionProps) {
+  const { t, language } = useLanguage();
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [search, setSearch] = useState("");
+  const [activeProject, setActiveProject] = useState<any | null>(null);
+
+  // Comparison mode
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
+
+  // Extract unique categories
+  const categories = ["All", ...Array.from(new Set(projects.map((p) => p.category).filter(Boolean)))];
+
+  const filtered = projects.filter((p) => {
+    const matchesCat = selectedCategory === "All" || p.category === selectedCategory;
+    const matchesSearch =
+      p.title.toLowerCase().includes(search.toLowerCase()) ||
+      (p.shortDescription && p.shortDescription.toLowerCase().includes(search.toLowerCase())) ||
+      (p.techStack && (p.techStack as string[]).some((t) => t.toLowerCase().includes(search.toLowerCase())));
+    return matchesCat && matchesSearch;
+  });
+
+  const toggleCompare = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (compareIds.includes(id)) {
+      setCompareIds((prev) => prev.filter((item) => item !== id));
+    } else {
+      if (compareIds.length >= 2) {
+        setCompareIds([compareIds[1], id]);
+      } else {
+        setCompareIds((prev) => [...prev, id]);
+      }
+    }
+  };
+
+  const comparedProjects = projects.filter((p) => compareIds.includes(p.id));
+
+  return (
+    <section id="projects" className="py-24 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-xs font-mono text-cyan-600 dark:text-cyan-400">
+              <FolderGit2 className="w-3.5 h-3.5" />
+              <span>{t("projects.badge", "Selected works")}</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
+              {t("projects.title", "Featured Projects & Case Studies")}
+            </h2>
+            <p className="text-sm text-muted-foreground max-w-xl">
+              {t("projects.subtitle", "Discover enterprise architectures, open-source utilities, and 3D web applications.")}
+            </p>
+          </div>
+
+          {/* Search & Compare Controls */}
+          <div className="flex items-center gap-3">
+            {compareIds.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsCompareOpen(true)}
+                className="border-violet-500/40 text-violet-600 dark:text-violet-400 bg-violet-500/10 hover:bg-violet-500/20 text-xs rounded-full font-mono"
+              >
+                <GitCompare className="w-3.5 h-3.5 mr-1.5" />
+                <span>{t("projects.compareButton", "Compare Architecture")} ({compareIds.length}/2)</span>
+              </Button>
+            )}
+
+            <div className="relative w-full sm:w-64">
+              <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t("projects.searchPlaceholder", "Search projects or technologies...")}
+                className="pl-9 bg-card border-border text-xs rounded-full text-foreground"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Category Filter Pills */}
+        <div className="flex flex-wrap items-center gap-2 mb-10">
+          {categories.map((cat) => (
+            <Button
+              key={cat}
+              type="button"
+              size="sm"
+              variant={selectedCategory === cat ? "default" : "outline"}
+              aria-pressed={selectedCategory === cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`h-9 rounded-full px-4 text-xs font-medium transition-all ${
+                selectedCategory === cat
+                  ? "bg-gradient-to-r from-cyan-500 to-violet-600 font-semibold text-white shadow-md shadow-cyan-500/15 hover:from-cyan-400 hover:to-violet-500"
+                  : "bg-secondary/60 text-muted-foreground"
+              }`}
+            >
+              {cat === "All" ? t("projects.allCategories", "All Disciplines") : cat}
+            </Button>
+          ))}
+        </div>
+
+        {/* Project Grid with 3D Tilt Effect */}
+        {filtered.length === 0 ? (
+          <div className="text-center py-20 border border-dashed border-border rounded-3xl p-8 bg-card/40">
+            <Layers className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+            <h3 className="text-sm font-semibold text-foreground">
+              {language === "ar" ? "لم يتم العثور على مشاريع تطابق البحث" : "No projects found matching query"}
+            </h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              {language === "ar" ? "جرب البحث عن تقنية أخرى أو مسح الفلتر" : "Try searching for a different framework or clear the filter."}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((project) => {
+              const isSelectedForCompare = compareIds.includes(project.id);
+              return (
+                <TiltCard
+                  key={project.id}
+                  maxTilt={8}
+                  className="rounded-3xl glass-panel hover:border-cyan-500/40 transition-colors flex flex-col justify-between overflow-hidden relative cursor-pointer border border-border"
+                  onClick={() => setActiveProject(project)}
+                >
+                  {/* Visual Thumbnail */}
+                  <div className="aspect-[16/10] bg-muted relative overflow-hidden flex items-center justify-center">
+                    {project.thumbnail ? (
+                      <img
+                        src={project.thumbnail}
+                        alt={project.title}
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-tr from-cyan-950/20 via-violet-950/20 to-background flex items-center justify-center">
+                        <FolderGit2 className="w-10 h-10 text-cyan-500/50" />
+                      </div>
+                    )}
+
+                    {/* Featured Badge */}
+                    {project.isFeatured && (
+                      <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-500/40 text-[10px] font-mono text-amber-600 dark:text-amber-300 flex items-center gap-1 font-bold">
+                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                        FEATURED
+                      </div>
+                    )}
+
+                    {/* Compare Checkbox Button */}
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={isSelectedForCompare ? "default" : "outline"}
+                      aria-pressed={isSelectedForCompare}
+                      onClick={(e) => toggleCompare(project.id, e)}
+                      className={`absolute bottom-3 right-3 h-8 rounded-xl px-2.5 text-[10px] font-mono backdrop-blur-md transition-all ${
+                        isSelectedForCompare
+                          ? "border-violet-400 bg-violet-600 font-bold text-white hover:bg-violet-500"
+                          : "border-border bg-background/85 text-foreground hover:bg-background"
+                      }`}
+                      title="Compare with another architecture"
+                    >
+                      {isSelectedForCompare ? <Check className="w-3 h-3" /> : <GitCompare className="w-3 h-3" />}
+                      Compare
+                    </Button>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono text-cyan-600 dark:text-cyan-400 uppercase tracking-wider font-semibold">
+                          {project.category || "Full-Stack"}
+                        </span>
+                        {project.client && (
+                          <span className="text-[10px] font-mono text-muted-foreground">
+                            {project.client}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-lg font-bold text-foreground group-hover:text-cyan-500 transition-colors">
+                        {project.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                        {project.shortDescription || project.description || "High-performance software project."}
+                      </p>
+                    </div>
+
+                    {/* Tech stack tags */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {((project.techStack as string[]) || []).slice(0, 4).map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-secondary border border-border text-foreground"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                      {((project.techStack as string[]) || []).length > 4 && (
+                        <span className="text-[10px] font-mono text-muted-foreground self-center">
+                          +{((project.techStack as string[]) || []).length - 4}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Actions Bar */}
+                    <div className="pt-4 border-t border-border flex items-center justify-between">
+                      <span className="text-xs text-cyan-600 dark:text-cyan-400 flex items-center gap-1 font-semibold">
+                        <Eye className="w-3.5 h-3.5" />
+                        {t("projects.caseStudy", "Deep Dive Case Study")}
+                      </span>
+
+                      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        {project.githubUrl && (
+                          <a
+                            href={project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Source Code"
+                          >
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full">
+                              <Code2 className="w-4 h-4" />
+                            </Button>
+                          </a>
+                        )}
+                        {project.liveUrl && (
+                          <a
+                            href={project.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Live Demo"
+                          >
+                            <Button size="icon" className="h-8 w-8 rounded-full bg-cyan-500 hover:bg-cyan-400 text-white">
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </Button>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </TiltCard>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Case Study Detail Modal */}
+      <Dialog open={!!activeProject} onOpenChange={(open) => !open && setActiveProject(null)}>
+        <DialogContent className="bg-card border-border max-w-2xl max-h-[85vh] overflow-y-auto">
+          {activeProject && (
+            <div className="space-y-6">
+              <DialogHeader>
+                <div className="flex items-center gap-2 text-xs font-mono text-cyan-600 dark:text-cyan-400">
+                  <span>{activeProject.category || "CASE STUDY"}</span>
+                  {activeProject.client && <span>• Client: {activeProject.client}</span>}
+                </div>
+                <DialogTitle className="text-xl font-bold text-foreground mt-1">
+                  {activeProject.title}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground">
+                  {activeProject.shortDescription}
+                </DialogDescription>
+              </DialogHeader>
+
+              {activeProject.thumbnail && (
+                <div className="aspect-video rounded-2xl overflow-hidden border border-border">
+                  <img src={activeProject.thumbnail} alt={activeProject.title} className="w-full h-full object-cover" />
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                  Architecture Decisions & Deliverables
+                </h4>
+                <div className="p-4 rounded-2xl bg-secondary/60 border border-border text-xs text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                  {activeProject.description || "Detailed case study description."}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                  Complete Tech Stack
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {((activeProject.techStack as string[]) || []).map((tech: string) => (
+                    <Badge key={tech} className="bg-secondary border border-border text-cyan-600 dark:text-cyan-400 text-xs font-mono">
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-4 border-t border-border">
+                <div className="flex gap-3">
+                  {activeProject.liveUrl && (
+                    <a href={activeProject.liveUrl} target="_blank" rel="noopener noreferrer">
+                      <Button size="sm" className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold text-xs">
+                        <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
+                        {t("projects.liveDemo", "Live Production")}
+                      </Button>
+                    </a>
+                  )}
+                  {activeProject.githubUrl && (
+                    <a href={activeProject.githubUrl} target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" size="sm" className="text-xs border-border">
+                        <Code2 className="w-3.5 h-3.5 mr-1.5" />
+                        {t("projects.viewCode", "Source Code")}
+                      </Button>
+                    </a>
+                  )}
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setActiveProject(null)} className="text-xs">
+                  {t("projects.closeModal", "Close")}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Project Comparison Modal */}
+      <Dialog open={isCompareOpen} onOpenChange={setIsCompareOpen}>
+        <DialogContent className="bg-card border-border max-w-4xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-foreground flex items-center gap-2">
+              <GitCompare className="w-5 h-5 text-violet-500" />
+              {t("projects.compareButton", "Architecture Comparison Matrix")}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Direct technical evaluation between selected project architectures
+            </DialogDescription>
+          </DialogHeader>
+
+          {comparedProjects.length < 2 ? (
+            <div className="py-8 text-center text-xs text-muted-foreground">
+              Please select at least 2 projects using the &quot;Compare&quot; button on project cards.
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-6 py-4">
+              {comparedProjects.slice(0, 2).map((p) => (
+                <div key={p.id} className="p-5 rounded-2xl bg-secondary/60 border border-border space-y-4">
+                  <div>
+                    <span className="text-[10px] font-mono text-cyan-600 dark:text-cyan-400 uppercase">{p.category}</span>
+                    <h3 className="font-bold text-sm text-foreground mt-0.5">{p.title}</h3>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{p.shortDescription}</p>
+                  </div>
+
+                  <div className="space-y-1.5 pt-3 border-t border-border/50 text-xs">
+                    <span className="text-muted-foreground font-semibold block">Client / Domain:</span>
+                    <span className="text-foreground">{p.client || "Open-Source"}</span>
+                  </div>
+
+                  <div className="space-y-1.5 pt-3 border-t border-border/50 text-xs">
+                    <span className="text-muted-foreground font-semibold block">Tech Stack:</span>
+                    <div className="flex flex-wrap gap-1">
+                      {((p.techStack as string[]) || []).map((t: string) => (
+                        <span key={t} className="px-2 py-0.5 rounded text-[10px] bg-card text-foreground font-mono border border-border">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 pt-3 border-t border-border/50 text-xs">
+                    <span className="text-muted-foreground font-semibold block">Deployment URL:</span>
+                    {p.liveUrl ? (
+                      <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1 font-mono text-[11px]">
+                        {p.liveUrl} <ExternalLink className="w-3 h-3" />
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground font-mono text-[11px]">Private Network</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </section>
+  );
+}

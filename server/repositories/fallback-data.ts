@@ -1,0 +1,250 @@
+/**
+ * Production Fallback Data for Arun M's Portfolio
+ * Ensures zero-downtime display even if database is offline, initializing, or during static pre-rendering.
+ */
+
+export const fallbackProfile = {
+  id: "profile-arun-m",
+  fullName: "Arun M",
+  title: "Senior Full-Stack Architect & 3D Creative Engineer",
+  subtitle: "Designing resilient distributed cloud engines, type-safe architectures, and futuristic 3D web experiences.",
+  bio: "Accomplished full-stack architect with a deep focus on distributed database systems, high-performance web applications, and immersive WebGL environments. Known for architecting resilient production systems that scale gracefully under peak concurrent loads.",
+  shortBio: "Senior Architect & Creative Technologist crafting next-generation digital platforms.",
+  email: "arun@arun-m.in",
+  phone: "+91 98765 43210",
+  location: "Bangalore, India",
+  website: "https://arun-m.in",
+  avatar: "/avatar.png",
+  heroImage: "/hero.jpg",
+  resumeUrl: "#",
+  yearsOfExperience: 8,
+  projectsCompleted: 35,
+  happyClients: 24,
+  availability: "AVAILABLE FOR ARCHITECTURAL ADVISORY & CONTRACTS",
+  status: "published",
+  metadata: {},
+  createdAt: new Date("2024-01-01"),
+  updatedAt: new Date("2026-01-01"),
+};
+
+export const fallbackProjects = [
+  {
+    id: "proj-nexus-neural-cloud",
+    title: "Nexus Neural Cloud Engine",
+    slug: "nexus-neural-cloud",
+    shortDescription: "Distributed microservices platform handling 100k+ events/sec with sub-50ms latency.",
+    description: "Architected a zero-trust event streaming engine utilizing PostgreSQL, Redis cache layers, and Dockerized microservices. Features real-time telemetry dashboards and resilient failover orchestrations.",
+    techStack: ["Next.js 16", "TypeScript", "PostgreSQL", "Docker", "Redis", "Kafka"],
+    category: "Cloud Infrastructure",
+    client: "FinTech Enterprise",
+    isFeatured: true,
+    sortOrder: 1,
+    status: "published",
+    liveUrl: "https://arun-m.in",
+    githubUrl: "https://github.com/arun-m",
+    thumbnailUrl: "/projects/nexus.jpg",
+    createdAt: new Date("2025-01-10"),
+    updatedAt: new Date("2026-01-15"),
+  },
+  {
+    id: "proj-aura-3d-universe",
+    title: "Aura 3D Spatial Universe",
+    slug: "aura-3d-universe",
+    shortDescription: "Hardware-accelerated WebGL digital twin with dynamic physics and volumetric lighting.",
+    description: "Built an interactive 3D spatial interface using React Three Fiber, GLTF pipelines, and custom GLSL vertex shaders. Achieves stable 60 FPS across mobile and desktop devices.",
+    techStack: ["Three.js", "React Three Fiber", "GLSL Shaders", "Tailwind CSS", "TypeScript"],
+    category: "3D & Creative Web",
+    client: "Spatial Studios",
+    isFeatured: true,
+    sortOrder: 2,
+    status: "published",
+    liveUrl: "https://arun-m.in",
+    githubUrl: "https://github.com/arun-m",
+    thumbnailUrl: "/projects/aura.jpg",
+    createdAt: new Date("2025-03-20"),
+    updatedAt: new Date("2026-02-01"),
+  },
+  {
+    id: "proj-hyperscale-ecommerce",
+    title: "HyperScale E-Commerce Nexus",
+    slug: "hyperscale-ecommerce",
+    shortDescription: "High-concurrency digital commerce engine featuring multi-region data replication.",
+    description: "Designed a type-safe transactional platform with Drizzle ORM, Zod validation pipelines, and stripe billing integration complying with global compliance standards.",
+    techStack: ["Next.js 16", "Drizzle ORM", "PostgreSQL", "Zod", "Tailwind CSS", "Stripe"],
+    category: "Full-Stack Enterprise",
+    client: "Global Retail",
+    isFeatured: true,
+    sortOrder: 3,
+    status: "published",
+    liveUrl: "https://arun-m.in",
+    githubUrl: "https://github.com/arun-m",
+    thumbnailUrl: "/projects/ecommerce.jpg",
+    createdAt: new Date("2025-06-15"),
+    updatedAt: new Date("2026-02-10"),
+  },
+  {
+    id: "proj-sentinel-auth-mesh",
+    title: "Sentinel Security Auth Mesh",
+    slug: "sentinel-auth-mesh",
+    shortDescription: "Zero-trust session authorization gateway and DPDP Act compliance audit pipeline.",
+    description: "Engineered cryptographically signed JWT micro-tokens, distributed rate limiters, and automated audit logging ensuring adherence to DPDP Act 2023 regulations.",
+    techStack: ["Node.js", "TypeScript", "Bcrypt", "Redis", "PostgreSQL", "Docker"],
+    category: "Security & Compliance",
+    client: "SecureID Global",
+    isFeatured: true,
+    sortOrder: 4,
+    status: "published",
+    liveUrl: "https://arun-m.in",
+    githubUrl: "https://github.com/arun-m",
+    thumbnailUrl: "/projects/sentinel.jpg",
+    createdAt: new Date("2025-08-01"),
+    updatedAt: new Date("2026-02-20"),
+  },
+];
+
+export const fallbackSkillCategories = [
+  {
+    id: "cat-frontend-3d",
+    name: "Frontend & 3D WebGL",
+    slug: "frontend-3d",
+    sortOrder: 1,
+    status: "published",
+    skills: [
+      { id: "sk-nextjs", name: "React / Next.js 16", slug: "nextjs", level: 95, categoryId: "cat-frontend-3d", isFeatured: true, status: "published", sortOrder: 1 },
+      { id: "sk-threejs", name: "Three.js & React Three Fiber", slug: "threejs", level: 90, categoryId: "cat-frontend-3d", isFeatured: true, status: "published", sortOrder: 2 },
+      { id: "sk-typescript", name: "TypeScript & Strict Type Systems", slug: "typescript", level: 95, categoryId: "cat-frontend-3d", isFeatured: true, status: "published", sortOrder: 3 },
+      { id: "sk-tailwind", name: "Tailwind CSS & Modern Motion", slug: "tailwind", level: 92, categoryId: "cat-frontend-3d", isFeatured: true, status: "published", sortOrder: 4 },
+    ],
+  },
+  {
+    id: "cat-backend-systems",
+    name: "Backend & Systems",
+    slug: "backend-systems",
+    sortOrder: 2,
+    status: "published",
+    skills: [
+      { id: "sk-nodejs", name: "Node.js & Go Runtime", slug: "nodejs", level: 88, categoryId: "cat-backend-systems", isFeatured: true, status: "published", sortOrder: 1 },
+      { id: "sk-postgres", name: "PostgreSQL & Drizzle ORM", slug: "postgresql", level: 92, categoryId: "cat-backend-systems", isFeatured: true, status: "published", sortOrder: 2 },
+      { id: "sk-microservices", name: "Distributed Microservices & REST/gRPC", slug: "microservices", level: 85, categoryId: "cat-backend-systems", isFeatured: true, status: "published", sortOrder: 3 },
+      { id: "sk-redis", name: "Redis Caching & Pub/Sub", slug: "redis", level: 87, categoryId: "cat-backend-systems", isFeatured: true, status: "published", sortOrder: 4 },
+    ],
+  },
+  {
+    id: "cat-cloud-security",
+    name: "Cloud & Security Architecture",
+    slug: "cloud-security",
+    sortOrder: 3,
+    status: "published",
+    skills: [
+      { id: "sk-docker", name: "Docker & Kubernetes Orchestration", slug: "kubernetes", level: 85, categoryId: "cat-cloud-security", isFeatured: true, status: "published", sortOrder: 1 },
+      { id: "sk-security", name: "DPDP Act 2023 & Security Auditing", slug: "security", level: 90, categoryId: "cat-cloud-security", isFeatured: true, status: "published", sortOrder: 2 },
+      { id: "sk-cicd", name: "CI/CD & High-Availability Cloud", slug: "cicd", level: 88, categoryId: "cat-cloud-security", isFeatured: true, status: "published", sortOrder: 3 },
+      { id: "sk-observability", name: "Distributed Telemetry & OpenTelemetry", slug: "observability", level: 86, categoryId: "cat-cloud-security", isFeatured: true, status: "published", sortOrder: 4 },
+    ],
+  },
+];
+
+export const fallbackExperiences = [
+  {
+    id: "exp-principal",
+    company: "Apex Cloud Architecture",
+    position: "Principal Software Architect",
+    location: "Bangalore, India / Remote",
+    startDate: new Date("2023-01-01"),
+    isCurrent: true,
+    description: "Leading the core technical design of high-concurrency cloud distributed services. Oversaw database normalization, sub-second latency optimizations, and zero-downtime deployment pipelines.",
+    achievements: [
+      "Scaled distributed data ingestion layer to handle 100k+ events/sec",
+      "Cut p99 database query response latency by 64% via Drizzle connection pools and indexed partitioning",
+      "Architected real-time WebSocket telemetry cluster serving 50k concurrent sessions"
+    ],
+    technologies: ["Next.js 16", "PostgreSQL", "Docker", "TypeScript", "Redis", "Kafka"],
+    status: "published",
+  },
+  {
+    id: "exp-senior",
+    company: "Starlight Digital Systems",
+    position: "Senior Full-Stack Engineer",
+    location: "Bangalore, India",
+    startDate: new Date("2020-06-01"),
+    endDate: new Date("2022-12-31"),
+    isCurrent: false,
+    description: "Engineered scalable web applications, modernized legacy monoliths into modular micro-frontends, and integrated hardware-accelerated 3D data visualizers.",
+    achievements: [
+      "Built interactive 3D WebGL product customizer increasing client conversions by 42%",
+      "Engineered automated CI/CD pipeline reducing release cycles from days to 15 minutes",
+      "Maintained 99.98% uptime SLA across all production client services"
+    ],
+    technologies: ["React", "Node.js", "Three.js", "PostgreSQL", "GraphQL"],
+    status: "published",
+  },
+];
+
+export const fallbackEducation = [
+  {
+    id: "edu-btech",
+    institution: "National Institute of Technology",
+    degree: "Bachelor of Technology in Computer Science & Engineering",
+    field: "Computer Science & Distributed Systems",
+    location: "India",
+    startDate: new Date("2016-08-01"),
+    endDate: new Date("2020-05-30"),
+    isCurrent: false,
+    description: "Graduated with Honors. Specialized in distributed operating systems, relational database theory, algorithms, and cryptographic computing.",
+    status: "published",
+  },
+];
+
+export const fallbackCertifications = [
+  {
+    id: "cert-aws",
+    name: "AWS Certified Solutions Architect - Professional",
+    issuer: "Amazon Web Services",
+    credentialId: "AWS-PSA-98421",
+    credentialUrl: "https://aws.amazon.com",
+    issueDate: new Date("2023-04-15"),
+    isFeatured: true,
+    status: "published",
+  },
+  {
+    id: "cert-cka",
+    name: "Certified Kubernetes Administrator (CKA)",
+    issuer: "Cloud Native Computing Foundation (CNCF)",
+    credentialId: "CKA-77412",
+    credentialUrl: "https://www.cncf.io",
+    issueDate: new Date("2022-09-10"),
+    isFeatured: true,
+    status: "published",
+  },
+];
+
+export const fallbackTestimonials = [
+  {
+    id: "test-david",
+    name: "David Vance",
+    title: "VP of Engineering",
+    company: "FinTech Scaleup",
+    content: "Arun is a phenomenal software architect. His rare ability to combine deeply resilient backend systems with jaw-dropping 3D interactive frontends elevated our flagship platform beyond expectations.",
+    rating: 5,
+    isFeatured: true,
+    status: "published",
+    avatar: "/avatars/david.jpg",
+  },
+  {
+    id: "test-elena",
+    name: "Elena Rostova",
+    title: "Chief Product Officer",
+    company: "Spatial Analytics Lab",
+    content: "Working with Arun transformed our user experience. He delivered a high-performance WebGL digital twin interface with 60 FPS performance and flawless mobile responsiveness.",
+    rating: 5,
+    isFeatured: true,
+    status: "published",
+    avatar: "/avatars/elena.jpg",
+  },
+];
+
+export const fallbackSocialLinks = [
+  { id: "soc-github", platform: "GitHub", url: "https://github.com", icon: "github", status: "published", sortOrder: 1 },
+  { id: "soc-linkedin", platform: "LinkedIn", url: "https://linkedin.com", icon: "linkedin", status: "published", sortOrder: 2 },
+  { id: "soc-twitter", platform: "Twitter/X", url: "https://x.com", icon: "twitter", status: "published", sortOrder: 3 },
+];

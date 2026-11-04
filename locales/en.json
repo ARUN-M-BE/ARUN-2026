@@ -1,0 +1,120 @@
+{
+  "nav": {
+    "universe": "Home",
+    "projects": "Projects",
+    "skills": "Skills",
+    "experience": "Experience",
+    "credentials": "Credentials",
+    "analytics": "Telemetry",
+    "contact": "Contact",
+    "admin": "Admin CMS",
+    "tour": "Take Tour",
+    "toggleSound": "Sound",
+    "toggleTheme": "Theme",
+    "toggleLang": "Language",
+    "fullscreen": "Fullscreen",
+    "statusOnline": "Cluster Active",
+    "commandPalette": "Search (Ctrl+K)"
+  },
+  "hero": {
+    "available": "Available for architectural advisory & engineering",
+    "role": "Senior Full-Stack Architect & Creative Developer",
+    "tagline": "Designing resilient distributed systems and immersive WebGL environments.",
+    "explore": "View projects",
+    "guidedTour": "Guided tour",
+    "downloadResume": "Download CV",
+    "statYears": "Years experience",
+    "statProjects": "Production builds",
+    "statPerformance": "Core web vitals",
+    "statUsers": "Active users"
+  },
+  "about": {
+    "badge": "Engineering perspective",
+    "title": "Architecting reliable, high-throughput systems",
+    "description": "Specializing in cloud-native microservices, WebGL/Three.js creative engineering, and high-performance full-stack web applications.",
+    "pillar1Title": "Distributed systems",
+    "pillar1Desc": "Fault-tolerant microservices, Kafka streaming, and Neon/PostgreSQL optimization.",
+    "pillar2Title": "Creative 3D experiences",
+    "pillar2Desc": "Cinematic Three.js and shaders tuned for 60 FPS mobile-first performance.",
+    "pillar3Title": "Security & privacy",
+    "pillar3Desc": "Zero-trust session auth, cryptographic sanitization, and legal compliance.",
+    "pillar4Title": "Production reliability",
+    "pillar4Desc": "Sub-second LCP, automated CI/CD pipelines, and proactive health observability."
+  },
+  "projects": {
+    "badge": "Selected works",
+    "title": "Featured projects & case studies",
+    "subtitle": "A collection of production architectures, distributed systems, and WebGL applications.",
+    "searchPlaceholder": "Search projects by name, category, or stack...",
+    "allCategories": "All disciplines",
+    "compareButton": "Compare architecture",
+    "liveDemo": "Visit live app",
+    "viewCode": "Source code",
+    "caseStudy": "Read case study",
+    "metrics": "Key metrics",
+    "closeModal": "Close"
+  },
+  "skills": {
+    "badge": "Technical capabilities",
+    "title": "Engineering proficiencies",
+    "subtitle": "Core proficiencies across frontend engineering, backend services, relational data, and cloud infrastructure.",
+    "sliderLabel": "Minimum proficiency",
+    "verified": "Verified mastery"
+  },
+  "analytics": {
+    "badge": "System telemetry",
+    "title": "Real-time performance & telemetry",
+    "subtitle": "Live telemetry streaming from production nodes, visitor metrics, and performance vitals.",
+    "liveRequests": "Requests per minute",
+    "uptime": "System uptime",
+    "uptimeValue": "99.98%",
+    "avgLatency": "Edge latency",
+    "activeSessions": "Active sessions",
+    "trafficChart": "Real-time throughput (req/sec)",
+    "globalPings": "Global edge node latency",
+    "coreWebVitals": "Core Web Vitals telemetry",
+    "cacheHit": "Edge cache hit rate",
+    "refreshInterval": "Live 2-second heartbeat"
+  },
+  "experience": {
+    "badge": "Work history",
+    "title": "Professional experience",
+    "subtitle": "Track record of architectural leadership and engineering high-impact platforms."
+  },
+  "education": {
+    "badge": "Credentials",
+    "title": "Education & certifications",
+    "subtitle": "Formal qualifications and industry-certified technical achievements.",
+    "verifyLink": "Verify credential"
+  },
+  "testimonials": {
+    "badge": "Testimonials",
+    "title": "Client & peer recommendations",
+    "subtitle": "Verifiable feedback from engineering managers, CTOs, and collaborative partners."
+  },
+  "contact": {
+    "badge": "Get in touch",
+    "title": "Let's build something exceptional",
+    "subtitle": "Open for architectural consulting, enterprise contract development, or full-time roles.",
+    "name": "Full name",
+    "namePlaceholder": "Jane Doe",
+    "email": "Email address",
+    "emailPlaceholder": "jane@example.com",
+    "subject": "Project scope",
+    "subjectPlaceholder": "Architecture redesign & 3D implementation",
+    "message": "Message",
+    "messagePlaceholder": "Tell me about your project, timeline, and technical objectives...",
+    "consent": "I agree to the processing of my contact information in accordance with DPDP Act 2023 and the Privacy Policy.",
+    "send": "Send message",
+    "sending": "Sending message...",
+    "successTitle": "Message sent successfully",
+    "successDesc": "Thank you for reaching out. A confirmation has been logged and you will receive a response shortly."
+  },
+  "footer": {
+    "rights": "All rights reserved. Built with Next.js, React Three Fiber & Drizzle ORM.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "cookies": "Cookie Policy",
+    "dpdp": "India DPDP Act 2023 & IT Act 2000 Compliant"
+  }
+}
