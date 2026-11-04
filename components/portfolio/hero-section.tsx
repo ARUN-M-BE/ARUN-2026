@@ -10,6 +10,11 @@ import {
   ChevronRight,
   ChevronLeft,
   Sparkles,
+  Clock,
+  Layers,
+  Zap,
+  CheckCircle2,
+  Orbit,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -19,8 +24,9 @@ import { useLanguage } from "@/context/languageContext";
 const HeroCanvas = dynamic(() => import("@/components/3d/hero-canvas"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="w-10 h-10 rounded-full border-2 border-cyan-500/20 border-t-cyan-500 animate-spin" />
+    <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+      <div className="w-10 h-10 rounded-full border-2 border-sky-500/20 border-t-sky-500 animate-spin" />
+      <span className="text-xs font-mono text-muted-foreground">Initializing 3D Core...</span>
     </div>
   ),
 });
@@ -105,41 +111,44 @@ export function HeroSection({ profile }: HeroSectionProps) {
   };
 
   return (
-    <section id="hero" className="min-h-screen relative flex items-center justify-center pt-24 pb-16 overflow-hidden">
+    <section id="hero" className="min-h-[92vh] relative flex items-center justify-center pt-24 pb-16 sm:py-28 overflow-hidden">
       {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-sky-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-10 sm:gap-14 items-center relative z-10">
         {/* Left Column: Typography & CTAs */}
         <div className="lg:col-span-7 space-y-6 text-center lg:text-left rtl:lg:text-right">
           {/* Availability pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-xs font-mono text-cyan-600 dark:text-cyan-400 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/25 text-xs font-mono text-sky-600 dark:text-sky-400 shadow-xs">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500" />
+            </span>
             <span>{profile?.availability || t("hero.available", "Available for architectural advisory & engineering")}</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-foreground leading-[1.1]">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground leading-[1.1]">
             <span className="block">
               {profile?.fullName || "Arun M"}
             </span>
-            <span className="block text-2xl sm:text-3xl lg:text-4xl font-bold mt-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-cyan-400 to-violet-500">
+            <span className="block text-xl sm:text-3xl lg:text-4xl font-bold mt-2 text-gradient-brand">
               {profile?.title || t("hero.role", "Senior Full-Stack Architect & 3D Engineer")}
             </span>
           </h1>
 
-          <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
             {profile?.subtitle || t("hero.tagline", "Architecting resilient cloud platforms, distributed systems, and cinematic 3D digital experiences for high-growth enterprises.")}
           </p>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap items-center justify-center lg:justify-start rtl:lg:justify-end gap-4 pt-2">
+          <div className="flex flex-wrap items-center justify-center lg:justify-start rtl:lg:justify-end gap-3 sm:gap-4 pt-2">
             <a href="#projects">
               <Button
                 size="lg"
-                className="h-12 px-6 rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-400 hover:to-violet-500 text-white font-bold text-sm shadow-lg shadow-cyan-500/25 group transition-all"
+                className="h-11 sm:h-12 px-6 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs sm:text-sm shadow-md shadow-sky-500/20 group transition-all"
               >
-                <span>{t("hero.explore", "View projects")}</span>
+                <span>{t("hero.explore", "View Selected Works")}</span>
                 <ArrowRight className="w-4 h-4 ml-2 rtl:rotate-180 group-hover:translate-x-1 transition-transform" />
               </Button>
             </a>
@@ -148,10 +157,10 @@ export function HeroSection({ profile }: HeroSectionProps) {
               variant="outline"
               size="lg"
               onClick={startTour}
-              className="h-12 px-6 rounded-full border-border bg-secondary/80 hover:bg-secondary text-foreground text-sm font-semibold"
+              className="h-11 sm:h-12 px-6 rounded-full border-border bg-card/70 hover:bg-card text-foreground text-xs sm:text-sm font-semibold shadow-xs"
             >
-              <Compass className="w-4 h-4 mr-2 text-cyan-500" />
-              <span>{t("hero.guidedTour", "Guided Tour")}</span>
+              <Compass className="w-4 h-4 mr-2 text-sky-500" />
+              <span>{t("hero.guidedTour", "Interactive Tour")}</span>
             </Button>
 
             {profile?.resumeUrl && (
@@ -159,7 +168,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
                 <Button
                   variant="ghost"
                   size="lg"
-                  className="h-12 px-4 rounded-full text-muted-foreground hover:text-foreground text-sm font-medium"
+                  className="h-11 sm:h-12 px-4 rounded-full text-muted-foreground hover:text-foreground text-xs sm:text-sm font-medium"
                 >
                   <FileDown className="w-4 h-4 mr-1.5" />
                   <span>{t("hero.downloadResume", "Resume")}</span>
@@ -169,121 +178,101 @@ export function HeroSection({ profile }: HeroSectionProps) {
           </div>
 
           {/* Stat counters */}
-          <div className="grid grid-cols-3 gap-6 pt-8 border-t border-border max-w-lg mx-auto lg:mx-0">
-            <div>
-              <div className="text-2xl sm:text-3xl font-black font-mono text-foreground">
+          <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-border max-w-lg mx-auto lg:mx-0">
+            <div className="p-3 sm:p-4 rounded-2xl bg-card/50 border border-border/80">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                <Clock className="w-3.5 h-3.5 text-sky-500" />
+                <span>{t("hero.statYears", "Experience")}</span>
+              </div>
+              <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground">
                 {profile?.yearsOfExperience || 8}+
               </div>
-              <div className="text-xs text-muted-foreground mt-0.5">{t("hero.statYears", "Years Experience")}</div>
             </div>
-            <div>
-              <div className="text-2xl sm:text-3xl font-black font-mono text-cyan-500">
-                {profile?.projectsCompleted || 32}+
+
+            <div className="p-3 sm:p-4 rounded-2xl bg-card/50 border border-border/80">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                <Layers className="w-3.5 h-3.5 text-indigo-500" />
+                <span>{t("hero.statProjects", "Projects")}</span>
               </div>
-              <div className="text-xs text-muted-foreground mt-0.5">{t("hero.statProjects", "Projects Delivered")}</div>
+              <div className="text-xl sm:text-3xl font-extrabold font-mono text-sky-500">
+                {profile?.projectsCompleted || 35}+
+              </div>
             </div>
-            <div>
-              <div className="text-2xl sm:text-3xl font-black font-mono text-violet-500">
+
+            <div className="p-3 sm:p-4 rounded-2xl bg-card/50 border border-border/80">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                <Zap className="w-3.5 h-3.5 text-emerald-500" />
+                <span>{t("hero.statPerformance", "Vitals")}</span>
+              </div>
+              <div className="text-xl sm:text-3xl font-extrabold font-mono text-emerald-500">
                 100%
               </div>
-              <div className="text-xs text-muted-foreground mt-0.5">{t("hero.statPerformance", "Lighthouse Vitals")}</div>
             </div>
           </div>
         </div>
 
         {/* Right Column: 3D Identity Sculpture */}
-        <div className="lg:col-span-5 h-[420px] sm:h-[500px] lg:h-[550px] w-full relative">
-          <div className="w-full h-full glass-panel-glow rounded-3xl overflow-hidden relative border border-cyan-500/20 shadow-2xl">
+        <div className="lg:col-span-5 h-[340px] sm:h-[440px] lg:h-[520px] w-full relative">
+          <div className="w-full h-full glass-panel-glow rounded-3xl overflow-hidden relative border border-border shadow-xl">
             <HeroCanvas />
             {/* Interactive hint pill */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-background/80 backdrop-blur-md border border-border text-[11px] text-muted-foreground font-mono pointer-events-none">
-              {language === "ar" ? "اسحب • دوّر • استكشف" : "Drag • Orbit • Explore"}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-background/80 backdrop-blur-md border border-border text-[11px] text-muted-foreground font-mono pointer-events-none flex items-center gap-1.5 shadow-xs">
+              <Orbit className="w-3.5 h-3.5 text-sky-500 animate-spin" />
+              <span>{language === "ar" ? "اسحب • دوّر • استكشف" : "Drag • Orbit • Explore"}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Guided Tour Modal */}
+      {/* Guided Tour Dialog */}
       <Dialog open={isTourOpen} onOpenChange={setIsTourOpen}>
-        <DialogContent className="relative max-w-lg overflow-hidden rounded-3xl border-cyan-500/20 bg-card p-0 shadow-cyan-950/20">
-          <div aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-400 via-sky-500 to-violet-500" />
-          <div className="space-y-7 p-6 pt-8 sm:p-8">
-            <DialogHeader className="gap-5">
-              <Badge
-                variant="outline"
-                className="h-auto w-fit gap-2 rounded-full border-cyan-500/25 bg-cyan-500/10 px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-cyan-700 dark:text-cyan-300"
-              >
-                <Sparkles className="size-3" />
-                {language === "ar" ? "جولة استكشافية" : "PORTFOLIO GUIDED TOUR"}
+        <DialogContent className="max-w-md bg-card/95 border-border backdrop-blur-xl p-6 rounded-2xl">
+          <DialogHeader className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Badge variant="outline" className="text-xs font-mono border-sky-500/30 text-sky-500 bg-sky-500/10">
+                {language === "ar" ? `المحطة ${tourStep + 1} من ${tourSteps.length}` : `Orbit ${tourStep + 1} of ${tourSteps.length}`}
               </Badge>
+              <Sparkles className="w-4 h-4 text-sky-500" />
+            </div>
+            <DialogTitle className="text-lg font-bold text-foreground">
+              {tourSteps[tourStep].title}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground leading-relaxed pt-1">
+              {tourSteps[tourStep].desc}
+            </DialogDescription>
+          </DialogHeader>
 
-              <div className="space-y-3">
-                <DialogTitle aria-live="polite" className="text-xl font-bold leading-tight tracking-tight text-foreground sm:text-2xl">
-                  {tourSteps[tourStep].title}
-                </DialogTitle>
-                <DialogDescription className="max-w-md text-sm leading-7 text-muted-foreground">
-                  {tourSteps[tourStep].desc}
-                </DialogDescription>
-              </div>
-            </DialogHeader>
+          <div className="flex items-center justify-between pt-6 border-t border-border">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrevStep}
+              disabled={tourStep === 0}
+              className="text-xs h-9 rounded-xl"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1 rtl:rotate-180" />
+              <span>{language === "ar" ? "السابق" : "Previous"}</span>
+            </Button>
 
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between text-[11px] font-semibold">
-                <span className="text-muted-foreground">
-                  {language === "ar" ? "التقدم في الجولة" : "YOUR PROGRESS"}
-                </span>
-                <span className="font-mono text-cyan-700 dark:text-cyan-300">
-                  {String(tourStep + 1).padStart(2, "0")} / {String(tourSteps.length).padStart(2, "0")}
-                </span>
-              </div>
-              <div
-                role="progressbar"
-                aria-label={language === "ar" ? "التقدم في الجولة" : "Tour progress"}
-                aria-valuemin={1}
-                aria-valuemax={tourSteps.length}
-                aria-valuenow={tourStep + 1}
-                className="h-1.5 overflow-hidden rounded-full bg-muted"
-              >
+            <div className="flex items-center gap-1.5">
+              {tourSteps.map((_, i) => (
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 transition-[width] duration-500"
-                  style={{ width: `${((tourStep + 1) / tourSteps.length) * 100}%` }}
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all ${
+                    i === tourStep ? "w-6 bg-sky-500" : "w-1.5 bg-border"
+                  }`}
                 />
-              </div>
+              ))}
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-5">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handlePrevStep}
-                disabled={tourStep === 0}
-                className="h-10 rounded-full px-3 text-muted-foreground"
-              >
-                <ChevronLeft className="size-4 rtl:rotate-180" />
-                {language === "ar" ? "السابق" : "Previous"}
-              </Button>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsTourOpen(false)}
-                  className="h-10 rounded-full px-3 text-muted-foreground"
-                >
-                  {language === "ar" ? "تخطي" : "Skip tour"}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleNextStep}
-                  className="h-10 rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 px-4 font-semibold text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-violet-500"
-                >
-                  {tourStep === tourSteps.length - 1
-                    ? (language === "ar" ? "إنهاء الجولة" : "Complete tour")
-                    : (language === "ar" ? "القسم التالي" : "Next section")}
-                  <ChevronRight className="size-4 rtl:rotate-180" />
-                </Button>
-              </div>
-            </div>
+            <Button
+              size="sm"
+              onClick={handleNextStep}
+              className="text-xs h-9 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-semibold"
+            >
+              <span>{tourStep === tourSteps.length - 1 ? (language === "ar" ? "إنهاء الجولة" : "Done") : (language === "ar" ? "التالي" : "Next")}</span>
+              <ChevronRight className="w-4 h-4 ml-1 rtl:rotate-180" />
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

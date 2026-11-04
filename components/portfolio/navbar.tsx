@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CommandPalette } from "./command-palette";
 import {
-  Radio,
+  Sparkles,
   Menu,
   Volume2,
   VolumeX,
@@ -27,6 +27,14 @@ import {
   Moon,
   Languages,
   Settings2,
+  FolderGit2,
+  Cpu,
+  Activity,
+  Briefcase,
+  GraduationCap,
+  Mail,
+  Layers,
+  CircleDot,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 
@@ -40,9 +48,9 @@ export function PortfolioNavbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 30);
+      setScrolled(window.scrollY > 24);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -61,7 +69,7 @@ export function PortfolioNavbar() {
       osc.start();
       osc.stop(ctx.currentTime + duration);
     } catch {
-      // Audio autoplay policy
+      // Audio autoplay policy handled
     }
   };
 
@@ -105,53 +113,63 @@ export function PortfolioNavbar() {
   };
 
   const navLinks = [
-    { label: t("nav.universe", "Universe"), href: "#hero" },
-    { label: t("nav.projects", "Projects"), href: "#projects" },
-    { label: t("nav.skills", "Skills"), href: "#skills" },
-    { label: t("nav.experience", "Experience"), href: "#experience" },
-    { label: t("nav.credentials", "Credentials"), href: "#education" },
-    { label: t("nav.analytics", "Live Telemetry"), href: "#analytics" },
-    { label: t("nav.contact", "Contact"), href: "#contact" },
+    { label: t("nav.universe", "Universe"), href: "#hero", icon: Sparkles },
+    { label: t("nav.projects", "Projects"), href: "#projects", icon: FolderGit2 },
+    { label: t("nav.skills", "Skills"), href: "#skills", icon: Cpu },
+    { label: t("nav.experience", "Experience"), href: "#experience", icon: Briefcase },
+    { label: t("nav.credentials", "Credentials"), href: "#education", icon: GraduationCap },
+    { label: t("nav.analytics", "Live Telemetry"), href: "#analytics", icon: Activity },
+    { label: t("nav.contact", "Contact"), href: "#contact", icon: Mail },
   ];
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 sm:px-8 py-3.5 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 ${
         scrolled
-          ? "glass-panel border-b border-border shadow-lg"
+          ? "glass-panel border-b border-border shadow-md"
           : "bg-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Brand with live status badge */}
-        <div className="flex items-center gap-4">
-          <a href="#hero" onClick={() => playChime(780)} className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-violet-600 flex items-center justify-center text-black font-bold shadow-md shadow-cyan-500/20 group-hover:scale-105 transition-transform">
-              <Radio className="w-4 h-4 text-white" />
+        <div className="flex items-center gap-3 sm:gap-4">
+          <a
+            href="#hero"
+            onClick={() => playChime(780)}
+            className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
+          >
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
+              <Layers className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </div>
             <div>
-              <span className="font-bold tracking-tight text-foreground text-sm">ARUN M</span>
-              <span className="block text-[10px] text-cyan-500 font-mono tracking-widest uppercase">
+              <span className="font-extrabold tracking-tight text-foreground text-sm sm:text-base">ARUN M</span>
+              <span className="block text-[10px] text-sky-600 dark:text-sky-400 font-mono tracking-wider uppercase font-semibold">
                 {language === "ar" ? "معمار برمجيات 3D" : "3D Architect"}
               </span>
             </div>
           </a>
 
-          <div className="hidden xl:flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+          <div className="hidden xl:inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
             <span>{t("nav.statusOnline", "Cluster Active")} • 60 FPS</span>
           </div>
         </div>
 
         {/* Desktop Nav Links */}
-        <nav className="hidden lg:flex items-center gap-1 p-1 rounded-full bg-secondary/80 border border-border/80 backdrop-blur-md">
+        <nav
+          aria-label={language === "ar" ? "التنقل الرئيسي" : "Main navigation"}
+          className="hidden lg:flex items-center gap-0.5 p-1 rounded-full bg-secondary/80 border border-border backdrop-blur-md"
+        >
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onMouseEnter={() => playChime(440, 0.08)}
               onClick={() => playChime(880, 0.12)}
-              className="px-3.5 py-1.5 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-background/80 transition-all"
+              className="px-3.5 py-1.5 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-background/90 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               {link.label}
             </a>
@@ -159,10 +177,11 @@ export function PortfolioNavbar() {
         </nav>
 
         {/* Right Action Cluster */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Command Palette */}
           <CommandPalette />
 
+          {/* Preferences Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -170,124 +189,160 @@ export function PortfolioNavbar() {
                 size="icon"
                 aria-label={language === "ar" ? "إعدادات الموقع" : "Site preferences"}
                 title={language === "ar" ? "إعدادات الموقع" : "Site preferences"}
-                className="size-9 rounded-xl border-border/80 bg-background/70 shadow-sm"
+                className="size-9 sm:size-10 rounded-xl border-border bg-card/60 shadow-xs hover:border-primary/40 hover:bg-primary/5"
               >
-                <Settings2 className="size-4 text-primary" />
+                <Settings2 className="size-4 text-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-60">
+            <DropdownMenuContent align="end" className="w-64 p-2 bg-card/95 border-border backdrop-blur-xl shadow-xl">
               <DropdownMenuLabel className="px-2.5 py-2">
-                <span className="block text-xs font-semibold text-foreground">
-                  {language === "ar" ? "تفضيلات الموقع" : "Site preferences"}
+                <span className="block text-xs font-bold text-foreground">
+                  {language === "ar" ? "تفضيلات العرض" : "Experience Controls"}
                 </span>
                 <span className="mt-0.5 block text-[11px] font-normal text-muted-foreground">
-                  {language === "ar" ? "خصص طريقة استكشافك" : "Make this space yours"}
+                  {language === "ar" ? "تخصيص الواجهة والسمات الصوتية" : "Customize theme, audio & locale"}
                 </span>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => { playChime(600, 0.1); toggleLanguage(); }}>
-                <Languages className="text-cyan-600 dark:text-cyan-300" />
-                <span>{language === "en" ? "Switch to Arabic" : "التبديل إلى الإنجليزية"}</span>
+              <DropdownMenuItem
+                className="gap-2.5 text-xs py-2.5 cursor-pointer"
+                onSelect={() => { playChime(600, 0.1); toggleLanguage(); }}
+              >
+                <Languages className="size-4 text-sky-500" />
+                <span>{language === "en" ? "Switch to Arabic (العربية)" : "التبديل إلى الإنجليزية"}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => { playChime(700, 0.1); setTheme(theme === "dark" ? "light" : "dark"); }}>
+              <DropdownMenuItem
+                className="gap-2.5 text-xs py-2.5 cursor-pointer"
+                onSelect={() => { playChime(700, 0.1); setTheme(theme === "dark" ? "light" : "dark"); }}
+              >
                 {theme === "dark"
-                  ? <Sun className="text-amber-500" />
-                  : <Moon className="text-violet-500" />}
-                <span>{language === "ar"
-                  ? (theme === "dark" ? "التبديل إلى المظهر الفاتح" : "التبديل إلى المظهر الداكن")
-                  : (theme === "dark" ? "Switch to light appearance" : "Switch to dark appearance")}</span>
+                  ? <Sun className="size-4 text-amber-500" />
+                  : <Moon className="size-4 text-indigo-500" />}
+                <span>
+                  {language === "ar"
+                    ? (theme === "dark" ? "المظهر الفاتح" : "المظهر الداكن")
+                    : (theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode")}
+                </span>
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={toggleFullscreen}>
-                {isFullscreen ? <Minimize2 /> : <Maximize2 />}
-                <span>{language === "ar"
-                  ? (isFullscreen ? "إنهاء العرض الغامر" : "تفعيل العرض الغامر")
-                  : (isFullscreen ? "Exit immersive view" : "Enter immersive view")}</span>
+              <DropdownMenuItem
+                className="gap-2.5 text-xs py-2.5 cursor-pointer"
+                onSelect={toggleFullscreen}
+              >
+                {isFullscreen ? <Minimize2 className="size-4 text-sky-500" /> : <Maximize2 className="size-4 text-sky-500" />}
+                <span>
+                  {language === "ar"
+                    ? (isFullscreen ? "إنهاء العرض الغامر" : "شاشة كاملة غامرة")
+                    : (isFullscreen ? "Exit Immersive View" : "Fullscreen Immersive")}
+                </span>
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={toggleSound}>
+              <DropdownMenuItem
+                className="gap-2.5 text-xs py-2.5 cursor-pointer"
+                onSelect={toggleSound}
+              >
                 {soundEnabled
-                  ? <Volume2 className="text-cyan-600 dark:text-cyan-300" />
-                  : <VolumeX />}
-                <span>{language === "ar"
-                  ? (soundEnabled ? "إيقاف الأجواء الصوتية" : "تشغيل الأجواء الصوتية")
-                  : (soundEnabled ? "Turn ambience off" : "Turn ambience on")}</span>
+                  ? <Volume2 className="size-4 text-emerald-500" />
+                  : <VolumeX className="size-4 text-muted-foreground" />}
+                <span>
+                  {language === "ar"
+                    ? (soundEnabled ? "إيقاف الأجواء الصوتية" : "تشغيل الأجواء الصوتية")
+                    : (soundEnabled ? "Disable Audio Ambience" : "Enable Audio Ambience")}
+                </span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Admin link */}
+          {/* Admin CMS Portal Shortcut */}
           <Button
             asChild
             variant="outline"
             size="sm"
-            className="hidden h-9 rounded-xl border-border/80 bg-background/70 px-3 text-xs text-foreground shadow-sm transition-all hover:border-primary/40 hover:bg-primary/10 sm:inline-flex"
+            className="hidden sm:inline-flex h-9 sm:h-10 rounded-xl border-border bg-card/60 px-3.5 text-xs font-semibold text-foreground shadow-xs hover:border-primary/40 hover:bg-primary/5"
           >
             <Link href="/admin">
-              <Shield className="w-3.5 h-3.5 mr-1 text-cyan-500" />
+              <Shield className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
               <span>{t("nav.admin", "CMS Portal")}</span>
             </Link>
           </Button>
 
-          {/* Mobile hamburger menu */}
+          {/* Mobile Sheet Menu */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden text-foreground">
-                <Menu className="w-5 h-5" />
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Open navigation menu"
+                className="lg:hidden size-9 sm:size-10 rounded-xl text-foreground hover:bg-secondary"
+              >
+                <Menu className="size-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[min(20rem,85vw)] border-border bg-background/95 text-foreground backdrop-blur-2xl">
-              <div className="mt-8 flex flex-col gap-6">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-violet-600 flex items-center justify-center text-white font-bold">
-                    <Radio className="w-4 h-4" />
+            <SheetContent side="right" className="w-[min(22rem,85vw)] border-border bg-card/95 text-foreground backdrop-blur-2xl p-6 flex flex-col justify-between">
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 pb-4 border-b border-border">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-md shadow-sky-500/20">
+                    <Layers className="w-4.5 h-4.5" />
                   </div>
-                  <span className="font-bold tracking-tight text-foreground text-sm">DEV.PORTFOLIO</span>
+                  <div>
+                    <span className="font-extrabold tracking-tight text-foreground text-base">ARUN M</span>
+                    <span className="block text-[10px] text-sky-500 font-mono tracking-wider uppercase font-semibold">
+                      {language === "ar" ? "معمار برمجيات 3D" : "3D Architect"}
+                    </span>
+                  </div>
                 </div>
 
-                <nav aria-label={language === "ar" ? "التنقل الرئيسي" : "Main navigation"} className="space-y-1">
-                  {navLinks.map((link) => (
-                    <SheetClose asChild key={link.href}>
-                      <a
-                        href={link.href}
-                        className="block rounded-xl px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      >
-                        {link.label}
-                      </a>
-                    </SheetClose>
-                  ))}
+                <nav aria-label={language === "ar" ? "التنقل الرئيسي المحمول" : "Mobile navigation"} className="space-y-1">
+                  {navLinks.map((link) => {
+                    const Icon = link.icon;
+                    return (
+                      <SheetClose asChild key={link.href}>
+                        <a
+                          href={link.href}
+                          className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                        >
+                          <Icon className="size-4 text-sky-500 shrink-0" />
+                          <span>{link.label}</span>
+                        </a>
+                      </SheetClose>
+                    );
+                  })}
                 </nav>
+              </div>
 
-                <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
+              <div className="space-y-3 pt-6 border-t border-border">
+                <div className="grid grid-cols-2 gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      toggleLanguage();
-                    }}
-                    className="h-10 rounded-xl px-3 text-xs"
+                    onClick={toggleLanguage}
+                    className="h-11 rounded-xl text-xs gap-1.5 justify-center"
                   >
-                    <Languages className="size-4 text-cyan-600 dark:text-cyan-300" />
+                    <Languages className="size-4 text-sky-500" />
                     <span>{language === "en" ? "العربية" : "English"}</span>
                   </Button>
 
                   <Button
                     variant="outline"
-                    size="icon"
+                    size="sm"
                     aria-label="Toggle color theme"
                     onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                    className="size-10 rounded-xl"
+                    className="h-11 rounded-xl text-xs gap-1.5 justify-center"
                   >
-                    {theme === "dark" ? <Sun className="size-4 text-amber-500" /> : <Moon className="size-4 text-violet-500" />}
+                    {theme === "dark" ? <Sun className="size-4 text-amber-500" /> : <Moon className="size-4 text-indigo-500" />}
+                    <span>{theme === "dark" ? "Light" : "Dark"}</span>
                   </Button>
                 </div>
 
-                <div className="border-t border-border pt-3">
-                  <Button asChild variant="outline" className="h-11 w-full justify-between rounded-xl border-primary/20 bg-primary/5 text-primary hover:bg-primary/10">
+                <SheetClose asChild>
+                  <Button asChild variant="default" className="h-11 w-full justify-between rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs shadow-md shadow-sky-500/20">
                     <Link href="/admin">
-                      <span>{t("nav.admin", "Admin CMS Login")}</span>
+                      <span className="flex items-center gap-2">
+                        <Shield className="size-4" />
+                        {t("nav.admin", "Admin CMS Portal")}
+                      </span>
                       <ArrowUpRight className="size-4" />
                     </Link>
                   </Button>
-                </div>
+                </SheetClose>
               </div>
             </SheetContent>
           </Sheet>

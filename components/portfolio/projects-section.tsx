@@ -16,6 +16,7 @@ import {
   Eye,
   GitCompare,
   Check,
+  Sparkles,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 
@@ -23,7 +24,7 @@ interface ProjectsSectionProps {
   projects: any[];
 }
 
-export function ProjectsSection({ projects }: ProjectsSectionProps) {
+export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
   const { t, language } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [search, setSearch] = useState("");
@@ -33,15 +34,15 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
 
-  // Extract unique categories
-  const categories = ["All", ...Array.from(new Set(projects.map((p) => p.category).filter(Boolean)))];
+  // Extract unique categories safely
+  const categories = ["All", ...Array.from(new Set((projects || []).map((p) => p.category).filter(Boolean)))];
 
-  const filtered = projects.filter((p) => {
+  const filtered = (projects || []).filter((p) => {
     const matchesCat = selectedCategory === "All" || p.category === selectedCategory;
     const matchesSearch =
       p.title.toLowerCase().includes(search.toLowerCase()) ||
       (p.shortDescription && p.shortDescription.toLowerCase().includes(search.toLowerCase())) ||
-      (p.techStack && (p.techStack as string[]).some((t) => t.toLowerCase().includes(search.toLowerCase())));
+      (p.techStack && (p.techStack as string[]).some((tech) => tech.toLowerCase().includes(search.toLowerCase())));
     return matchesCat && matchesSearch;
   });
 
@@ -58,34 +59,34 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
     }
   };
 
-  const comparedProjects = projects.filter((p) => compareIds.includes(p.id));
+  const comparedProjects = (projects || []).filter((p) => compareIds.includes(p.id));
 
   return (
-    <section id="projects" className="py-24 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+    <section id="projects" className="py-20 sm:py-28 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-xs font-mono text-cyan-600 dark:text-cyan-400">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/25 text-xs font-mono text-sky-600 dark:text-sky-400">
               <FolderGit2 className="w-3.5 h-3.5" />
-              <span>{t("projects.badge", "Selected works")}</span>
+              <span>{t("projects.badge", "Selected Works")}</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
               {t("projects.title", "Featured Projects & Case Studies")}
             </h2>
-            <p className="text-sm text-muted-foreground max-w-xl">
+            <p className="text-xs sm:text-sm text-muted-foreground max-w-xl">
               {t("projects.subtitle", "Discover enterprise architectures, open-source utilities, and 3D web applications.")}
             </p>
           </div>
 
           {/* Search & Compare Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             {compareIds.length > 0 && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setIsCompareOpen(true)}
-                className="border-violet-500/40 text-violet-600 dark:text-violet-400 bg-violet-500/10 hover:bg-violet-500/20 text-xs rounded-full font-mono"
+                className="border-indigo-500/40 text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 text-xs rounded-xl font-mono h-10 px-3.5"
               >
                 <GitCompare className="w-3.5 h-3.5 mr-1.5" />
                 <span>{t("projects.compareButton", "Compare Architecture")} ({compareIds.length}/2)</span>
@@ -93,12 +94,12 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
             )}
 
             <div className="relative w-full sm:w-64">
-              <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder={t("projects.searchPlaceholder", "Search projects or technologies...")}
-                className="pl-9 bg-card border-border text-xs rounded-full text-foreground"
+                placeholder={t("projects.searchPlaceholder", "Search projects or stacks...")}
+                className="pl-9 h-10 bg-card border-border text-xs rounded-xl text-foreground"
               />
             </div>
           </div>
@@ -114,10 +115,10 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
               variant={selectedCategory === cat ? "default" : "outline"}
               aria-pressed={selectedCategory === cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`h-9 rounded-full px-4 text-xs font-medium transition-all ${
+              className={`h-9 rounded-xl px-4 text-xs font-medium transition-all ${
                 selectedCategory === cat
-                  ? "bg-gradient-to-r from-cyan-500 to-violet-600 font-semibold text-white shadow-md shadow-cyan-500/15 hover:from-cyan-400 hover:to-violet-500"
-                  : "bg-secondary/60 text-muted-foreground"
+                  ? "bg-gradient-to-r from-sky-500 to-indigo-600 font-semibold text-white shadow-md shadow-sky-500/15 hover:from-sky-400 hover:to-indigo-500"
+                  : "bg-secondary/60 text-muted-foreground hover:text-foreground"
               }`}
             >
               {cat === "All" ? t("projects.allCategories", "All Disciplines") : cat}
@@ -144,20 +145,20 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                 <TiltCard
                   key={project.id}
                   maxTilt={8}
-                  className="rounded-3xl glass-panel hover:border-cyan-500/40 transition-colors flex flex-col justify-between overflow-hidden relative cursor-pointer border border-border"
+                  className="rounded-3xl glass-panel hover:border-sky-500/40 transition-colors flex flex-col justify-between overflow-hidden relative cursor-pointer border border-border shadow-xs"
                   onClick={() => setActiveProject(project)}
                 >
                   {/* Visual Thumbnail */}
                   <div className="aspect-[16/10] bg-muted relative overflow-hidden flex items-center justify-center">
-                    {project.thumbnail ? (
+                    {project.thumbnailUrl ? (
                       <img
-                        src={project.thumbnail}
+                        src={project.thumbnailUrl}
                         alt={project.title}
                         className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-tr from-cyan-950/20 via-violet-950/20 to-background flex items-center justify-center">
-                        <FolderGit2 className="w-10 h-10 text-cyan-500/50" />
+                      <div className="w-full h-full bg-gradient-to-tr from-sky-500/10 via-indigo-500/10 to-card flex items-center justify-center">
+                        <FolderGit2 className="w-12 h-12 text-sky-500/40" />
                       </div>
                     )}
 
@@ -178,12 +179,12 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                       onClick={(e) => toggleCompare(project.id, e)}
                       className={`absolute bottom-3 right-3 h-8 rounded-xl px-2.5 text-[10px] font-mono backdrop-blur-md transition-all ${
                         isSelectedForCompare
-                          ? "border-violet-400 bg-violet-600 font-bold text-white hover:bg-violet-500"
-                          : "border-border bg-background/85 text-foreground hover:bg-background"
+                          ? "border-indigo-400 bg-indigo-600 font-bold text-white hover:bg-indigo-500"
+                          : "border-border bg-card/85 text-foreground hover:bg-card"
                       }`}
                       title="Compare with another architecture"
                     >
-                      {isSelectedForCompare ? <Check className="w-3 h-3" /> : <GitCompare className="w-3 h-3" />}
+                      {isSelectedForCompare ? <Check className="w-3 h-3 mr-1" /> : <GitCompare className="w-3 h-3 mr-1" />}
                       Compare
                     </Button>
                   </div>
@@ -192,7 +193,7 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                   <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono text-cyan-600 dark:text-cyan-400 uppercase tracking-wider font-semibold">
+                        <span className="text-[10px] font-mono text-sky-600 dark:text-sky-400 uppercase tracking-wider font-semibold">
                           {project.category || "Full-Stack"}
                         </span>
                         {project.client && (
@@ -201,7 +202,7 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                           </span>
                         )}
                       </div>
-                      <h3 className="text-lg font-bold text-foreground group-hover:text-cyan-500 transition-colors">
+                      <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-sky-500 transition-colors">
                         {project.title}
                       </h3>
                       <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
@@ -228,9 +229,9 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
 
                     {/* Actions Bar */}
                     <div className="pt-4 border-t border-border flex items-center justify-between">
-                      <span className="text-xs text-cyan-600 dark:text-cyan-400 flex items-center gap-1 font-semibold">
+                      <span className="text-xs text-sky-600 dark:text-sky-400 flex items-center gap-1 font-semibold">
                         <Eye className="w-3.5 h-3.5" />
-                        {t("projects.caseStudy", "Deep Dive Case Study")}
+                        {t("projects.caseStudy", "Case Study")}
                       </span>
 
                       <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
@@ -253,7 +254,7 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                             rel="noopener noreferrer"
                             title="Live Demo"
                           >
-                            <Button size="icon" className="h-8 w-8 rounded-full bg-cyan-500 hover:bg-cyan-400 text-white">
+                            <Button size="icon" className="h-8 w-8 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white shadow-xs">
                               <ExternalLink className="w-3.5 h-3.5" />
                             </Button>
                           </a>
@@ -270,31 +271,34 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
 
       {/* Case Study Detail Modal */}
       <Dialog open={!!activeProject} onOpenChange={(open) => !open && setActiveProject(null)}>
-        <DialogContent className="bg-card border-border max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="bg-card/95 border-border backdrop-blur-xl max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl p-6">
           {activeProject && (
             <div className="space-y-6">
-              <DialogHeader>
-                <div className="flex items-center gap-2 text-xs font-mono text-cyan-600 dark:text-cyan-400">
-                  <span>{activeProject.category || "CASE STUDY"}</span>
+              <DialogHeader className="space-y-2">
+                <div className="flex items-center gap-2 text-xs font-mono text-sky-600 dark:text-sky-400">
+                  <Badge variant="outline" className="text-[10px] border-sky-500/30 text-sky-500 bg-sky-500/10">
+                    {activeProject.category || "CASE STUDY"}
+                  </Badge>
                   {activeProject.client && <span>• Client: {activeProject.client}</span>}
                 </div>
-                <DialogTitle className="text-xl font-bold text-foreground mt-1">
+                <DialogTitle className="text-lg sm:text-xl font-bold text-foreground">
                   {activeProject.title}
                 </DialogTitle>
-                <DialogDescription className="text-xs text-muted-foreground">
+                <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
                   {activeProject.shortDescription}
                 </DialogDescription>
               </DialogHeader>
 
-              {activeProject.thumbnail && (
+              {activeProject.thumbnailUrl && (
                 <div className="aspect-video rounded-2xl overflow-hidden border border-border">
-                  <img src={activeProject.thumbnail} alt={activeProject.title} className="w-full h-full object-cover" />
+                  <img src={activeProject.thumbnailUrl} alt={activeProject.title} className="w-full h-full object-cover" />
                 </div>
               )}
 
               <div className="space-y-3">
-                <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
-                  Architecture Decisions & Deliverables
+                <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-sky-500" />
+                  Architecture Overview & Highlights
                 </h4>
                 <div className="p-4 rounded-2xl bg-secondary/60 border border-border text-xs text-foreground/90 leading-relaxed whitespace-pre-wrap">
                   {activeProject.description || "Detailed case study description."}
@@ -302,12 +306,13 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
               </div>
 
               <div className="space-y-2">
-                <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
                   Complete Tech Stack
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {((activeProject.techStack as string[]) || []).map((tech: string) => (
-                    <Badge key={tech} className="bg-secondary border border-border text-cyan-600 dark:text-cyan-400 text-xs font-mono">
+                    <Badge key={tech} className="bg-secondary border border-border text-foreground text-xs font-mono">
                       {tech}
                     </Badge>
                   ))}
@@ -315,10 +320,10 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
               </div>
 
               <div className="flex items-center justify-between pt-4 border-t border-border">
-                <div className="flex gap-3">
+                <div className="flex gap-2.5">
                   {activeProject.liveUrl && (
                     <a href={activeProject.liveUrl} target="_blank" rel="noopener noreferrer">
-                      <Button size="sm" className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold text-xs">
+                      <Button size="sm" className="h-9 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs shadow-xs">
                         <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
                         {t("projects.liveDemo", "Live Production")}
                       </Button>
@@ -326,14 +331,14 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                   )}
                   {activeProject.githubUrl && (
                     <a href={activeProject.githubUrl} target="_blank" rel="noopener noreferrer">
-                      <Button variant="outline" size="sm" className="text-xs border-border">
+                      <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl text-xs border-border">
                         <Code2 className="w-3.5 h-3.5 mr-1.5" />
                         {t("projects.viewCode", "Source Code")}
                       </Button>
                     </a>
                   )}
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => setActiveProject(null)} className="text-xs">
+                <Button variant="ghost" size="sm" onClick={() => setActiveProject(null)} className="h-9 rounded-xl text-xs">
                   {t("projects.closeModal", "Close")}
                 </Button>
               </div>
@@ -344,10 +349,10 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
 
       {/* Project Comparison Modal */}
       <Dialog open={isCompareOpen} onOpenChange={setIsCompareOpen}>
-        <DialogContent className="bg-card border-border max-w-4xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="bg-card/95 border-border backdrop-blur-xl max-w-4xl max-h-[85vh] overflow-y-auto rounded-2xl p-6">
           <DialogHeader>
             <DialogTitle className="text-foreground flex items-center gap-2">
-              <GitCompare className="w-5 h-5 text-violet-500" />
+              <GitCompare className="w-5 h-5 text-indigo-500" />
               {t("projects.compareButton", "Architecture Comparison Matrix")}
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
@@ -360,35 +365,35 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
               Please select at least 2 projects using the &quot;Compare&quot; button on project cards.
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-6 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
               {comparedProjects.slice(0, 2).map((p) => (
                 <div key={p.id} className="p-5 rounded-2xl bg-secondary/60 border border-border space-y-4">
                   <div>
-                    <span className="text-[10px] font-mono text-cyan-600 dark:text-cyan-400 uppercase">{p.category}</span>
+                    <span className="text-[10px] font-mono text-sky-600 dark:text-sky-400 uppercase font-semibold">{p.category}</span>
                     <h3 className="font-bold text-sm text-foreground mt-0.5">{p.title}</h3>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{p.shortDescription}</p>
                   </div>
 
                   <div className="space-y-1.5 pt-3 border-t border-border/50 text-xs">
                     <span className="text-muted-foreground font-semibold block">Client / Domain:</span>
-                    <span className="text-foreground">{p.client || "Open-Source"}</span>
+                    <span className="text-foreground">{p.client || "Enterprise"}</span>
                   </div>
 
                   <div className="space-y-1.5 pt-3 border-t border-border/50 text-xs">
                     <span className="text-muted-foreground font-semibold block">Tech Stack:</span>
                     <div className="flex flex-wrap gap-1">
-                      {((p.techStack as string[]) || []).map((t: string) => (
-                        <span key={t} className="px-2 py-0.5 rounded text-[10px] bg-card text-foreground font-mono border border-border">
-                          {t}
+                      {((p.techStack as string[]) || []).map((tech: string) => (
+                        <span key={tech} className="px-2 py-0.5 rounded text-[10px] bg-card text-foreground font-mono border border-border">
+                          {tech}
                         </span>
                       ))}
                     </div>
                   </div>
 
                   <div className="space-y-1.5 pt-3 border-t border-border/50 text-xs">
-                    <span className="text-muted-foreground font-semibold block">Deployment URL:</span>
+                    <span className="text-muted-foreground font-semibold block">Production URL:</span>
                     {p.liveUrl ? (
-                      <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1 font-mono text-[11px]">
+                      <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 font-mono text-[11px]">
                         {p.liveUrl} <ExternalLink className="w-3 h-3" />
                       </a>
                     ) : (
