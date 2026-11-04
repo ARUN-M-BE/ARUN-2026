@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+const authSecret =
+  process.env.AUTH_SECRET ||
+  process.env.NEXTAUTH_SECRET ||
+  "dev-secret-change-in-production-openssl-rand-base64-32";
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -18,7 +23,7 @@ export async function proxy(request: NextRequest) {
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
     const token = await getToken({
       req: request,
-      secret: process.env.AUTH_SECRET,
+      secret: authSecret,
     });
 
     if (!token) {
@@ -52,4 +57,3 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
-
