@@ -1,19 +1,29 @@
 import * as React from "react";
-
 import { cn } from "@/lib/utils";
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
-  return (
-    <input
-      type={type}
-      data-slot="input"
-      className={cn(
-        "w-full min-w-0 h-12 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring   disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive   md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
+export interface InputProps extends React.ComponentProps<"input"> {}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        ref={ref}
+        data-slot="input"
+        className={cn(
+          "flex h-10 w-full min-w-0 rounded-lg border border-input/80 bg-background/60 px-3.5 py-2 text-base shadow-sm backdrop-blur-sm transition-all duration-200 outline-none",
+          "placeholder:text-muted-foreground/70",
+          "focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 focus-visible:ring-offset-background",
+          "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted/30",
+          "aria-invalid:border-destructive aria-invalid:ring-destructive/30",
+          "md:text-sm dark:bg-input/20",
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+);
+Input.displayName = "Input";
 
 export { Input };
