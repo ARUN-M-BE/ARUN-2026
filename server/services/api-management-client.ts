@@ -17,7 +17,7 @@ export class ApiManagementClient {
   private timeoutMs: number;
 
   constructor(config?: Partial<ApiClientConfig>) {
-    this.baseUrl = (config?.baseUrl || process.env.API_MANAGEMENT_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.arun-m.in").replace(/\/$/, "");
+    this.baseUrl = (config?.baseUrl || process.env.NEXT_PUBLIC_API_URL || "https://api.arun-m.in").replace(/\/$/, "");
     this.apiKey = config?.apiKey || process.env.API_MANAGEMENT_KEY || null;
     this.timeoutMs = config?.timeoutMs || 8000;
   }
@@ -36,9 +36,6 @@ export class ApiManagementClient {
     return headers;
   }
 
-  /**
-   * Health & connectivity ping to https://api.arun-m.in
-   */
   async checkHealth(): Promise<{ isOnline: boolean; latencyMs: number; statusCode?: number; error?: string }> {
     const start = Date.now();
     try {
