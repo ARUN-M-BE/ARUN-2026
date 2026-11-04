@@ -21,7 +21,7 @@ import {
   Scale,
   Image,
   History,
-  Radio,
+  Layers,
   Share2,
   Server,
 } from "lucide-react";
@@ -74,12 +74,12 @@ export function AdminSidebar() {
     <aside className="sticky top-0 flex h-screen w-16 shrink-0 flex-col border-r border-border/70 bg-sidebar/90 backdrop-blur-xl lg:w-64">
       {/* Brand */}
       <div className="flex h-16 items-center justify-center gap-3 border-b border-border/60 px-2 lg:justify-start lg:px-5">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-500 to-violet-600 text-white shadow-lg shadow-cyan-500/15">
-          <Radio className="size-4 text-white" />
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/15">
+          <Layers className="size-4 text-white" />
         </div>
         <div className="hidden min-w-0 lg:block">
-          <span className="block truncate text-sm font-bold tracking-tight text-foreground">DEV PORTFOLIO</span>
-          <span className="block text-[10px] text-cyan-400 font-mono tracking-wider">3D ENGINE CMS</span>
+          <span className="block truncate text-sm font-extrabold tracking-tight text-foreground">ARUN M</span>
+          <span className="block text-[10px] text-sky-500 font-mono tracking-wider font-semibold">CMS NEXUS</span>
         </div>
       </div>
 

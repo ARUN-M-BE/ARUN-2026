@@ -1,29 +1,29 @@
 "use client";
 
-import { MessageSquareQuote, Star, CheckCircle2 } from "lucide-react";
+import { MessageSquareQuote, Star, CheckCircle2, Quote } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 
 interface TestimonialsSectionProps {
   testimonials: any[];
 }
 
-export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) {
+export function TestimonialsSection({ testimonials = [] }: TestimonialsSectionProps) {
   const { t } = useLanguage();
-  if (testimonials.length === 0) return null;
+  if (!testimonials || testimonials.length === 0) return null;
 
   return (
-    <section id="testimonials" className="py-24 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+    <section id="testimonials" className="py-20 sm:py-28 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-xs font-mono text-indigo-600 dark:text-indigo-400">
+        <div className="text-center max-w-2xl mx-auto mb-14 sm:mb-18 space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-xs font-mono text-indigo-600 dark:text-indigo-400">
             <MessageSquareQuote className="w-3.5 h-3.5" />
-            <span>{t("testimonials.badge", "VERIFIED RECOMMENDATIONS")}</span>
+            <span>{t("testimonials.badge", "Verified Recommendations")}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
             {t("testimonials.title", "Client & Peer Testimonials")}
           </h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
             {t("testimonials.subtitle", "Verifiable feedback from engineering managers, CTOs, and collaborative partners.")}
           </p>
         </div>
@@ -33,14 +33,17 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
           {testimonials.map((item) => (
             <div
               key={item.id}
-              className="glass-panel rounded-3xl p-8 flex flex-col justify-between space-y-6 hover:border-indigo-500/40 transition-all border border-border"
+              className="glass-panel rounded-3xl p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-indigo-500/40 transition-all border border-border shadow-xs relative"
             >
               <div className="space-y-4">
-                {/* Rating stars */}
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: item.rating || 5 }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  ))}
+                <div className="flex items-center justify-between">
+                  {/* Rating stars */}
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: item.rating || 5 }).map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+                  <Quote className="w-6 h-6 text-muted-foreground/30" />
                 </div>
 
                 <p className="text-xs sm:text-sm text-foreground/85 italic leading-relaxed">
@@ -50,7 +53,7 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
 
               <div className="pt-4 border-t border-border flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-xs text-foreground flex items-center gap-1.5">
+                  <div className="font-bold text-xs sm:text-sm text-foreground flex items-center gap-1.5">
                     {item.name}
                     {item.isVerified && (
                       <span title="Verified Client Claim">
@@ -58,7 +61,7 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-muted-foreground">
+                  <div className="text-[11px] text-muted-foreground mt-0.5">
                     {item.title} {item.company && `• ${item.company}`}
                   </div>
                 </div>

@@ -76,7 +76,7 @@ export function AboutSection({ profile }: AboutSectionProps) {
               <p>
                 {language === "ar"
                   ? "ترتكز فلسفتي على دقة الصنعة البرمجية: تصميم مخططات قواعد بيانات متينة، كتابة شفرة آمنة من الأخطاء من خلال TypeScript، وبناء واجهات سلسة تحترم تجربة المستخدم واستهلاك البطارية."
-                  : "My philosophy centers on uncompromising software craftsmanship: clean relational schemas, type-level invariants, modular component trees, and cinematic motion design that delights users while respecting accessibility standards and battery life.")}
+                  : "My philosophy centers on uncompromising software craftsmanship: clean relational schemas, type-level invariants, modular component trees, and cinematic motion design that delights users while respecting accessibility standards and battery life."}
               </p>
             </div>
 

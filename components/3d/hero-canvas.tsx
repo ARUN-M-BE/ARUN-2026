@@ -53,31 +53,31 @@ function InteractiveSculpture({
 
   return (
     <group onClick={onClick}>
-      {/* Outer Cyan Gyroscope Ring */}
+      {/* Outer Sky Gyroscope Ring */}
       <mesh ref={outerRingRef}>
         <torusGeometry args={[2.5, 0.02, 16, 120]} />
-        <meshBasicMaterial color="#06b6d4" wireframe transparent opacity={0.35} />
+        <meshBasicMaterial color="#38bdf8" wireframe transparent opacity={0.35} />
       </mesh>
 
-      {/* Secondary Violet Orbital Ring */}
+      {/* Secondary Indigo Orbital Ring */}
       <mesh ref={secondaryRingRef}>
         <torusGeometry args={[2.8, 0.015, 16, 120]} />
-        <meshBasicMaterial color="#8b5cf6" wireframe transparent opacity={0.3} />
+        <meshBasicMaterial color="#818cf8" wireframe transparent opacity={0.3} />
       </mesh>
 
       {/* Orbiting Tech Satellites */}
       <group ref={satelliteGroupRef}>
         <mesh position={[2.6, 0, 0]}>
           <octahedronGeometry args={[0.12, 0]} />
-          <meshBasicMaterial color="#06b6d4" />
+          <meshBasicMaterial color="#38bdf8" />
         </mesh>
         <mesh position={[-2.6, 0, 0]}>
           <octahedronGeometry args={[0.12, 0]} />
-          <meshBasicMaterial color="#8b5cf6" />
+          <meshBasicMaterial color="#818cf8" />
         </mesh>
         <mesh position={[0, 2.6, 0]}>
           <dodecahedronGeometry args={[0.1, 0]} />
-          <meshBasicMaterial color="#f59e0b" />
+          <meshBasicMaterial color="#38bdf8" />
         </mesh>
       </group>
 
@@ -86,8 +86,8 @@ function InteractiveSculpture({
         <mesh ref={meshRef}>
           <icosahedronGeometry args={[1.35, 1]} />
           <MeshDistortMaterial
-            color="#080a18"
-            emissive="#06b6d4"
+            color="#0c101c"
+            emissive="#38bdf8"
             emissiveIntensity={isPulsing ? 1.2 : 0.4}
             roughness={0.08}
             metalness={0.92}
@@ -99,13 +99,13 @@ function InteractiveSculpture({
         {/* Inner Pulsing Crystal */}
         <mesh ref={innerCoreRef}>
           <octahedronGeometry args={[0.8, 0]} />
-          <meshBasicMaterial color="#8b5cf6" wireframe transparent opacity={0.6} />
+          <meshBasicMaterial color="#818cf8" wireframe transparent opacity={0.6} />
         </mesh>
 
         {/* Outer Geometric Wireframe Cage */}
         <mesh ref={wireframeRef}>
           <icosahedronGeometry args={[1.75, 1]} />
-          <meshBasicMaterial color="#06b6d4" wireframe transparent opacity={0.45} />
+          <meshBasicMaterial color="#38bdf8" wireframe transparent opacity={0.45} />
         </mesh>
       </Float>
     </group>
@@ -113,50 +113,50 @@ function InteractiveSculpture({
 }
 
 // ─── Dual Cosmic Particles Field ───────────────────────────
-function CosmicParticles({ count = 220 }: { count?: number }) {
-  const [cyanPoints, violetPoints] = useMemo(() => {
-    const cCoords = new Float32Array((count / 2) * 3);
-    const vCoords = new Float32Array((count / 2) * 3);
+function CosmicParticles({ count = 200 }: { count?: number }) {
+  const [skyPoints, indigoPoints] = useMemo(() => {
+    const sCoords = new Float32Array((count / 2) * 3);
+    const iCoords = new Float32Array((count / 2) * 3);
     for (let i = 0; i < count / 2; i++) {
-      cCoords[i * 3] = (Math.random() - 0.5) * 18;
-      cCoords[i * 3 + 1] = (Math.random() - 0.5) * 18;
-      cCoords[i * 3 + 2] = (Math.random() - 0.5) * 18;
+      sCoords[i * 3] = (Math.random() - 0.5) * 18;
+      sCoords[i * 3 + 1] = (Math.random() - 0.5) * 18;
+      sCoords[i * 3 + 2] = (Math.random() - 0.5) * 18;
 
-      vCoords[i * 3] = (Math.random() - 0.5) * 18;
-      vCoords[i * 3 + 1] = (Math.random() - 0.5) * 18;
-      vCoords[i * 3 + 2] = (Math.random() - 0.5) * 18;
+      iCoords[i * 3] = (Math.random() - 0.5) * 18;
+      iCoords[i * 3 + 1] = (Math.random() - 0.5) * 18;
+      iCoords[i * 3 + 2] = (Math.random() - 0.5) * 18;
     }
-    return [cCoords, vCoords];
+    return [sCoords, iCoords];
   }, [count]);
 
-  const cyanRef = useRef<THREE.Points>(null!);
-  const violetRef = useRef<THREE.Points>(null!);
+  const skyRef = useRef<THREE.Points>(null!);
+  const indigoRef = useRef<THREE.Points>(null!);
 
   useFrame((state, delta) => {
-    if (cyanRef.current) {
-      cyanRef.current.rotation.y += delta * 0.025;
-      cyanRef.current.rotation.x -= delta * 0.01;
+    if (skyRef.current) {
+      skyRef.current.rotation.y += delta * 0.025;
+      skyRef.current.rotation.x -= delta * 0.01;
     }
-    if (violetRef.current) {
-      violetRef.current.rotation.y += delta * 0.02;
-      violetRef.current.rotation.z += delta * 0.015;
+    if (indigoRef.current) {
+      indigoRef.current.rotation.y += delta * 0.02;
+      indigoRef.current.rotation.z += delta * 0.015;
     }
   });
 
   return (
     <>
-      <points ref={cyanRef}>
+      <points ref={skyRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[cyanPoints, 3]} />
+          <bufferAttribute attach="attributes-position" args={[skyPoints, 3]} />
         </bufferGeometry>
-        <pointsMaterial size={0.038} color="#06b6d4" transparent opacity={0.65} sizeAttenuation />
+        <pointsMaterial size={0.038} color="#38bdf8" transparent opacity={0.65} sizeAttenuation />
       </points>
 
-      <points ref={violetRef}>
+      <points ref={indigoRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[violetPoints, 3]} />
+          <bufferAttribute attach="attributes-position" args={[indigoPoints, 3]} />
         </bufferGeometry>
-        <pointsMaterial size={0.032} color="#8b5cf6" transparent opacity={0.55} sizeAttenuation />
+        <pointsMaterial size={0.032} color="#818cf8" transparent opacity={0.55} sizeAttenuation />
       </points>
     </>
   );
@@ -166,10 +166,10 @@ function CosmicParticles({ count = 220 }: { count?: number }) {
 function FallbackSculpture() {
   return (
     <div className="w-full h-full flex items-center justify-center relative">
-      <div className="w-64 h-64 rounded-full bg-gradient-to-tr from-cyan-500/20 via-violet-500/20 to-transparent blur-2xl animate-pulse" />
-      <div className="absolute w-52 h-52 rounded-2xl border-2 border-cyan-400/40 bg-card/40 backdrop-blur-xl rotate-12 flex items-center justify-center shadow-2xl shadow-cyan-500/20">
-        <div className="w-36 h-36 rounded-xl border border-violet-400/50 -rotate-6 flex items-center justify-center bg-cyan-950/30">
-          <div className="w-20 h-20 rounded-lg bg-cyan-400/20 border border-cyan-400 flex items-center justify-center text-cyan-300 font-mono text-xs">
+      <div className="w-64 h-64 rounded-full bg-gradient-to-tr from-sky-500/15 via-indigo-500/15 to-transparent blur-2xl animate-pulse" />
+      <div className="absolute w-48 h-48 rounded-2xl border border-sky-400/30 bg-card/60 backdrop-blur-xl rotate-12 flex items-center justify-center shadow-xl">
+        <div className="w-32 h-32 rounded-xl border border-indigo-400/40 -rotate-6 flex items-center justify-center bg-sky-950/20">
+          <div className="w-18 h-18 rounded-lg bg-sky-400/20 border border-sky-400 flex items-center justify-center text-sky-400 font-mono text-xs font-bold">
             3D ENGINE
           </div>
         </div>
@@ -195,7 +195,7 @@ export default function HeroCanvas() {
       mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
@@ -215,13 +215,13 @@ export default function HeroCanvas() {
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       >
         <ambientLight intensity={0.7} />
-        <directionalLight position={[10, 10, 5]} intensity={1.8} color="#06b6d4" />
-        <directionalLight position={[-10, -10, -5]} intensity={1.2} color="#8b5cf6" />
-        <pointLight position={[0, 0, 2.5]} intensity={2.2} color="#06b6d4" />
-        <pointLight position={[0, -2, -1]} intensity={1.0} color="#f59e0b" />
+        <directionalLight position={[10, 10, 5]} intensity={1.8} color="#38bdf8" />
+        <directionalLight position={[-10, -10, -5]} intensity={1.2} color="#818cf8" />
+        <pointLight position={[0, 0, 2.5]} intensity={2.2} color="#38bdf8" />
+        <pointLight position={[0, -2, -1]} intensity={1.0} color="#6366f1" />
 
         <InteractiveSculpture mouse={mouse} isPulsing={isPulsing} onClick={handleClick} />
-        <CosmicParticles count={200} />
+        <CosmicParticles count={180} />
       </Canvas>
     </div>
   );
