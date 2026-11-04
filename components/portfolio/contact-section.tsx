@@ -95,7 +95,7 @@ export function ContactSection({ profile, socialLinks }: ContactSectionProps) {
             <div className="space-y-3 pt-4 border-t border-border text-xs">
               <div className="flex items-center gap-3 text-foreground/90">
                 <Mail className="w-4 h-4 text-cyan-500 shrink-0" />
-                <span>{profile?.email || "architect@developer-portfolio.com"}</span>
+                <span>{profile?.email || "arun@arun-m.in"}</span>
               </div>
               <div className="flex items-center gap-3 text-foreground/90">
                 <MapPin className="w-4 h-4 text-violet-500 shrink-0" />

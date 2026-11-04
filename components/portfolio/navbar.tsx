@@ -130,9 +130,9 @@ export function PortfolioNavbar() {
               <Radio className="w-4 h-4 text-white" />
             </div>
             <div>
-              <span className="font-bold tracking-tight text-foreground text-sm">DEV.PORTFOLIO</span>
+              <span className="font-bold tracking-tight text-foreground text-sm">ARUN M</span>
               <span className="block text-[10px] text-cyan-500 font-mono tracking-widest uppercase">
-                {language === "ar" ? "محرك 3D" : "3D Engine"}
+                {language === "ar" ? "معمار برمجيات 3D" : "3D Architect"}
               </span>
             </div>
           </a>

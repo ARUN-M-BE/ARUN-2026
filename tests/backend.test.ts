@@ -3,10 +3,11 @@
  * Follows the backend-development and testing-qa skill standards.
  */
 
-import { hashPassword, verifyPassword, slugify, sanitizeHtml, formatApiResponse } from "../server/utils";
-import { contactFormSchema, projectSchema, skillSchema } from "../server/validators";
-import { rateLimiter } from "../server/middleware/rate-limit";
-import { db } from "../server/config/database";
+import { hashPassword, verifyPassword, slugify, sanitizeHtml, formatApiResponse } from "../src/utils";
+import { contactFormSchema, projectSchema, skillSchema } from "../src/validators";
+import { rateLimiter } from "../src/middleware/rate-limit";
+import { db } from "../src/config/database";
+import { ProfileRepository, ProjectRepository, SkillRepository } from "../src/repositories";
 import { sql } from "drizzle-orm";
 
 async function runTestSuite() {
@@ -85,6 +86,15 @@ async function runTestSuite() {
     console.warn(`  ! Database unreachable in this environment: ${err.message}`);
   }
 
+  // 7. Database Resilience & Graceful Fallback Integrity
+  console.log("\n[7] Testing Database Resilience & Graceful Fallback");
+  const fallbackProf = await ProfileRepository.getPublished();
+  assert(fallbackProf !== null && fallbackProf.fullName === "Arun M", "ProfileRepository returns Arun M resiliently");
+  const fallbackProjs = await ProjectRepository.findPublished();
+  assert(Array.isArray(fallbackProjs) && fallbackProjs.length > 0, `ProjectRepository returns ${fallbackProjs.length} published projects`);
+  const fallbackCats = await SkillRepository.getPublishedCategoriesWithSkills();
+  assert(Array.isArray(fallbackCats) && fallbackCats.length > 0, `SkillRepository returns ${fallbackCats.length} skill clusters with children`);
+
   console.log(`\n=== TEST RESULTS: ${passed} PASSED, ${failed} FAILED ===`);
   if (failed > 0) {
     process.exit(1);
@@ -95,4 +105,3 @@ runTestSuite().catch((err) => {
   console.error("Test suite runtime failure:", err);
   process.exit(1);
 });
-

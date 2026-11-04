@@ -86,6 +86,15 @@ async function runTestSuite() {
     console.warn(`  ! Database unreachable in this environment: ${err.message}`);
   }
 
+  // 7. Database Resilience & Graceful Fallback Integrity
+  console.log("\n[7] Testing Database Resilience & Graceful Fallback");
+  const fallbackProf = await ProfileRepository.getPublished();
+  assert(fallbackProf !== null && fallbackProf.fullName === "Arun M", "ProfileRepository returns Arun M resiliently");
+  const fallbackProjs = await ProjectRepository.findPublished();
+  assert(Array.isArray(fallbackProjs) && fallbackProjs.length > 0, `ProjectRepository returns ${fallbackProjs.length} published projects`);
+  const fallbackCats = await SkillRepository.getPublishedCategoriesWithSkills();
+  assert(Array.isArray(fallbackCats) && fallbackCats.length > 0, `SkillRepository returns ${fallbackCats.length} skill clusters with children`);
+
   console.log(`\n=== TEST RESULTS: ${passed} PASSED, ${failed} FAILED ===`);
   if (failed > 0) {
     process.exit(1);

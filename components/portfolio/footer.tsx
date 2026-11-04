@@ -25,7 +25,7 @@ export function PortfolioFooter() {
                 <Radio className="w-3.5 h-3.5 text-white" />
               </div>
               <div>
-                <span className="font-bold tracking-tight text-foreground text-sm">DEV PORTFOLIO</span>
+                <span className="font-bold tracking-tight text-foreground text-sm">ARUN M</span>
                 <Badge variant="outline" className="ml-2 h-5 rounded-full border-primary/20 bg-primary/5 px-2 text-[9px] font-mono text-primary">ONLINE</Badge>
               </div>
             </div>
@@ -77,7 +77,7 @@ export function PortfolioFooter() {
         {/* Bottom Attribution */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-border text-[11px] text-muted-foreground">
           <div>
-            © {new Date().getFullYear()} Developer Portfolio. {language === "ar" ? "جميع الحقوق محفوظة." : "All Rights Reserved."}
+            © {new Date().getFullYear()} Arun M. {language === "ar" ? "جميع الحقوق محفوظة." : "All Rights Reserved."}
           </div>
           <div className="font-mono text-cyan-600 dark:text-cyan-400">
             {language === "ar" ? "نظام موزع • 60 FPS • محمي بالكامل" : "DISTRIBUTED SYSTEM • 60 FPS • SECURE"}
