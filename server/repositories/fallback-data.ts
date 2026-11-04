@@ -248,3 +248,4 @@ export const fallbackSocialLinks = [
   { id: "soc-linkedin", platform: "LinkedIn", url: "https://linkedin.com", icon: "linkedin", status: "published", sortOrder: 2 },
   { id: "soc-twitter", platform: "Twitter/X", url: "https://x.com", icon: "twitter", status: "published", sortOrder: 3 },
 ];
+

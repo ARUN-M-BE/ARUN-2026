@@ -24,3 +24,4 @@ version: 2.0.0
 - Tri-color neon accents (Cyan `#06b6d4`, Violet `#8b5cf6`, Amber `#f59e0b`).
 - Clean theme transitions with zero flash of unstyled content (FOUC).
 - Semantic colors for status badges: Emerald for online/success, Amber for warning, Rose for destructive.
+

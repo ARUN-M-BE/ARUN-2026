@@ -14,3 +14,4 @@ version: 1.0.0
 - Use bcrypt with work factor >= 12.
 - Protect administrative routes with cryptographic JWT / NextAuth session validation.
 - Audit log all mutation events with timestamp, user ID, IP address, and entity ID.
+

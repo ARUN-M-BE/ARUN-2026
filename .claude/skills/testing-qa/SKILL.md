@@ -14,3 +14,4 @@ version: 1.0.0
 ## 2. Type Checking & Build Verification
 - Zero TypeScript warnings or `any` compromises (`tsc --noEmit`).
 - Production build passes with zero fatal webpack/turbopack panics.
+

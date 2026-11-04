@@ -14,3 +14,4 @@ version: 1.0.0
 - Foreign keys with cascading rules (`onDelete: "cascade"`).
 - B-Tree indexes on high-frequency lookup fields (`slug`, `status`, `sortOrder`, `createdAt`).
 - Immutable audit trails for all mutating operations.
+

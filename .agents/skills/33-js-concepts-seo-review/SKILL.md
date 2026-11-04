@@ -20,3 +20,4 @@ version: 1.0.0
   - LCP < 1.2s: Preload critical assets, dynamically import heavy 3D canvases.
   - CLS < 0.05: Explicit aspect ratios and skeleton containers for all dynamic cards and canvases.
   - INP < 100ms: Debounce inputs and offload heavy computation.
+

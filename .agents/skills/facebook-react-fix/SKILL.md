@@ -27,3 +27,4 @@ version: 1.0.0
 ## 4. Key Management & Reconciliation
 - Never use array indices as React keys on reorderable lists; use stable unique IDs (`item.id`).
 - Ensure consistent fragment structures across conditional branches.
+
