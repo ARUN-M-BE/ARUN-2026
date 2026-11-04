@@ -1,19 +1,15 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
 import {
   Activity,
   Zap,
-  Server,
   Globe2,
   Cpu,
-  Database,
-  ArrowUpRight,
   ShieldCheck,
   Radio,
   Clock,
-  Flame,
+  ArrowUpRight,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 
@@ -21,10 +17,9 @@ export function RealtimeTelemetry() {
   const { t, language } = useLanguage();
 
   // Simulated live ticking metrics
-  const [streamTicks, setStreamTicks] = useState(0);
+  const [, setStreamTicks] = useState(0);
   const [requestsPerMin, setRequestsPerMin] = useState(1640);
   const [latency, setLatency] = useState(18);
-  const [cacheHitRate, setCacheHitRate] = useState(99.4);
   const [activeSessions, setActiveSessions] = useState(48);
 
   // Time-series waveform data
@@ -87,124 +82,112 @@ export function RealtimeTelemetry() {
   ];
 
   return (
-    <section id="analytics" className="relative py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="analytics" className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
       {/* Background glow elements */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header */}
-      <div className="text-center max-w-3xl mx-auto mb-14">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-xs font-mono uppercase tracking-wider mb-4 shadow-sm">
+      <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-18">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-sky-500/25 bg-sky-500/10 text-sky-600 dark:text-sky-400 text-xs font-mono uppercase tracking-wider mb-4 shadow-xs">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500" />
           </span>
-          {t("analytics.badge", "System Telemetry")}
+          <span>{t("analytics.badge", "System Telemetry")}</span>
         </div>
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-foreground">
-          {t("analytics.title", "Real-Time Public Analytics & Observability")}
+        <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
+          {t("analytics.title", "Real-Time Telemetry & Observability")}
         </h2>
-        <p className="mt-4 text-base sm:text-lg text-muted-foreground">
+        <p className="mt-3 text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto">
           {t("analytics.subtitle", "Live telemetry streaming from production nodes, visitor metrics, and performance vitals.")}
         </p>
       </div>
 
       {/* Main Grid Telemetry Container */}
-      <div className="glass-panel rounded-2xl p-6 sm:p-8 border border-border dark:border-cyan-500/20 shadow-xl space-y-8">
+      <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-border shadow-xl space-y-8">
         
         {/* Top Metric Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {/* Requests */}
-          <div className="p-4 sm:p-5 rounded-xl bg-background/60 border border-border/80 dark:border-white/5 relative overflow-hidden group">
+          <div className="p-4 sm:p-5 rounded-2xl bg-card/60 border border-border relative overflow-hidden group">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
-              <span className="text-xs font-mono uppercase">{t("analytics.liveRequests", "Live Requests / Min")}</span>
-              <Activity className="w-4 h-4 text-cyan-500 animate-pulse" />
+              <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.liveRequests", "Ingress / Min")}</span>
+              <Activity className="w-4 h-4 text-sky-500 animate-pulse" />
             </div>
-            <div className="text-2xl sm:text-3xl font-black font-mono text-foreground flex items-baseline gap-2">
+            <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground flex items-baseline gap-2">
               {requestsPerMin.toLocaleString()}
-              <span className="text-xs font-normal text-emerald-500 flex items-center">
-                ↑ 4.2%
-              </span>
+              <span className="text-xs font-semibold text-emerald-500">↑ 4.2%</span>
             </div>
-            <p className="text-[11px] text-muted-foreground mt-1">
-              {t("analytics.refreshInterval", "Live 2-second heartbeat")}
+            <p className="text-[10px] text-muted-foreground mt-1">
+              {t("analytics.refreshInterval", "2s streaming heartbeat")}
             </p>
           </div>
 
           {/* Latency */}
-          <div className="p-4 sm:p-5 rounded-xl bg-background/60 border border-border/80 dark:border-white/5 relative overflow-hidden group">
+          <div className="p-4 sm:p-5 rounded-2xl bg-card/60 border border-border relative overflow-hidden group">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
-              <span className="text-xs font-mono uppercase">{t("analytics.avgLatency", "Edge Latency")}</span>
+              <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.avgLatency", "Edge Latency")}</span>
               <Zap className="w-4 h-4 text-amber-500" />
             </div>
-            <div className="text-2xl sm:text-3xl font-black font-mono text-foreground flex items-baseline gap-2">
+            <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground flex items-baseline gap-1.5">
               {latency}
-              <span className="text-sm font-normal text-muted-foreground">ms</span>
-              <span className="text-xs font-normal text-emerald-500">Sub-30ms</span>
+              <span className="text-xs font-normal text-muted-foreground font-sans">ms</span>
+              <span className="text-xs font-semibold text-emerald-500 ml-1">Sub-30ms</span>
             </div>
-            <p className="text-[11px] text-muted-foreground mt-1">Ashburn / Frankfurt / Mumbai</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Multi-region edge mesh</p>
           </div>
 
           {/* Active Sessions */}
-          <div className="p-4 sm:p-5 rounded-xl bg-background/60 border border-border/80 dark:border-white/5 relative overflow-hidden group">
+          <div className="p-4 sm:p-5 rounded-2xl bg-card/60 border border-border relative overflow-hidden group">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
-              <span className="text-xs font-mono uppercase">{t("analytics.activeSessions", "Active Global Sessions")}</span>
-              <Globe2 className="w-4 h-4 text-violet-500" />
+              <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.activeSessions", "Active Sessions")}</span>
+              <Globe2 className="w-4 h-4 text-indigo-500" />
             </div>
-            <div className="text-2xl sm:text-3xl font-black font-mono text-foreground flex items-baseline gap-2">
+            <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground flex items-baseline gap-2">
               {activeSessions}
-              <span className="text-xs font-normal text-cyan-500 flex items-center">
-                ● Live
-              </span>
+              <span className="text-xs font-semibold text-sky-500">● Live</span>
             </div>
-            <p className="text-[11px] text-muted-foreground mt-1">Distributed across 14 countries</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Distributed across 14 nodes</p>
           </div>
 
           {/* Uptime */}
-          <div className="p-4 sm:p-5 rounded-xl bg-background/60 border border-border/80 dark:border-white/5 relative overflow-hidden group">
+          <div className="p-4 sm:p-5 rounded-2xl bg-card/60 border border-border relative overflow-hidden group">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
-              <span className="text-xs font-mono uppercase">{t("analytics.uptime", "System Uptime")}</span>
+              <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.uptime", "Uptime SLA")}</span>
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
             </div>
-            <div className="text-2xl sm:text-3xl font-black font-mono text-emerald-500 flex items-baseline gap-2">
+            <div className="text-xl sm:text-3xl font-extrabold font-mono text-emerald-500 flex items-baseline gap-2">
               99.98%
               <span className="text-xs font-normal text-muted-foreground">SLA</span>
             </div>
-            <p className="text-[11px] text-muted-foreground mt-1">Zero downtime continuous deployment</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Zero-downtime rolling deploys</p>
           </div>
         </div>
 
         {/* Real-time Waveform Chart */}
-        <div className="p-5 sm:p-6 rounded-xl bg-background/40 border border-border/80 dark:border-white/5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <div className="p-5 sm:p-6 rounded-2xl bg-card/40 border border-border">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
-              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                <Radio className="w-4 h-4 text-cyan-500 animate-pulse" />
-                {t("analytics.trafficChart", "Real-Time Throughput (Requests/sec)")}
+              <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                <Activity className="w-4 h-4 text-sky-500" />
+                {t("analytics.trafficChart", "Live Traffic Waveform (Req / sec)")}
               </h3>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Streaming live ingress payload samples across global CDN edge nodes
+                Streaming ingress samples across cloud edge endpoints
               </p>
             </div>
             <div className="flex items-center gap-3 text-xs font-mono">
-              <span className="flex items-center gap-1.5 text-cyan-600 dark:text-cyan-400">
-                <span className="w-2 h-2 rounded-full bg-cyan-500" /> Live Ingress
+              <span className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400">
+                <span className="w-2 h-2 rounded-full bg-sky-500" /> Live Ingress
               </span>
               <span className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="w-2 h-2 rounded-full bg-violet-500" /> 99.4% Cache Hit
+                <span className="w-2 h-2 rounded-full bg-indigo-500" /> 99.4% Cache Hit
               </span>
             </div>
           </div>
 
           {/* Live SVG Graph */}
-          <div className="relative h-44 w-full overflow-hidden rounded-lg bg-background/30 p-2 border border-border/40">
-            {/* Grid lines */}
-            <div className="absolute inset-0 grid grid-rows-4 w-full h-full pointer-events-none opacity-20">
-              <div className="border-b border-cyan-500/30 w-full" />
-              <div className="border-b border-cyan-500/30 w-full" />
-              <div className="border-b border-cyan-500/30 w-full" />
-              <div className="border-b border-cyan-500/30 w-full" />
-            </div>
-
+          <div className="relative h-40 sm:h-44 w-full overflow-hidden rounded-xl bg-card/60 p-2 border border-border">
             <svg
               className="w-full h-full overflow-visible"
               viewBox="0 0 800 180"
@@ -212,8 +195,8 @@ export function RealtimeTelemetry() {
             >
               <defs>
                 <linearGradient id="telemetryGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#00f0ff" stopOpacity="0.35" />
-                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.0" />
+                  <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0.0" />
                 </linearGradient>
               </defs>
 
@@ -226,22 +209,12 @@ export function RealtimeTelemetry() {
               {/* Glowing stroke */}
               <polyline
                 fill="none"
-                stroke="#00f0ff"
+                stroke="#38bdf8"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 points={svgPoints}
               />
-
-              {/* Pulsing end point */}
-              {history.length > 0 && (
-                <circle
-                  cx={800}
-                  cy={180 - ((history[history.length - 1] - 20) / (110 - 20)) * 150 - 15}
-                  r="5"
-                  className="fill-cyan-400 animate-ping"
-                />
-              )}
             </svg>
           </div>
         </div>
@@ -249,25 +222,25 @@ export function RealtimeTelemetry() {
         {/* Global Edge Nodes & Core Web Vitals Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Edge Latency Table */}
-          <div className="p-5 rounded-xl bg-background/40 border border-border/80 dark:border-white/5 space-y-4">
+          <div className="p-5 rounded-2xl bg-card/40 border border-border space-y-4">
             <h4 className="text-sm font-bold text-foreground flex items-center justify-between">
               <span className="flex items-center gap-2">
-                <Globe2 className="w-4 h-4 text-cyan-500" />
+                <Globe2 className="w-4 h-4 text-sky-500" />
                 {t("analytics.globalPings", "Global Edge Node Latency")}
               </span>
-              <span className="text-xs font-mono text-emerald-500">All Clusters Green</span>
+              <span className="text-xs font-mono text-emerald-500 font-semibold">All Clusters Optimal</span>
             </h4>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {edgeNodes.map((node, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between p-2.5 rounded-lg bg-background/60 border border-border/50 text-xs"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-card/70 border border-border text-xs"
                 >
                   <span className="font-medium text-foreground">{node.city}</span>
                   <div className="flex items-center gap-3">
                     <span className="font-mono text-muted-foreground">{node.ping} ms</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold">
                       {node.status}
                     </span>
                   </div>
@@ -277,37 +250,37 @@ export function RealtimeTelemetry() {
           </div>
 
           {/* Architecture Vitals */}
-          <div className="p-5 rounded-xl bg-background/40 border border-border/80 dark:border-white/5 space-y-4">
+          <div className="p-5 rounded-2xl bg-card/40 border border-border space-y-4">
             <h4 className="text-sm font-bold text-foreground flex items-center justify-between">
               <span className="flex items-center gap-2">
-                <Cpu className="w-4 h-4 text-violet-500" />
+                <Cpu className="w-4 h-4 text-indigo-500" />
                 {t("analytics.coreWebVitals", "Core Web Vitals Telemetry")}
               </span>
-              <span className="text-xs font-mono text-cyan-500">100 / 100 Audit</span>
+              <span className="text-xs font-mono text-sky-600 dark:text-sky-400 font-semibold">100/100 Lighthouse</span>
             </h4>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg bg-background/60 border border-border/50">
+              <div className="p-3 rounded-xl bg-card/70 border border-border">
                 <div className="text-[11px] text-muted-foreground font-mono">LCP (Largest Paint)</div>
-                <div className="text-lg font-black font-mono text-emerald-500 mt-1">0.78s</div>
+                <div className="text-base sm:text-lg font-bold font-mono text-emerald-500 mt-1">0.78s</div>
                 <div className="text-[10px] text-muted-foreground">Target: ≤ 2.5s (Good)</div>
               </div>
 
-              <div className="p-3 rounded-lg bg-background/60 border border-border/50">
+              <div className="p-3 rounded-xl bg-card/70 border border-border">
                 <div className="text-[11px] text-muted-foreground font-mono">INP (Interaction)</div>
-                <div className="text-lg font-black font-mono text-emerald-500 mt-1">36ms</div>
+                <div className="text-base sm:text-lg font-bold font-mono text-emerald-500 mt-1">36ms</div>
                 <div className="text-[10px] text-muted-foreground">Target: ≤ 200ms (Good)</div>
               </div>
 
-              <div className="p-3 rounded-lg bg-background/60 border border-border/50">
+              <div className="p-3 rounded-xl bg-card/70 border border-border">
                 <div className="text-[11px] text-muted-foreground font-mono">CLS (Layout Shift)</div>
-                <div className="text-lg font-black font-mono text-emerald-500 mt-1">0.002</div>
+                <div className="text-base sm:text-lg font-bold font-mono text-emerald-500 mt-1">0.002</div>
                 <div className="text-[10px] text-muted-foreground">Target: ≤ 0.1 (Good)</div>
               </div>
 
-              <div className="p-3 rounded-lg bg-background/60 border border-border/50">
+              <div className="p-3 rounded-xl bg-card/70 border border-border">
                 <div className="text-[11px] text-muted-foreground font-mono">Cache Hit Ratio</div>
-                <div className="text-lg font-black font-mono text-cyan-500 mt-1">99.4%</div>
+                <div className="text-base sm:text-lg font-bold font-mono text-sky-500 mt-1">99.4%</div>
                 <div className="text-[10px] text-muted-foreground">Edge CDN Stored</div>
               </div>
             </div>
@@ -318,4 +291,3 @@ export function RealtimeTelemetry() {
     </section>
   );
 }
-

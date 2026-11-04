@@ -60,10 +60,10 @@ export function CookieConsent() {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
-      <div className="glass-panel rounded-2xl p-5 shadow-2xl border border-cyan-500/30 space-y-4 text-xs">
+      <div className="glass-panel rounded-2xl p-5 shadow-2xl border border-sky-500/20 space-y-4 text-xs">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-500 border border-cyan-500/30 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-sky-500/15 text-sky-500 border border-sky-500/25 flex items-center justify-center">
               <Cookie className="w-4 h-4" />
             </div>
             <h4 className="font-bold text-foreground text-sm">
@@ -124,7 +124,7 @@ export function CookieConsent() {
             <Button
               size="sm"
               onClick={handleSaveCustom}
-              className="w-full bg-cyan-500 hover:bg-cyan-400 text-white font-semibold text-xs h-8"
+              className="w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs h-9 rounded-xl"
             >
               {language === "ar" ? "حفظ التفضيلات" : "Save My Preferences"}
             </Button>
@@ -133,7 +133,7 @@ export function CookieConsent() {
               <Button
                 size="sm"
                 onClick={handleAcceptAll}
-                className="w-full sm:w-auto flex-1 bg-cyan-500 hover:bg-cyan-400 text-white font-semibold text-xs h-8"
+                className="w-full sm:w-auto flex-1 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs h-9 rounded-xl shadow-xs"
               >
                 {language === "ar" ? "قبول الكل" : "Accept All"}
               </Button>
@@ -141,7 +141,7 @@ export function CookieConsent() {
                 variant="outline"
                 size="sm"
                 onClick={handleAcceptEssential}
-                className="w-full sm:w-auto text-xs h-8 border-border text-foreground"
+                className="w-full sm:w-auto text-xs h-9 rounded-xl border-border text-foreground hover:bg-secondary"
               >
                 {language === "ar" ? "رفض الاختيارية" : "Reject Optional"}
               </Button>
@@ -149,20 +149,20 @@ export function CookieConsent() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowPreferences(true)}
-                className="text-xs h-8 text-cyan-500 hover:text-cyan-600 dark:hover:text-cyan-400"
+                className="text-xs h-9 rounded-xl text-sky-500 hover:text-sky-600 dark:hover:text-sky-400"
               >
-                <Settings2 className="w-3.5 h-3.5" />
+                <Settings2 className="w-4 h-4" />
               </Button>
             </>
           )}
         </div>
 
         <div className="text-[10px] text-muted-foreground text-center pt-1 border-t border-border">
-          <Link href="/legal/cookie-policy" className="text-cyan-500 hover:underline">
+          <Link href="/legal/cookie-policy" className="text-sky-500 hover:underline">
             {language === "ar" ? "سياسة ملفات الارتباط" : "Cookie Policy"}
           </Link>{" "}
           &{" "}
-          <Link href="/legal/privacy-policy" className="text-cyan-500 hover:underline">
+          <Link href="/legal/privacy-policy" className="text-sky-500 hover:underline">
             {language === "ar" ? "سياسة الخصوصية" : "Privacy Policy"}
           </Link>
           .

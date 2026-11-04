@@ -40,7 +40,7 @@ export function MouseGlow() {
           translateX: "-50%",
           translateY: "-50%",
         }}
-        className="h-[480px] w-[480px] rounded-full bg-gradient-to-r from-cyan-500/10 via-violet-500/10 to-transparent blur-3xl"
+        className="h-[480px] w-[480px] rounded-full bg-gradient-to-r from-sky-500/8 via-indigo-500/8 to-transparent blur-3xl pointer-events-none"
       />
     </div>
   );

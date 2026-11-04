@@ -20,3 +20,4 @@ version: 1.0.0
 - Minimum tap target size: 44x44px for buttons, navigation links, and dropdown toggles on mobile touch devices.
 - Adequate line-height (`leading-relaxed` / `leading-normal`) and readable font sizes (minimum 14px for body text on mobile).
 - Responsive navigation: Drawer/Sheet for mobile viewports, seamless horizontal navbar for desktop.
+

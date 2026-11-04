@@ -16,6 +16,8 @@ import {
   CheckCircle2,
   MapPin,
   Clock,
+  MessageSquare,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -26,7 +28,7 @@ interface ContactSectionProps {
   socialLinks: any[];
 }
 
-export function ContactSection({ profile, socialLinks }: ContactSectionProps) {
+export function ContactSection({ profile, socialLinks = [] }: ContactSectionProps) {
   const { t, language } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -70,38 +72,38 @@ export function ContactSection({ profile, socialLinks }: ContactSectionProps) {
   };
 
   return (
-    <section id="contact" className="py-24 relative overflow-hidden">
+    <section id="contact" className="py-20 sm:py-28 relative overflow-hidden">
       {/* Background glow */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-sky-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 sm:gap-14 items-start">
           {/* Left Column: Direct Info */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-xs font-mono text-cyan-600 dark:text-cyan-400">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/25 text-xs font-mono text-sky-600 dark:text-sky-400">
               <Mail className="w-3.5 h-3.5" />
-              <span>{t("contact.badge", "Get in touch")}</span>
+              <span>{t("contact.badge", "Get In Touch")}</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
               {t("contact.title", "Let's Build Something Exceptional")}
             </h2>
 
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
               {t("contact.subtitle", "Reach out for architectural consulting, enterprise contract development, or full-time roles.")}
             </p>
 
             {/* Quick Contact Info */}
             <div className="space-y-3 pt-4 border-t border-border text-xs">
-              <div className="flex items-center gap-3 text-foreground/90">
-                <Mail className="w-4 h-4 text-cyan-500 shrink-0" />
-                <span>{profile?.email || "arun@arun-m.in"}</span>
+              <div className="flex items-center gap-3 text-foreground/90 p-2.5 rounded-xl bg-card/60 border border-border">
+                <Mail className="w-4 h-4 text-sky-500 shrink-0" />
+                <span className="font-mono">{profile?.email || "arun@arun-m.in"}</span>
               </div>
-              <div className="flex items-center gap-3 text-foreground/90">
-                <MapPin className="w-4 h-4 text-violet-500 shrink-0" />
+              <div className="flex items-center gap-3 text-foreground/90 p-2.5 rounded-xl bg-card/60 border border-border">
+                <MapPin className="w-4 h-4 text-indigo-500 shrink-0" />
                 <span>{profile?.location || "Bangalore, India (Available Worldwide Remote)"}</span>
               </div>
-              <div className="flex items-center gap-3 text-foreground/90">
+              <div className="flex items-center gap-3 text-foreground/90 p-2.5 rounded-xl bg-card/60 border border-border">
                 <Clock className="w-4 h-4 text-emerald-500 shrink-0" />
                 <span>
                   {language === "ar" ? "زمن الرد المتوقع: أقل من 24 ساعة" : "Typical response latency: < 24 hours"}
@@ -110,7 +112,7 @@ export function ContactSection({ profile, socialLinks }: ContactSectionProps) {
             </div>
 
             {/* Social handles list */}
-            {socialLinks.length > 0 && (
+            {(socialLinks || []).length > 0 && (
               <div className="pt-6 border-t border-border">
                 <h4 className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-3">
                   {language === "ar" ? "الشبكات المهنية وروابط المطور" : "Developer Handles & Networks"}
@@ -122,7 +124,7 @@ export function ContactSection({ profile, socialLinks }: ContactSectionProps) {
                       href={s.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-full bg-secondary hover:bg-secondary/80 border border-border text-xs text-foreground transition-all flex items-center gap-1.5"
+                      className="px-3 py-1.5 rounded-xl bg-secondary hover:bg-secondary/80 border border-border text-xs text-foreground transition-all flex items-center gap-1.5 shadow-xs"
                     >
                       <span>{s.label || s.platform}</span>
                     </a>
@@ -133,104 +135,134 @@ export function ContactSection({ profile, socialLinks }: ContactSectionProps) {
           </div>
 
           {/* Right Column: Interactive Form */}
-          <div className="lg:col-span-7 glass-panel rounded-3xl p-8 sm:p-10 relative overflow-hidden border border-border">
+          <div className="lg:col-span-7 glass-panel rounded-3xl p-6 sm:p-10 relative overflow-hidden border border-border shadow-xl">
             {isSuccess ? (
               <div className="text-center py-12 space-y-4">
                 <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-7 h-7" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground">{t("contact.successTitle", "Transmission Successful")}</h3>
-                <p className="text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
-                  {t("contact.successDesc", "Your message and DPDP Act 2023 consent record have been logged.")}
+                <h3 className="text-lg font-bold text-foreground">
+                  {t("contact.successHeading", "Communication Link Established")}
+                </h3>
+                <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                  {t("contact.successMessage", "Your dispatch has been registered with encrypted DPDP audit timestamps. Arun will respond promptly.")}
                 </p>
                 <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => setIsSuccess(false)}
-                  className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold text-xs mt-4"
+                  className="rounded-xl text-xs h-9"
                 >
-                  {language === "ar" ? "إرسال رسالة أخرى" : "Send Another Inquiry"}
+                  {t("contact.sendAnother", "Send Another Message")}
                 </Button>
               </div>
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs text-foreground font-medium">{t("contact.name", "Your Full Name")} *</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="contact-name" className="text-xs font-medium text-foreground">
+                      {t("contact.formName", "Your Name *")}
+                    </Label>
                     <Input
-                      placeholder={t("contact.namePlaceholder", "Jane Doe")}
+                      id="contact-name"
+                      placeholder="Jane Doe"
+                      className="h-11 bg-card/60 border-border text-xs rounded-xl"
                       {...register("name")}
-                      className="bg-background text-foreground text-xs border-border"
                     />
-                    {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+                    {errors.name && <p className="text-[11px] text-destructive">{errors.name.message}</p>}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="text-xs text-foreground font-medium">{t("contact.email", "Email Address")} *</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="contact-email" className="text-xs font-medium text-foreground">
+                      {t("contact.formEmail", "Your Email *")}
+                    </Label>
                     <Input
+                      id="contact-email"
                       type="email"
-                      placeholder={t("contact.emailPlaceholder", "jane@example.com")}
+                      placeholder="jane@company.com"
+                      className="h-11 bg-card/60 border-border text-xs rounded-xl"
                       {...register("email")}
-                      className="bg-background text-foreground text-xs border-border"
                     />
-                    {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+                    {errors.email && <p className="text-[11px] text-destructive">{errors.email.message}</p>}
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-xs text-foreground font-medium">{t("contact.subject", "Project Scope / Subject")} *</Label>
-                  <Input
-                    placeholder={t("contact.subjectPlaceholder", "Architecture Redesign & 3D Implementation")}
-                    {...register("subject")}
-                    className="bg-background text-foreground text-xs border-border"
-                  />
-                  {errors.subject && <p className="text-xs text-destructive">{errors.subject.message}</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs text-foreground font-medium">{t("contact.message", "Message / Brief")} *</Label>
-                  <Textarea
-                    rows={4}
-                    placeholder={t("contact.messagePlaceholder", "Tell me about your project, timeline, and technical objectives...")}
-                    {...register("message")}
-                    className="bg-background text-foreground text-xs border-border resize-none"
-                  />
-                  {errors.message && <p className="text-xs text-destructive">{errors.message.message}</p>}
-                </div>
-
-                {/* Statutory DPDP Act 2023 Consent Checkbox */}
-                <div className="pt-2">
-                  <label className="flex items-start gap-2.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      {...register("consentGiven")}
-                      className="mt-0.5 rounded border-border text-cyan-500 focus:ring-cyan-500"
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="contact-company" className="text-xs font-medium text-foreground">
+                      {t("contact.formCompany", "Company / Organization")}
+                    </Label>
+                    <Input
+                      id="contact-company"
+                      placeholder="Enterprise Corp"
+                      className="h-11 bg-card/60 border-border text-xs rounded-xl"
+                      {...register("company")}
                     />
-                    <span className="text-[11px] text-muted-foreground leading-relaxed">
-                      {t("contact.consent", "I agree to the processing of my contact information in accordance with DPDP Act 2023 and the Privacy Policy.")}{" "}
-                      <Link href="/legal/privacy-policy" className="text-cyan-500 hover:underline">
-                        Privacy Policy
-                      </Link>.
-                    </span>
-                  </label>
-                  {errors.consentGiven && (
-                    <p className="text-xs text-destructive mt-1">{errors.consentGiven.message}</p>
-                  )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="contact-subject" className="text-xs font-medium text-foreground">
+                      {t("contact.formSubject", "Subject *")}
+                    </Label>
+                    <Input
+                      id="contact-subject"
+                      placeholder="Architecture Advisory / Project"
+                      className="h-11 bg-card/60 border-border text-xs rounded-xl"
+                      {...register("subject")}
+                    />
+                    {errors.subject && <p className="text-[11px] text-destructive">{errors.subject.message}</p>}
+                  </div>
                 </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="contact-message" className="text-xs font-medium text-foreground">
+                    {t("contact.formMessage", "Message Details *")}
+                  </Label>
+                  <Textarea
+                    id="contact-message"
+                    rows={4}
+                    placeholder="Describe your architectural scope, project milestones, or collaboration vision..."
+                    className="bg-card/60 border-border text-xs rounded-xl resize-none"
+                    {...register("message")}
+                  />
+                  {errors.message && <p className="text-[11px] text-destructive">{errors.message.message}</p>}
+                </div>
+
+                {/* DPDP Act 2023 Explicit Consent Checkbox */}
+                <div className="flex items-start gap-2.5 pt-2">
+                  <input
+                    id="consentGiven"
+                    type="checkbox"
+                    className="mt-0.5 size-4 rounded accent-sky-500 cursor-pointer"
+                    {...register("consentGiven")}
+                  />
+                  <label htmlFor="consentGiven" className="text-[11px] text-muted-foreground leading-snug cursor-pointer">
+                    {language === "ar"
+                      ? "أوافق على معالجة بيانات الاتصال هذه للرد على طلبي، وفقًا لسياسة الخصوصية وقانون حماية البيانات الرقمية DPDP Act 2023."
+                      : "I consent to the collection and cryptographic logging of this message strictly for correspondence purposes in compliance with India's DPDP Act 2023."}{" "}
+                    <Link href="/legal/privacy-policy" className="text-sky-600 dark:text-sky-400 underline font-medium">
+                      {t("contact.privacyLink", "Privacy Policy")}
+                    </Link>
+                  </label>
+                </div>
+                {errors.consentGiven && (
+                  <p className="text-[11px] text-destructive">{errors.consentGiven.message}</p>
+                )}
 
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-400 hover:to-violet-500 text-white font-bold text-xs h-11 rounded-xl shadow-lg shadow-cyan-500/20"
+                  className="w-full h-11 sm:h-12 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs sm:text-sm shadow-md shadow-sky-500/20 mt-2 transition-all"
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {t("contact.sending", "Transmitting...")}
+                      {language === "ar" ? "جارٍ إرسال الرسالة..." : "Transmitting Encrypted Message..."}
                     </>
                   ) : (
                     <>
-                      <Send className="w-4 h-4 mr-2" />
-                      {t("contact.send", "Transmit Message")}
+                      <Send className="w-4 h-4 mr-2 rtl:rotate-180" />
+                      {t("contact.submitButton", "Transmit Message")}
                     </>
                   )}
                 </Button>
