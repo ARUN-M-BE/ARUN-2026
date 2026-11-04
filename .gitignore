@@ -49,3 +49,7 @@ next-env.d.ts
 /.agents/
 /.claude/
 .neon
+
+# cloudflare & opennext
+/.open-next/
+/.wrangler/

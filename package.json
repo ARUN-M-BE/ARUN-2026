@@ -19,7 +19,9 @@
     "db:push": "drizzle-kit push",
     "db:seed": "npx tsx scripts/seed.ts",
     "db:studio": "drizzle-kit studio",
-    "postbuild": "next-sitemap"
+    "postbuild": "next-sitemap",
+    "build:cloudflare": "opennextjs-cloudflare build",
+    "deploy:cloudflare": "opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@auth/core": "^0.41.3",
@@ -29,6 +31,7 @@
     "@neon/config": "^1.10.1",
     "@neon/env": "^1.6.9",
     "@neondatabase/serverless": "^1.2.0",
+    "@opennextjs/cloudflare": "^1.20.16",
     "@radix-ui/react-slot": "^1.3.3",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.2",
@@ -45,7 +48,7 @@
     "gsap": "^3.15.0",
     "lucide-react": "^1.28.0",
     "motion": "^14.9.0",
-    "next": "16.2.12",
+    "next": "^16.4.5",
     "next-auth": "^5.0.0-beta.32",
     "next-sitemap": "^4.2.3",
     "next-themes": "^0.4.6",
@@ -78,6 +81,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.157.0"
   }
 }
