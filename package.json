@@ -4,11 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "opennextjs-cloudflare build",
+    "build": "next build && opennextjs-cloudflare build --skipNextBuild",
+    "build:next": "next build",
+    "build:worker": "opennextjs-cloudflare build --skipNextBuild",
     "start": "next start",
-    "lint": "eslint . --ext .ts,.tsx",
-    "deploy": "opennextjs-cloudflare deploy",
     "preview": "opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare deploy",
+    "test": "vitest run",
+    "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "backend:dev": "tsx watch backend/src/server.ts",
     "backend:start": "tsx backend/src/server.ts",
@@ -23,7 +26,6 @@
     "build:cloudflare": "opennextjs-cloudflare build",
     "deploy:cloudflare": "opennextjs-cloudflare deploy",
     "cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "build:next": "next build --webpack",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts"
   },
   "dependencies": {

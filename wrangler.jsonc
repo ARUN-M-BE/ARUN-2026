@@ -13,10 +13,6 @@
     {
       "pattern": "arun-m.in",
       "custom_domain": true
-    },
-    {
-      "pattern": "www.arun-m.in",
-      "custom_domain": true
     }
   ]
 }
