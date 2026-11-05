@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --webpack",
+    "build": "opennextjs-cloudflare build",
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",
-    "deploy": "next build",
-    "preview": "next start",
+    "deploy": "opennextjs-cloudflare deploy",
+    "preview": "opennextjs-cloudflare preview",
     "typecheck": "tsc --noEmit",
     "backend:dev": "tsx watch backend/src/server.ts",
     "backend:start": "tsx backend/src/server.ts",
@@ -22,7 +22,9 @@
     "postbuild": "next-sitemap",
     "build:cloudflare": "opennextjs-cloudflare build",
     "deploy:cloudflare": "opennextjs-cloudflare deploy",
-    "cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "build:next": "next build --webpack",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts"
   },
   "dependencies": {
     "@auth/core": "^0.41.3",
