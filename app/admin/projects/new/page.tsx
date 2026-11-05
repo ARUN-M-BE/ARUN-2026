@@ -1,17 +1,11 @@
-import { requireAdmin } from "@/lib/auth-guard";
-import { PageHeader } from "@/components/admin/page-header";
-import { ProjectForm } from "../project-form";
+import { Suspense } from "react";
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton";
+import PageContent from "@/components/admin/features/projects/create/ProjectCreateServer";
 
-export default async function NewProjectPage() {
-  await requireAdmin();
-
+export default function NewProjectPage() {
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Create Universe Project"
-        description="Add a new project case study with interactive parameters and tech stack tags."
-      />
-      <ProjectForm />
-    </div>
+    <Suspense fallback={<AdminPageSkeleton />}>
+      <PageContent />
+    </Suspense>
   );
 }

@@ -1,30 +1,15 @@
-import { requireAdmin } from "@/lib/auth-guard";
-import { getServices } from "@/lib/actions";
-import { notFound } from "next/navigation";
-import { PageHeader } from "@/components/admin/page-header";
-import { ServiceForm } from "../../service-form";
+import { Suspense } from "react";
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton";
+import PageContent from "@/components/admin/features/services/edit/ServiceEditServer";
 
-export default async function EditServicePage({
+export default function EditServicePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireAdmin();
-  const { id } = await params;
-  const items = await getServices();
-  const svc = items.find((i) => i.id === id);
-
-  if (!svc) {
-    notFound();
-  }
-
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title={`Edit Service: ${svc.title}`}
-        description="Update service scope, deliverables or pricing terms."
-      />
-      <ServiceForm initialData={svc} isEditing />
-    </div>
+    <Suspense fallback={<AdminPageSkeleton />}>
+      <PageContent params={params} />
+    </Suspense>
   );
 }

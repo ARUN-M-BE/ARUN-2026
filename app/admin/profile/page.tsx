@@ -1,19 +1,11 @@
-import { requireAdmin } from "@/lib/auth-guard";
-import { getProfile } from "@/lib/actions";
-import { PageHeader } from "@/components/admin/page-header";
-import { ProfileForm } from "./profile-form";
+import { Suspense } from "react";
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton";
+import PageContent from "@/components/admin/features/profile/ProfileServer";
 
-export default async function ProfileAdminPage() {
-  await requireAdmin();
-  const profile = await getProfile();
-
+export default function ProfileAdminPage() {
   return (
-    <div className="space-y-6 max-w-4xl">
-      <PageHeader
-        title="Personal Profile & Developer Identity"
-        description="Update your bio, titles, headline stats, and contact availability shown in the 3D hero sculpture."
-      />
-      <ProfileForm initialData={profile} />
-    </div>
+    <Suspense fallback={<AdminPageSkeleton />}>
+      <PageContent />
+    </Suspense>
   );
 }
