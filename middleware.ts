@@ -7,7 +7,7 @@ const authSecret =
   process.env.NEXTAUTH_SECRET ||
   "dev-secret-change-in-production-openssl-rand-base64-32";
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip static assets, favicon, API auth routes
@@ -79,8 +79,8 @@ export async function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Compatibility export
-export const middleware = proxy;
+// Next.js 16 forward compatibility export
+export const proxy = middleware;
 
 export const config = {
   matcher: [
