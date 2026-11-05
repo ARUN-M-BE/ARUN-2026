@@ -6,6 +6,7 @@ import { ProfileForm } from "@/components/admin/features/profile/shared/ProfileF
 export default async function ProfileAdminPage() {
   await requireAdmin();
   const profile = await getProfile();
+  const serializedProfile = profile ? JSON.parse(JSON.stringify(profile)) : null;
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -13,7 +14,7 @@ export default async function ProfileAdminPage() {
         title="Personal Profile & Developer Identity"
         description="Update your bio, titles, headline stats, and contact availability shown in the 3D hero sculpture."
       />
-      <ProfileForm initialData={profile} />
+      <ProfileForm initialData={serializedProfile} />
     </div>
   );
 }
