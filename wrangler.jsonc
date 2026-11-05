@@ -14,5 +14,15 @@
       "pattern": "arun-m.in",
       "custom_domain": true
     }
-  ]
+  ],
+  "vars": {
+    "DATABASE_URL": "postgresql://neondb_owner:npg_9qjlOrcT4ImV@ep-wispy-pond-a1oope80-pooler.ap-southeast-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+    "DATABASE_URL_UNPOOLED": "postgresql://neondb_owner:npg_9qjlOrcT4ImV@ep-wispy-pond-a1oope80.ap-southeast-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+    "NEXT_PUBLIC_SITE_URL": "https://arun-m.in",
+    "NEXTAUTH_URL": "https://arun-m.in",
+    "AUTH_SECRET": "dev-secret-change-in-production-openssl-rand-base64-32",
+    "NEXTAUTH_SECRET": "dev-secret-change-in-production-openssl-rand-base64-32",
+    "ADMIN_EMAIL": "arun@arun-m.in",
+    "ADMIN_PASSWORD": "Admin@123"
+  }
 }

@@ -23,7 +23,8 @@ import { ContactSection } from "@/components/portfolio/contact-section";
 import { PortfolioFooter } from "@/components/portfolio/footer";
 import { CookieConsent } from "@/components/portfolio/cookie-consent";
 
-export const revalidate = 60; // Cache and revalidate public content
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function HomePage() {
   const [

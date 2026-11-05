@@ -10,6 +10,27 @@ const authSecret =
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Intercept missing static assets to prevent Next server RSC 404 fallback loop and Error 1102
+  if (pathname.startsWith("/_next/static/")) {
+    const isCss = pathname.endsWith(".css");
+    const isJs = pathname.endsWith(".js") || pathname.endsWith(".mjs");
+    return new NextResponse(
+      isJs ? "/* Chunk not found */" : isCss ? "/* Style not found */" : "Not Found",
+      {
+        status: 404,
+        statusText: "Not Found",
+        headers: {
+          "Content-Type": isCss
+            ? "text/css; charset=utf-8"
+            : isJs
+            ? "application/javascript; charset=utf-8"
+            : "text/plain; charset=utf-8",
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
+      }
+    );
+  }
+
   // Set request headers including x-pathname for server component & layout context
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-pathname", pathname);
@@ -108,6 +129,7 @@ export const proxy = middleware;
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/_next/static/:path*",
+    "/((?!_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
