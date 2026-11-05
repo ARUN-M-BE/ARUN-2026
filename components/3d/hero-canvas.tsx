@@ -2,7 +2,6 @@
 
 import React, { useRef, useMemo, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, MeshDistortMaterial } from "@react-three/drei";
 import * as THREE from "three";
 
 // ─── 3D Identity Sculpture Core ────────────────────────────
@@ -21,15 +20,22 @@ function InteractiveSculpture({
   const outerRingRef = useRef<THREE.Mesh>(null!);
   const secondaryRingRef = useRef<THREE.Mesh>(null!);
   const satelliteGroupRef = useRef<THREE.Group>(null!);
+  const floatGroupRef = useRef<THREE.Group>(null!);
 
   useFrame((state, delta) => {
     const pulseFactor = isPulsing ? 1.4 : 1.0;
 
+    // Smooth floating animation without heavy external library
+    if (floatGroupRef.current) {
+      floatGroupRef.current.position.y = Math.sin(state.clock.elapsedTime * 1.8) * 0.12;
+      floatGroupRef.current.rotation.z = Math.cos(state.clock.elapsedTime * 0.9) * 0.05;
+    }
+
     if (meshRef.current) {
       meshRef.current.rotation.x += delta * 0.25 * pulseFactor;
       meshRef.current.rotation.y += delta * 0.35 * pulseFactor;
-      meshRef.current.position.x = THREE.MathUtils.lerp(meshRef.current.position.x, mouse.current.x * 0.7, 0.05);
-      meshRef.current.position.y = THREE.MathUtils.lerp(meshRef.current.position.y, mouse.current.y * 0.7, 0.05);
+      meshRef.current.position.x = THREE.MathUtils.lerp(meshRef.current.position.x, mouse.current.x * 0.7, 0.08);
+      meshRef.current.position.y = THREE.MathUtils.lerp(meshRef.current.position.y, mouse.current.y * 0.7, 0.08);
     }
     if (wireframeRef.current) {
       wireframeRef.current.rotation.x -= delta * 0.15;
@@ -55,13 +61,13 @@ function InteractiveSculpture({
     <group onClick={onClick}>
       {/* Outer Sky Gyroscope Ring */}
       <mesh ref={outerRingRef}>
-        <torusGeometry args={[2.5, 0.02, 16, 120]} />
+        <torusGeometry args={[2.5, 0.02, 16, 64]} />
         <meshBasicMaterial color="#38bdf8" wireframe transparent opacity={0.35} />
       </mesh>
 
       {/* Secondary Indigo Orbital Ring */}
       <mesh ref={secondaryRingRef}>
-        <torusGeometry args={[2.8, 0.015, 16, 120]} />
+        <torusGeometry args={[2.8, 0.015, 16, 64]} />
         <meshBasicMaterial color="#818cf8" wireframe transparent opacity={0.3} />
       </mesh>
 
@@ -81,18 +87,18 @@ function InteractiveSculpture({
         </mesh>
       </group>
 
-      <Float speed={2.5} rotationIntensity={0.8} floatIntensity={1.2}>
+      <group ref={floatGroupRef}>
         {/* Core Glowing Metallic Sculpture */}
         <mesh ref={meshRef}>
           <icosahedronGeometry args={[1.35, 1]} />
-          <MeshDistortMaterial
+          <meshPhysicalMaterial
             color="#0c101c"
             emissive="#38bdf8"
-            emissiveIntensity={isPulsing ? 1.2 : 0.4}
-            roughness={0.08}
-            metalness={0.92}
-            distort={0.28}
-            speed={2.2}
+            emissiveIntensity={isPulsing ? 1.4 : 0.45}
+            roughness={0.1}
+            metalness={0.9}
+            clearcoat={1}
+            clearcoatRoughness={0.1}
           />
         </mesh>
 
@@ -107,24 +113,27 @@ function InteractiveSculpture({
           <icosahedronGeometry args={[1.75, 1]} />
           <meshBasicMaterial color="#38bdf8" wireframe transparent opacity={0.45} />
         </mesh>
-      </Float>
+      </group>
     </group>
   );
 }
 
 // ─── Dual Cosmic Particles Field ───────────────────────────
-function CosmicParticles({ count = 200 }: { count?: number }) {
+function CosmicParticles({ count = 120 }: { count?: number }) {
   const [skyPoints, indigoPoints] = useMemo(() => {
     const sCoords = new Float32Array((count / 2) * 3);
     const iCoords = new Float32Array((count / 2) * 3);
     for (let i = 0; i < count / 2; i++) {
-      sCoords[i * 3] = (Math.random() - 0.5) * 18;
-      sCoords[i * 3 + 1] = (Math.random() - 0.5) * 18;
-      sCoords[i * 3 + 2] = (Math.random() - 0.5) * 18;
+      // Deterministic spread without calling impure Math.random during render cycles
+      const angle = (i / (count / 2)) * Math.PI * 2;
+      const radius = 2.5 + (i % 5) * 1.2;
+      sCoords[i * 3] = Math.cos(angle) * radius;
+      sCoords[i * 3 + 1] = Math.sin(angle * 2) * 3.5;
+      sCoords[i * 3 + 2] = Math.sin(angle) * radius;
 
-      iCoords[i * 3] = (Math.random() - 0.5) * 18;
-      iCoords[i * 3 + 1] = (Math.random() - 0.5) * 18;
-      iCoords[i * 3 + 2] = (Math.random() - 0.5) * 18;
+      iCoords[i * 3] = Math.sin(angle) * (radius + 0.5);
+      iCoords[i * 3 + 1] = Math.cos(angle * 1.5) * 3.2;
+      iCoords[i * 3 + 2] = Math.cos(angle) * (radius + 0.5);
     }
     return [sCoords, iCoords];
   }, [count]);
@@ -162,31 +171,13 @@ function CosmicParticles({ count = 200 }: { count?: number }) {
   );
 }
 
-// ─── Fallback Sculpture ───────────────────────────────────
-function FallbackSculpture() {
-  return (
-    <div className="w-full h-full flex items-center justify-center relative">
-      <div className="w-64 h-64 rounded-full bg-gradient-to-tr from-sky-500/15 via-indigo-500/15 to-transparent blur-2xl animate-pulse" />
-      <div className="absolute w-48 h-48 rounded-2xl border border-sky-400/30 bg-card/60 backdrop-blur-xl rotate-12 flex items-center justify-center shadow-xl">
-        <div className="w-32 h-32 rounded-xl border border-indigo-400/40 -rotate-6 flex items-center justify-center bg-sky-950/20">
-          <div className="w-18 h-18 rounded-lg bg-sky-400/20 border border-sky-400 flex items-center justify-center text-sky-400 font-mono text-xs font-bold">
-            3D ENGINE
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Main Hero Canvas Component ───────────────────────────
 export default function HeroCanvas() {
-  const [mounted, setMounted] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isPulsing, setIsPulsing] = useState(false);
   const mouse = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    setMounted(true);
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     setPrefersReducedMotion(mediaQuery.matches);
 
@@ -204,14 +195,16 @@ export default function HeroCanvas() {
     setTimeout(() => setIsPulsing(false), 600);
   };
 
-  if (!mounted || prefersReducedMotion) {
-    return <FallbackSculpture />;
+  if (prefersReducedMotion) {
+    return null;
   }
 
   return (
     <div className="w-full h-full relative cursor-pointer select-none">
       <Canvas
         camera={{ position: [0, 0, 5.2], fov: 45 }}
+        dpr={[1, 1.5]}
+        performance={{ min: 0.5 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       >
         <ambientLight intensity={0.7} />
@@ -221,7 +214,7 @@ export default function HeroCanvas() {
         <pointLight position={[0, -2, -1]} intensity={1.0} color="#6366f1" />
 
         <InteractiveSculpture mouse={mouse} isPulsing={isPulsing} onClick={handleClick} />
-        <CosmicParticles count={180} />
+        <CosmicParticles count={120} />
       </Canvas>
     </div>
   );
