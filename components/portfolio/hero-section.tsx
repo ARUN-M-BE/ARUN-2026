@@ -20,15 +20,33 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/context/languageContext";
 
-// Dynamic import of 3D Canvas to optimize LCP and bundle size
+// Instant zero-latency geometric sculpture placeholder
+function HeroFallbackSculpture() {
+  return (
+    <div className="w-full h-full flex items-center justify-center relative overflow-hidden select-none">
+      <div className="w-64 h-64 rounded-full bg-gradient-to-tr from-sky-500/20 via-indigo-500/15 to-transparent blur-2xl animate-pulse pointer-events-none" />
+      <div className="relative flex items-center justify-center">
+        {/* Outer Gyroscope Ring */}
+        <div className="w-64 h-64 rounded-full border border-sky-500/25 animate-[spin_12s_linear_infinite]" />
+        {/* Inner Orbital Ring */}
+        <div className="absolute w-48 h-48 rounded-full border border-dashed border-indigo-400/30 animate-[spin_8s_linear_infinite_reverse]" />
+        {/* Core Geometric Diamond */}
+        <div className="absolute w-28 h-28 rounded-2xl border border-sky-400/40 bg-card/60 backdrop-blur-md rotate-45 flex items-center justify-center shadow-lg shadow-sky-500/10">
+          <div className="w-16 h-16 rounded-xl border border-indigo-400/50 -rotate-12 flex items-center justify-center bg-sky-950/30">
+            <div className="w-8 h-8 rounded-lg bg-sky-400/20 border border-sky-400/80 flex items-center justify-center">
+              <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Instant-mount dynamic 3D Canvas
 const HeroCanvas = dynamic(() => import("@/components/3d/hero-canvas"), {
   ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-      <div className="w-10 h-10 rounded-full border-2 border-sky-500/20 border-t-sky-500 animate-spin" />
-      <span className="text-xs font-mono text-muted-foreground">Initializing 3D Core...</span>
-    </div>
-  ),
+  loading: () => <HeroFallbackSculpture />,
 });
 
 interface HeroSectionProps {
