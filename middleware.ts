@@ -10,13 +10,21 @@ const authSecret =
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Set request headers including x-pathname for server component & layout context
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", pathname);
+
   // Skip static assets, favicon, API auth routes
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api/auth") ||
     pathname.includes(".")
   ) {
-    return NextResponse.next();
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
   }
 
   // Detect session cookies across all NextAuth / Auth.js formats
@@ -36,32 +44,45 @@ export async function middleware(request: NextRequest) {
     ? "__Secure-next-auth.session-token"
     : "next-auth.session-token";
 
-  // Prevent authenticated user from re-accessing login page
-  if (pathname === "/admin/login") {
-    if (hasAuthJsCookie || hasNextAuthCookie) {
-      return NextResponse.redirect(new URL("/admin", request.url));
-    }
-    return NextResponse.next();
-  }
+  const isSecureCookie = cookieName.startsWith("__Secure-");
 
-  // Protect admin routes
-  if (pathname.startsWith("/admin")) {
-    let token = await getToken({
-      req: request,
-      secret: authSecret,
-      cookieName,
-    });
-
-    // Fallback attempt with default cookie configuration if initial lookup was empty
-    if (!token && (hasAuthJsCookie || hasNextAuthCookie)) {
+  // Decode token defensively
+  let token = null;
+  if (hasAuthJsCookie || hasNextAuthCookie) {
+    try {
       token = await getToken({
         req: request,
         secret: authSecret,
+        cookieName,
+        secureCookie: isSecureCookie,
       });
-    }
 
-    // If no token and no session cookie is present, redirect to login
-    if (!token && !hasAuthJsCookie && !hasNextAuthCookie) {
+      if (!token) {
+        token = await getToken({
+          req: request,
+          secret: authSecret,
+        });
+      }
+    } catch (tokenErr) {
+      console.warn("[middleware] Token verification failed:", tokenErr);
+    }
+  }
+
+  // Prevent authenticated user from re-accessing login page
+  if (pathname === "/admin/login") {
+    if (token) {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  }
+
+  // Protect all other admin routes
+  if (pathname.startsWith("/admin")) {
+    if (!token) {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
@@ -71,12 +92,19 @@ export async function middleware(request: NextRequest) {
   // Rate limiting headers for contact form
   if (pathname === "/api/contact") {
     const ip = request.headers.get("x-forwarded-for") || "unknown";
-    const response = NextResponse.next();
-    response.headers.set("X-Client-IP", ip);
-    return response;
+    requestHeaders.set("X-Client-IP", ip);
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
   }
 
-  return NextResponse.next();
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 }
 
 // Next.js 16 forward compatibility export
@@ -87,4 +115,3 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
-
