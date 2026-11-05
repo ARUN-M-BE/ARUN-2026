@@ -50,8 +50,10 @@ export default function AdminLoginPage() {
       toast.success("Authentication successful", {
         description: "Entering 3D Developer CMS...",
       });
-      router.push("/admin");
-      router.refresh();
+
+      const params = new URLSearchParams(window.location.search);
+      const destination = params.get("callbackUrl") || "/admin";
+      window.location.href = destination;
     } catch {
       toast.error("Authentication failed", {
         description: "An unexpected error occurred during sign in.",
