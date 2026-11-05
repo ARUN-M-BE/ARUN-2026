@@ -14,6 +14,19 @@ export default function AdminError({
 }) {
   useEffect(() => {
     console.error("[AdminError] Uncaught admin route error:", error);
+    const msg = error?.message || "";
+    if (
+      msg.includes("Loading chunk") ||
+      msg.includes("ChunkLoadError") ||
+      msg.includes("Failed to fetch dynamically imported module")
+    ) {
+      const key = "__chunk_reload_lock";
+      const last = parseInt(sessionStorage.getItem(key) || "0", 10);
+      if (Date.now() - last > 10000) {
+        sessionStorage.setItem(key, String(Date.now()));
+        window.location.reload();
+      }
+    }
   }, [error]);
 
   return (
@@ -70,4 +83,3 @@ export default function AdminError({
     </div>
   );
 }
-
