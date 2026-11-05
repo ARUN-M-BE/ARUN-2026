@@ -1,6 +1,6 @@
 import { db } from "../config/database";
 import * as schema from "../models/schema";
-import { eq, desc, asc, and, ilike, count } from "drizzle-orm";
+import { eq, desc, asc, and, or, ilike, count } from "drizzle-orm";
 import { isUUID } from "@/lib/utils";
 import {
   fallbackProfile,
@@ -33,11 +33,12 @@ export const ProfileRepository = {
   },
   async upsert(data: any) {
     try {
+      const { id: _ignored, ...cleanData } = data;
       const existing = await this.getFirst();
       if (existing && existing.id && isUUID(existing.id) && existing.id !== fallbackProfile.id) {
-        return await db.update(schema.profile).set({ ...data, updatedAt: new Date() }).where(eq(schema.profile.id, existing.id));
+        return await db.update(schema.profile).set({ ...cleanData, updatedAt: new Date() }).where(eq(schema.profile.id, existing.id));
       }
-      return await db.insert(schema.profile).values(data);
+      return await db.insert(schema.profile).values(cleanData);
     } catch (err) {
       console.warn("[ProfileRepository.upsert] DB update bypassed or failed:", err);
       return null;
@@ -79,17 +80,22 @@ export const ProjectRepository = {
         const [item] = await db.select().from(schema.projects).where(eq(schema.projects.id, id)).limit(1);
         if (item) return item;
       }
-      const [bySlug] = await db.select().from(schema.projects).where(eq(schema.projects.slug, id)).limit(1);
+      const cleanSlug = id.replace(/^proj-/, "");
+      const [bySlug] = await db.select().from(schema.projects).where(
+        or(eq(schema.projects.slug, id), eq(schema.projects.slug, cleanSlug))
+      ).limit(1);
       if (bySlug) return bySlug;
 
-      return fallbackProjects.find((p) => p.id === id || p.slug === id) || null;
+      return fallbackProjects.find((p) => p.id === id || p.slug === id || p.slug === cleanSlug) || null;
     } catch {
-      return fallbackProjects.find((p) => p.id === id || p.slug === id) || null;
+      const cleanSlug = id.replace(/^proj-/, "");
+      return fallbackProjects.find((p) => p.id === id || p.slug === id || p.slug === cleanSlug) || null;
     }
   },
   async create(data: any) {
     try {
-      const [item] = await db.insert(schema.projects).values(data).returning();
+      const { id: _ignored, ...cleanData } = data;
+      const [item] = await db.insert(schema.projects).values(cleanData).returning();
       return item;
     } catch (err) {
       console.warn("[ProjectRepository.create] DB insert failed:", err);
@@ -98,7 +104,8 @@ export const ProjectRepository = {
   },
   async update(id: string, data: any) {
     try {
-      const updateData = { ...data, updatedAt: new Date() };
+      const { id: _ignored, ...cleanData } = data;
+      const updateData = { ...cleanData, updatedAt: new Date() };
 
       // 1. Try finding by UUID if valid UUID
       if (isUUID(id)) {
@@ -109,9 +116,12 @@ export const ProjectRepository = {
         }
       }
 
-      // 2. Try finding by slug
-      const targetSlug = data.slug || id;
-      const [bySlug] = await db.select().from(schema.projects).where(eq(schema.projects.slug, targetSlug)).limit(1);
+      // 2. Try finding by slug (including cleanSlug)
+      const cleanSlug = id.replace(/^proj-/, "");
+      const targetSlug = data.slug || cleanSlug;
+      const [bySlug] = await db.select().from(schema.projects).where(
+        or(eq(schema.projects.slug, targetSlug), eq(schema.projects.slug, id), eq(schema.projects.slug, cleanSlug))
+      ).limit(1);
       if (bySlug) {
         const [updated] = await db.update(schema.projects).set(updateData).where(eq(schema.projects.id, bySlug.id)).returning();
         return updated;
@@ -132,7 +142,10 @@ export const ProjectRepository = {
       if (isUUID(id)) {
         return await db.delete(schema.projects).where(eq(schema.projects.id, id));
       }
-      return await db.delete(schema.projects).where(eq(schema.projects.slug, id));
+      const cleanSlug = id.replace(/^proj-/, "");
+      return await db.delete(schema.projects).where(
+        or(eq(schema.projects.slug, id), eq(schema.projects.slug, cleanSlug))
+      );
     } catch (err) {
       console.warn("[ProjectRepository.delete] DB delete error:", err);
       return null;
@@ -152,7 +165,8 @@ export const SkillRepository = {
   },
   async createCategory(data: any) {
     try {
-      const [cat] = await db.insert(schema.skillCategories).values(data).returning();
+      const { id: _ignored, ...cleanData } = data;
+      const [cat] = await db.insert(schema.skillCategories).values(cleanData).returning();
       return cat;
     } catch (err) {
       console.warn("[SkillRepository.createCategory] Error:", err);
@@ -164,7 +178,10 @@ export const SkillRepository = {
       if (isUUID(id)) {
         return await db.delete(schema.skillCategories).where(eq(schema.skillCategories.id, id));
       }
-      return await db.delete(schema.skillCategories).where(eq(schema.skillCategories.slug, id));
+      const cleanSlug = id.replace(/^cat-/, "");
+      return await db.delete(schema.skillCategories).where(
+        or(eq(schema.skillCategories.slug, id), eq(schema.skillCategories.slug, cleanSlug))
+      );
     } catch (err) {
       console.warn("[SkillRepository.deleteCategory] Error:", err);
       return null;
@@ -197,8 +214,9 @@ export const SkillRepository = {
   },
   async createSkill(data: any) {
     try {
+      const { id: _ignored, ...cleanData } = data;
       const safeData = {
-        ...data,
+        ...cleanData,
         categoryId: isUUID(data?.categoryId) ? data.categoryId : null,
       };
       const [skill] = await db.insert(schema.skills).values(safeData).returning();
@@ -213,7 +231,10 @@ export const SkillRepository = {
       if (isUUID(id)) {
         return await db.delete(schema.skills).where(eq(schema.skills.id, id));
       }
-      return await db.delete(schema.skills).where(eq(schema.skills.slug, id));
+      const cleanSlug = id.replace(/^sk-/, "");
+      return await db.delete(schema.skills).where(
+        or(eq(schema.skills.slug, id), eq(schema.skills.slug, cleanSlug))
+      );
     } catch (err) {
       console.warn("[SkillRepository.deleteSkill] Error:", err);
       return null;
@@ -241,7 +262,8 @@ export const ExperienceRepository = {
   },
   async create(data: any) {
     try {
-      const [exp] = await db.insert(schema.experience).values(data).returning();
+      const { id: _ignored, ...cleanData } = data;
+      const [exp] = await db.insert(schema.experience).values(cleanData).returning();
       return exp;
     } catch (err) {
       console.warn("[ExperienceRepository.create] Error:", err);
@@ -250,7 +272,8 @@ export const ExperienceRepository = {
   },
   async update(id: string, data: any) {
     try {
-      const updateData = { ...data, updatedAt: new Date() };
+      const { id: _ignored, ...cleanData } = data;
+      const updateData = { ...cleanData, updatedAt: new Date() };
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.experience).where(eq(schema.experience.id, id)).limit(1);
         if (existing) {
@@ -307,7 +330,8 @@ export const EducationRepository = {
   },
   async create(data: any) {
     try {
-      const [edu] = await db.insert(schema.education).values(data).returning();
+      const { id: _ignored, ...cleanData } = data;
+      const [edu] = await db.insert(schema.education).values(cleanData).returning();
       return edu;
     } catch (err) {
       console.warn("[EducationRepository.create] Error:", err);
@@ -316,7 +340,8 @@ export const EducationRepository = {
   },
   async update(id: string, data: any) {
     try {
-      const updateData = { ...data, updatedAt: new Date() };
+      const { id: _ignored, ...cleanData } = data;
+      const updateData = { ...cleanData, updatedAt: new Date() };
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.education).where(eq(schema.education.id, id)).limit(1);
         if (existing) {
@@ -373,7 +398,8 @@ export const CertificationRepository = {
   },
   async create(data: any) {
     try {
-      const [cert] = await db.insert(schema.certifications).values(data).returning();
+      const { id: _ignored, ...cleanData } = data;
+      const [cert] = await db.insert(schema.certifications).values(cleanData).returning();
       return cert;
     } catch (err) {
       console.warn("[CertificationRepository.create] Error:", err);
@@ -382,7 +408,8 @@ export const CertificationRepository = {
   },
   async update(id: string, data: any) {
     try {
-      const updateData = { ...data, updatedAt: new Date() };
+      const { id: _ignored, ...cleanData } = data;
+      const updateData = { ...cleanData, updatedAt: new Date() };
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.certifications).where(eq(schema.certifications.id, id)).limit(1);
         if (existing) {
@@ -437,7 +464,8 @@ export const ServiceRepository = {
   },
   async create(data: any) {
     try {
-      const [svc] = await db.insert(schema.services).values(data).returning();
+      const { id: _ignored, ...cleanData } = data;
+      const [svc] = await db.insert(schema.services).values(cleanData).returning();
       return svc;
     } catch (err) {
       console.warn("[ServiceRepository.create] Error:", err);
@@ -446,7 +474,8 @@ export const ServiceRepository = {
   },
   async update(id: string, data: any) {
     try {
-      const updateData = { ...data, updatedAt: new Date() };
+      const { id: _ignored, ...cleanData } = data;
+      const updateData = { ...cleanData, updatedAt: new Date() };
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.services).where(eq(schema.services.id, id)).limit(1);
         if (existing) {
@@ -503,7 +532,8 @@ export const TestimonialRepository = {
   },
   async create(data: any) {
     try {
-      const [t] = await db.insert(schema.testimonials).values(data).returning();
+      const { id: _ignored, ...cleanData } = data;
+      const [t] = await db.insert(schema.testimonials).values(cleanData).returning();
       return t;
     } catch (err) {
       console.warn("[TestimonialRepository.create] Error:", err);
@@ -512,7 +542,8 @@ export const TestimonialRepository = {
   },
   async update(id: string, data: any) {
     try {
-      const updateData = { ...data, updatedAt: new Date() };
+      const { id: _ignored, ...cleanData } = data;
+      const updateData = { ...cleanData, updatedAt: new Date() };
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.testimonials).where(eq(schema.testimonials.id, id)).limit(1);
         if (existing) {
@@ -570,7 +601,8 @@ export const MessageRepository = {
   },
   async create(data: any) {
     try {
-      return await db.insert(schema.contactMessages).values(data);
+      const { id: _ignored, ...cleanData } = data;
+      return await db.insert(schema.contactMessages).values(cleanData);
     } catch (err) {
       console.warn("[MessageRepository.create] Stored in local fallback log:", err);
       return null;
@@ -626,7 +658,8 @@ export const NavigationRepository = {
   },
   async create(data: any) {
     try {
-      const [nav] = await db.insert(schema.navigation).values(data).returning();
+      const { id: _ignored, ...cleanData } = data;
+      const [nav] = await db.insert(schema.navigation).values(cleanData).returning();
       return nav;
     } catch (err) {
       console.warn("[NavigationRepository.create] Error:", err);
@@ -688,7 +721,8 @@ export const LegalRepository = {
   },
   async update(id: string, data: any) {
     try {
-      const updateData = { ...data, updatedAt: new Date() };
+      const { id: _ignored, ...cleanData } = data;
+      const updateData = { ...cleanData, updatedAt: new Date() };
       if (isUUID(id)) {
         return await db.update(schema.legalDocuments).set(updateData).where(eq(schema.legalDocuments.id, id));
       }
@@ -745,7 +779,8 @@ export const MediaRepository = {
   },
   async create(data: any) {
     try {
-      const [asset] = await db.insert(schema.mediaAssets).values(data).returning();
+      const { id: _ignored, ...cleanData } = data;
+      const [asset] = await db.insert(schema.mediaAssets).values(cleanData).returning();
       return asset;
     } catch (err) {
       console.warn("[MediaRepository.create] Error:", err);

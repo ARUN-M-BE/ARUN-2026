@@ -7,6 +7,6 @@ export function cn(...inputs: ClassValue[]) {
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export function isUUID(str: unknown): str is string {
+export function isUUID(str: unknown): boolean {
   return typeof str === "string" && UUID_REGEX.test(str);
 }

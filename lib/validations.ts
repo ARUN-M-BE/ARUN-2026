@@ -10,7 +10,7 @@ export const profileSchema = z.object({
   email: z.string().email("Invalid email").optional().or(z.literal("")),
   phone: z.string().optional(),
   location: z.string().optional(),
-  website: z.string().url("Invalid URL").optional().or(z.literal("")),
+  website: z.string().optional().or(z.literal("")),
   avatar: z.string().optional(),
   heroImage: z.string().optional(),
   resumeUrl: z.string().optional(),
@@ -24,13 +24,13 @@ export const profileSchema = z.object({
 // ─── Project ──────────────────────────────────────────────
 export const projectSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  slug: z.string().min(1, "Slug is required").regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens"),
+  slug: z.string().min(1, "Slug is required"),
   shortDescription: z.string().optional(),
   description: z.string().optional(),
   thumbnail: z.string().optional(),
   images: z.array(z.string()).default([]),
-  liveUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
-  githubUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  liveUrl: z.string().optional().or(z.literal("")),
+  githubUrl: z.string().optional().or(z.literal("")),
   techStack: z.array(z.string()).default([]),
   category: z.string().optional(),
   client: z.string().optional(),
@@ -57,7 +57,7 @@ export const skillSchema = z.object({
   slug: z.string().min(1, "Slug is required"),
   icon: z.string().optional(),
   level: z.coerce.number().int().min(0).max(100).default(50),
-  categoryId: z.string().uuid().optional().nullable(),
+  categoryId: z.string().optional().nullable(),
   isFeatured: z.boolean().default(false),
   sortOrder: z.coerce.number().int().default(0),
   status: z.enum(["draft", "published", "unpublished"]).default("published"),
@@ -73,8 +73,8 @@ export const experienceSchema = z.object({
   achievements: z.array(z.string()).default([]),
   techStack: z.array(z.string()).default([]),
   companyLogo: z.string().optional(),
-  companyUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
-  startDate: z.string().min(1, "Start date is required"),
+  companyUrl: z.string().optional().or(z.literal("")),
+  startDate: z.string().optional().or(z.literal("")),
   endDate: z.string().optional(),
   isCurrent: z.boolean().default(false),
   isFeatured: z.boolean().default(false),
@@ -91,8 +91,8 @@ export const educationSchema = z.object({
   description: z.string().optional(),
   grade: z.string().optional(),
   logo: z.string().optional(),
-  url: z.string().url("Invalid URL").optional().or(z.literal("")),
-  startDate: z.string().min(1, "Start date is required"),
+  url: z.string().optional().or(z.literal("")),
+  startDate: z.string().optional().or(z.literal("")),
   endDate: z.string().optional(),
   isCurrent: z.boolean().default(false),
   sortOrder: z.coerce.number().int().default(0),
@@ -104,7 +104,7 @@ export const certificationSchema = z.object({
   name: z.string().min(1, "Name is required"),
   issuer: z.string().min(1, "Issuer is required"),
   credentialId: z.string().optional(),
-  credentialUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  credentialUrl: z.string().optional().or(z.literal("")),
   image: z.string().optional(),
   issueDate: z.string().optional(),
   expiryDate: z.string().optional(),
@@ -135,7 +135,7 @@ export const testimonialSchema = z.object({
   content: z.string().min(1, "Content is required"),
   avatar: z.string().optional(),
   rating: z.coerce.number().int().min(1).max(5).optional(),
-  projectId: z.string().uuid().optional().nullable(),
+  projectId: z.string().optional().nullable(),
   isFeatured: z.boolean().default(false),
   isVerified: z.boolean().default(false),
   sortOrder: z.coerce.number().int().default(0),
@@ -145,7 +145,7 @@ export const testimonialSchema = z.object({
 // ─── Social Link ──────────────────────────────────────────
 export const socialLinkSchema = z.object({
   platform: z.string().min(1, "Platform is required"),
-  url: z.string().url("Invalid URL"),
+  url: z.string().min(1, "URL is required"),
   icon: z.string().optional(),
   label: z.string().optional(),
   sortOrder: z.coerce.number().int().default(0),
@@ -172,7 +172,7 @@ export const navigationSchema = z.object({
   sortOrder: z.coerce.number().int().default(0),
   isActive: z.boolean().default(true),
   group: z.string().default("main"),
-  parentId: z.string().uuid().optional().nullable(),
+  parentId: z.string().optional().nullable(),
 });
 
 // ─── Site Settings ────────────────────────────────────────
@@ -194,7 +194,7 @@ export const seoMetadataSchema = z.object({
   ogTitle: z.string().optional(),
   ogDescription: z.string().optional(),
   structuredData: z.any().optional(),
-  canonicalUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  canonicalUrl: z.string().optional().or(z.literal("")),
   noIndex: z.boolean().default(false),
 });
 
@@ -233,4 +233,3 @@ export type SiteSettingFormData = z.infer<typeof siteSettingSchema>;
 export type SeoMetadataFormData = z.infer<typeof seoMetadataSchema>;
 export type LegalDocumentFormData = z.infer<typeof legalDocumentSchema>;
 export type LoginFormData = z.infer<typeof loginSchema>;
-
