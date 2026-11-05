@@ -1,19 +1,30 @@
-import { Pool } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-serverless";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "../models/schema";
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  process.env.DATABASE_URL_UNPOOLED ||
-  "";
+let cachedDb: ReturnType<typeof drizzle> | null = null;
+let lastConnectionString = "";
 
-const pool = new Pool({
-  connectionString,
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
+export function getDb() {
+  const connectionString =
+    process.env.DATABASE_URL ||
+    process.env.DATABASE_URL_UNPOOLED ||
+    "";
+
+  if (!cachedDb || lastConnectionString !== connectionString) {
+    const sql = neon(connectionString);
+    cachedDb = drizzle(sql, { schema });
+    lastConnectionString = connectionString;
+  }
+  return cachedDb;
+}
+
+export const db = new Proxy({} as ReturnType<typeof drizzle>, {
+  get(_target, prop) {
+    const activeDb = getDb();
+    const val = (activeDb as any)[prop];
+    return typeof val === "function" ? val.bind(activeDb) : val;
+  },
 });
 
-export const db = drizzle(pool, { schema });
 export type Database = typeof db;
-export { pool };

@@ -207,6 +207,7 @@ export async function createSocialLink(data: any): Promise<{ success: boolean; d
   try {
     const [item] = await db.insert(schema.socialLinks).values(data).returning();
     revalidatePath("/");
+    revalidatePath("/admin/social-links");
     return { success: true, data: item };
   } catch (err: any) {
     console.warn("[actions.createSocialLink] Error:", err);
@@ -220,6 +221,7 @@ export async function deleteSocialLink(id: string): Promise<{ success: boolean; 
       await db.delete(schema.socialLinks).where(eq(schema.socialLinks.id, id));
     }
     revalidatePath("/");
+    revalidatePath("/admin/social-links");
     return { success: true };
   } catch (err: any) {
     console.warn("[actions.deleteSocialLink] Error:", err);
@@ -236,6 +238,7 @@ export async function createNavigation(data: any): Promise<{ success: boolean; d
   try {
     const item = await NavigationRepository.create(data);
     revalidatePath("/");
+    revalidatePath("/admin/navigation");
     return { success: true, data: item };
   } catch (err: any) {
     console.warn("[actions.createNavigation] Error:", err);
@@ -247,6 +250,7 @@ export async function deleteNavigation(id: string): Promise<{ success: boolean; 
   try {
     await NavigationRepository.delete(id);
     revalidatePath("/");
+    revalidatePath("/admin/navigation");
     return { success: true };
   } catch (err: any) {
     console.warn("[actions.deleteNavigation] Error:", err);

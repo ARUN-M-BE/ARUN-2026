@@ -17,6 +17,12 @@ import {
 import { revalidatePath } from "next/cache";
 import { ActionResult } from "../constants";
 
+function toSafeDate(val: unknown): Date | undefined {
+  if (!val) return undefined;
+  const d = new Date(val as any);
+  return isNaN(d.getTime()) ? undefined : d;
+}
+
 // ─── Profile Service ─────────────────────────────────────
 export const ProfileService = {
   async getProfile() {
@@ -54,8 +60,8 @@ export const ProjectService = {
     try {
       const item = await ProjectRepository.create({
         ...data,
-        startDate: data.startDate ? new Date(data.startDate) : undefined,
-        endDate: data.endDate ? new Date(data.endDate) : undefined,
+        startDate: toSafeDate(data.startDate),
+        endDate: toSafeDate(data.endDate),
       });
       await AuditRepository.log({ userId, action: "create", entity: "project", entityId: item?.id });
       revalidatePath("/");
@@ -70,12 +76,13 @@ export const ProjectService = {
     try {
       await ProjectRepository.update(id, {
         ...data,
-        startDate: data.startDate ? new Date(data.startDate) : undefined,
-        endDate: data.endDate ? new Date(data.endDate) : undefined,
+        startDate: toSafeDate(data.startDate),
+        endDate: toSafeDate(data.endDate),
       });
       await AuditRepository.log({ userId, action: "update", entity: "project", entityId: id });
       revalidatePath("/");
       revalidatePath("/admin/projects");
+      revalidatePath(`/admin/projects/${id}/edit`);
       return { success: true };
     } catch (err: any) {
       console.error("[ProjectService.updateProject] Error:", err);
@@ -169,8 +176,8 @@ export const ExperienceService = {
     try {
       const exp = await ExperienceRepository.create({
         ...data,
-        startDate: new Date(data.startDate),
-        endDate: data.endDate ? new Date(data.endDate) : undefined,
+        startDate: toSafeDate(data.startDate) || new Date(),
+        endDate: toSafeDate(data.endDate),
       });
       await AuditRepository.log({ userId, action: "create", entity: "experience", entityId: exp?.id });
       revalidatePath("/");
@@ -185,12 +192,13 @@ export const ExperienceService = {
     try {
       await ExperienceRepository.update(id, {
         ...data,
-        startDate: new Date(data.startDate),
-        endDate: data.endDate ? new Date(data.endDate) : undefined,
+        startDate: toSafeDate(data.startDate) || new Date(),
+        endDate: toSafeDate(data.endDate),
       });
       await AuditRepository.log({ userId, action: "update", entity: "experience", entityId: id });
       revalidatePath("/");
       revalidatePath("/admin/experience");
+      revalidatePath(`/admin/experience/${id}/edit`);
       return { success: true };
     } catch (err: any) {
       console.error("[ExperienceService.updateExperience] Error:", err);
@@ -223,8 +231,8 @@ export const EducationService = {
     try {
       const edu = await EducationRepository.create({
         ...data,
-        startDate: new Date(data.startDate),
-        endDate: data.endDate ? new Date(data.endDate) : undefined,
+        startDate: toSafeDate(data.startDate) || new Date(),
+        endDate: toSafeDate(data.endDate),
       });
       await AuditRepository.log({ userId, action: "create", entity: "education", entityId: edu?.id });
       revalidatePath("/");
@@ -239,12 +247,13 @@ export const EducationService = {
     try {
       await EducationRepository.update(id, {
         ...data,
-        startDate: new Date(data.startDate),
-        endDate: data.endDate ? new Date(data.endDate) : undefined,
+        startDate: toSafeDate(data.startDate) || new Date(),
+        endDate: toSafeDate(data.endDate),
       });
       await AuditRepository.log({ userId, action: "update", entity: "education", entityId: id });
       revalidatePath("/");
       revalidatePath("/admin/education");
+      revalidatePath(`/admin/education/${id}/edit`);
       return { success: true };
     } catch (err: any) {
       console.error("[EducationService.updateEducation] Error:", err);
@@ -277,8 +286,8 @@ export const CertificationService = {
     try {
       const cert = await CertificationRepository.create({
         ...data,
-        issueDate: data.issueDate ? new Date(data.issueDate) : undefined,
-        expiryDate: data.expiryDate ? new Date(data.expiryDate) : undefined,
+        issueDate: toSafeDate(data.issueDate),
+        expiryDate: toSafeDate(data.expiryDate),
       });
       await AuditRepository.log({ userId, action: "create", entity: "certification", entityId: cert?.id });
       revalidatePath("/");
@@ -293,12 +302,13 @@ export const CertificationService = {
     try {
       await CertificationRepository.update(id, {
         ...data,
-        issueDate: data.issueDate ? new Date(data.issueDate) : undefined,
-        expiryDate: data.expiryDate ? new Date(data.expiryDate) : undefined,
+        issueDate: toSafeDate(data.issueDate),
+        expiryDate: toSafeDate(data.expiryDate),
       });
       await AuditRepository.log({ userId, action: "update", entity: "certification", entityId: id });
       revalidatePath("/");
       revalidatePath("/admin/certifications");
+      revalidatePath(`/admin/certifications/${id}/edit`);
       return { success: true };
     } catch (err: any) {
       console.error("[CertificationService.updateCertification] Error:", err);
@@ -345,6 +355,7 @@ export const ServiceOfferingService = {
       await AuditRepository.log({ userId, action: "update", entity: "service", entityId: id });
       revalidatePath("/");
       revalidatePath("/admin/services");
+      revalidatePath(`/admin/services/${id}/edit`);
       return { success: true };
     } catch (err: any) {
       console.error("[ServiceOfferingService.updateService] Error:", err);
@@ -391,6 +402,7 @@ export const TestimonialService = {
       await AuditRepository.log({ userId, action: "update", entity: "testimonial", entityId: id });
       revalidatePath("/");
       revalidatePath("/admin/testimonials");
+      revalidatePath(`/admin/testimonials/${id}/edit`);
       return { success: true };
     } catch (err: any) {
       console.error("[TestimonialService.updateTestimonial] Error:", err);
@@ -486,7 +498,7 @@ export const LegalService = {
     try {
       await LegalRepository.update(id, {
         ...data,
-        effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : undefined,
+        effectiveDate: toSafeDate(data.effectiveDate),
       });
       await LegalRepository.addVersionHistory({
         documentId: id,
@@ -497,6 +509,7 @@ export const LegalService = {
       });
       await AuditRepository.log({ userId, action: "update", entity: "legal_document", entityId: id });
       revalidatePath("/admin/legal");
+      revalidatePath(`/admin/legal/${id}/edit`);
       revalidatePath(`/legal/${data.slug}`);
       return { success: true };
     } catch (err: any) {
