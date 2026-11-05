@@ -23,6 +23,7 @@ import { fallbackSocialLinks } from "@/server/repositories/fallback-data";
 import { db } from "@/server/config/database";
 import * as schema from "@/server/models/schema";
 import { count, eq } from "drizzle-orm";
+import { isUUID } from "@/lib/utils";
 import { requireAdmin } from "@/server/middleware/auth-guard";
 import { revalidatePath } from "next/cache";
 
@@ -203,15 +204,27 @@ export async function getPublicSocialLinks() {
 }
 export async function createSocialLink(data: any): Promise<{ success: boolean; data?: any; error?: string }> {
   await requireAdmin();
-  const [item] = await db.insert(schema.socialLinks).values(data).returning();
-  revalidatePath("/");
-  return { success: true, data: item };
+  try {
+    const [item] = await db.insert(schema.socialLinks).values(data).returning();
+    revalidatePath("/");
+    return { success: true, data: item };
+  } catch (err: any) {
+    console.warn("[actions.createSocialLink] Error:", err);
+    return { success: false, error: err.message || "Failed to create social link" };
+  }
 }
 export async function deleteSocialLink(id: string): Promise<{ success: boolean; error?: string }> {
   await requireAdmin();
-  await db.delete(schema.socialLinks).where(eq(schema.socialLinks.id, id));
-  revalidatePath("/");
-  return { success: true };
+  try {
+    if (isUUID(id)) {
+      await db.delete(schema.socialLinks).where(eq(schema.socialLinks.id, id));
+    }
+    revalidatePath("/");
+    return { success: true };
+  } catch (err: any) {
+    console.warn("[actions.deleteSocialLink] Error:", err);
+    return { success: false, error: err.message || "Failed to delete social link" };
+  }
 }
 
 // ─── Navigation ───────────────────────────────────────────
@@ -220,15 +233,25 @@ export async function getNavigation() {
 }
 export async function createNavigation(data: any): Promise<{ success: boolean; data?: any; error?: string }> {
   await requireAdmin();
-  const item = await NavigationRepository.create(data);
-  revalidatePath("/");
-  return { success: true, data: item };
+  try {
+    const item = await NavigationRepository.create(data);
+    revalidatePath("/");
+    return { success: true, data: item };
+  } catch (err: any) {
+    console.warn("[actions.createNavigation] Error:", err);
+    return { success: false, error: err.message || "Failed to create navigation" };
+  }
 }
 export async function deleteNavigation(id: string): Promise<{ success: boolean; error?: string }> {
   await requireAdmin();
-  await NavigationRepository.delete(id);
-  revalidatePath("/");
-  return { success: true };
+  try {
+    await NavigationRepository.delete(id);
+    revalidatePath("/");
+    return { success: true };
+  } catch (err: any) {
+    console.warn("[actions.deleteNavigation] Error:", err);
+    return { success: false, error: err.message || "Failed to delete navigation" };
+  }
 }
 
 // ─── Settings ────────────────────────────────────────────
@@ -254,14 +277,19 @@ export async function getSeoMetadata(page?: string) {
 }
 export async function upsertSeoMetadata(data: any): Promise<{ success: boolean; error?: string }> {
   await requireAdmin();
-  const [existing] = await db.select().from(schema.seoMetadata).where(eq(schema.seoMetadata.page, data.page)).limit(1);
-  if (existing) {
-    await db.update(schema.seoMetadata).set({ ...data, updatedAt: new Date() }).where(eq(schema.seoMetadata.id, existing.id));
-  } else {
-    await db.insert(schema.seoMetadata).values(data);
+  try {
+    const [existing] = await db.select().from(schema.seoMetadata).where(eq(schema.seoMetadata.page, data.page)).limit(1);
+    if (existing) {
+      await db.update(schema.seoMetadata).set({ ...data, updatedAt: new Date() }).where(eq(schema.seoMetadata.id, existing.id));
+    } else {
+      await db.insert(schema.seoMetadata).values(data);
+    }
+    revalidatePath("/admin/seo");
+    return { success: true };
+  } catch (err: any) {
+    console.warn("[actions.upsertSeoMetadata] Error:", err);
+    return { success: false, error: err.message || "Failed to upsert SEO metadata" };
   }
-  revalidatePath("/admin/seo");
-  return { success: true };
 }
 
 // ─── Legal Documents ──────────────────────────────────────

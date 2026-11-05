@@ -18,13 +18,15 @@ export default async function EditTestimonialPage({
     notFound();
   }
 
+  const serializedItem = JSON.parse(JSON.stringify(item));
+
   return (
     <div className="space-y-6">
       <PageHeader
         title={`Edit Testimonial: ${item.name}`}
         description="Update quote text, verification status or rating."
       />
-      <TestimonialForm initialData={item} isEditing />
+      <TestimonialForm initialData={serializedItem} isEditing />
     </div>
   );
 }

@@ -18,13 +18,15 @@ export default async function EditServicePage({
     notFound();
   }
 
+  const serializedSvc = JSON.parse(JSON.stringify(svc));
+
   return (
     <div className="space-y-6">
       <PageHeader
         title={`Edit Service: ${svc.title}`}
         description="Update service scope, deliverables or pricing terms."
       />
-      <ServiceForm initialData={svc} isEditing />
+      <ServiceForm initialData={serializedSvc} isEditing />
     </div>
   );
 }
