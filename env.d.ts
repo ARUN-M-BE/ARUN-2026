@@ -28,3 +28,4 @@ declare namespace Cloudflare {
 }
 
 interface CloudflareEnv extends __BaseEnv_CloudflareEnv {}
+
