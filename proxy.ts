@@ -10,7 +10,7 @@ const authSecret =
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip static assets, API auth routes
+  // Skip static assets, favicon, API auth routes
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api/auth") ||
@@ -19,22 +19,52 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Protect admin routes (except login)
-  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
-    const token = await getToken({
+  // Detect session cookies across all NextAuth / Auth.js formats
+  const hasAuthJsCookie =
+    request.cookies.has("authjs.session-token") ||
+    request.cookies.has("__Secure-authjs.session-token");
+  const hasNextAuthCookie =
+    request.cookies.has("next-auth.session-token") ||
+    request.cookies.has("__Secure-next-auth.session-token");
+
+  // Determine active cookie name to allow getToken to decode correctly
+  const cookieName = request.cookies.has("__Secure-authjs.session-token")
+    ? "__Secure-authjs.session-token"
+    : request.cookies.has("authjs.session-token")
+    ? "authjs.session-token"
+    : request.cookies.has("__Secure-next-auth.session-token")
+    ? "__Secure-next-auth.session-token"
+    : "next-auth.session-token";
+
+  // Prevent authenticated user from re-accessing login page
+  if (pathname === "/admin/login") {
+    if (hasAuthJsCookie || hasNextAuthCookie) {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // Protect admin routes
+  if (pathname.startsWith("/admin")) {
+    let token = await getToken({
       req: request,
       secret: authSecret,
+      cookieName,
     });
 
-    if (!token) {
+    // Fallback attempt with default cookie configuration if initial lookup was empty
+    if (!token && (hasAuthJsCookie || hasNextAuthCookie)) {
+      token = await getToken({
+        req: request,
+        secret: authSecret,
+      });
+    }
+
+    // If no token and no session cookie is present, redirect to login
+    if (!token && !hasAuthJsCookie && !hasNextAuthCookie) {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
-    }
-
-    // Already logged in trying to access login page
-    if (pathname === "/admin/login" && token) {
-      return NextResponse.redirect(new URL("/admin", request.url));
     }
   }
 
