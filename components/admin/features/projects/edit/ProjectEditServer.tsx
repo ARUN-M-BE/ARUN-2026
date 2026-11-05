@@ -11,11 +11,13 @@ export default async function EditProjectPage({
 }) {
   await requireAdmin();
   const { id } = await params;
-  const project = await getProjectById(id);
+  const rawProject = await getProjectById(id);
 
-  if (!project) {
+  if (!rawProject) {
     notFound();
   }
+
+  const project = JSON.parse(JSON.stringify(rawProject));
 
   return (
     <div className="space-y-6">

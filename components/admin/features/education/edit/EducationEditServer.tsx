@@ -18,13 +18,15 @@ export default async function EditEducationPage({
     notFound();
   }
 
+  const serializedEdu = JSON.parse(JSON.stringify(edu));
+
   return (
     <div className="space-y-6">
       <PageHeader
         title={`Edit Education: ${edu.degree}`}
         description="Update educational degree and institution details."
       />
-      <EducationForm initialData={edu} isEditing />
+      <EducationForm initialData={serializedEdu} isEditing />
     </div>
   );
 }

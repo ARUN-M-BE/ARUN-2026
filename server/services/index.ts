@@ -26,11 +26,16 @@ export const ProfileService = {
     return ProfileRepository.getPublished();
   },
   async updateProfile(userId: string, data: any): Promise<ActionResult> {
-    await ProfileRepository.upsert(data);
-    await AuditRepository.log({ userId, action: "update", entity: "profile" });
-    revalidatePath("/");
-    revalidatePath("/admin/profile");
-    return { success: true };
+    try {
+      await ProfileRepository.upsert(data);
+      await AuditRepository.log({ userId, action: "update", entity: "profile" });
+      revalidatePath("/");
+      revalidatePath("/admin/profile");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[ProfileService.updateProfile] Error:", err);
+      return { success: false, error: err.message || "Failed to update profile" };
+    }
   },
 };
 
@@ -46,33 +51,48 @@ export const ProjectService = {
     return ProjectRepository.findById(id);
   },
   async createProject(userId: string, data: any): Promise<ActionResult> {
-    const item = await ProjectRepository.create({
-      ...data,
-      startDate: data.startDate ? new Date(data.startDate) : undefined,
-      endDate: data.endDate ? new Date(data.endDate) : undefined,
-    });
-    await AuditRepository.log({ userId, action: "create", entity: "project", entityId: item.id });
-    revalidatePath("/");
-    revalidatePath("/admin/projects");
-    return { success: true, data: item };
+    try {
+      const item = await ProjectRepository.create({
+        ...data,
+        startDate: data.startDate ? new Date(data.startDate) : undefined,
+        endDate: data.endDate ? new Date(data.endDate) : undefined,
+      });
+      await AuditRepository.log({ userId, action: "create", entity: "project", entityId: item?.id });
+      revalidatePath("/");
+      revalidatePath("/admin/projects");
+      return { success: true, data: item };
+    } catch (err: any) {
+      console.error("[ProjectService.createProject] Error:", err);
+      return { success: false, error: err.message || "Failed to create project" };
+    }
   },
   async updateProject(userId: string, id: string, data: any): Promise<ActionResult> {
-    await ProjectRepository.update(id, {
-      ...data,
-      startDate: data.startDate ? new Date(data.startDate) : undefined,
-      endDate: data.endDate ? new Date(data.endDate) : undefined,
-    });
-    await AuditRepository.log({ userId, action: "update", entity: "project", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/projects");
-    return { success: true };
+    try {
+      await ProjectRepository.update(id, {
+        ...data,
+        startDate: data.startDate ? new Date(data.startDate) : undefined,
+        endDate: data.endDate ? new Date(data.endDate) : undefined,
+      });
+      await AuditRepository.log({ userId, action: "update", entity: "project", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/projects");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[ProjectService.updateProject] Error:", err);
+      return { success: false, error: err.message || "Failed to update project" };
+    }
   },
   async deleteProject(userId: string, id: string): Promise<ActionResult> {
-    await ProjectRepository.delete(id);
-    await AuditRepository.log({ userId, action: "delete", entity: "project", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/projects");
-    return { success: true };
+    try {
+      await ProjectRepository.delete(id);
+      await AuditRepository.log({ userId, action: "delete", entity: "project", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/projects");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[ProjectService.deleteProject] Error:", err);
+      return { success: false, error: err.message || "Failed to delete project" };
+    }
   },
 };
 
@@ -82,18 +102,28 @@ export const SkillService = {
     return SkillRepository.getCategories();
   },
   async createCategory(userId: string, data: any): Promise<ActionResult> {
-    const cat = await SkillRepository.createCategory(data);
-    await AuditRepository.log({ userId, action: "create", entity: "skill_category", entityId: cat.id });
-    revalidatePath("/");
-    revalidatePath("/admin/skills");
-    return { success: true, data: cat };
+    try {
+      const cat = await SkillRepository.createCategory(data);
+      await AuditRepository.log({ userId, action: "create", entity: "skill_category", entityId: cat?.id });
+      revalidatePath("/");
+      revalidatePath("/admin/skills");
+      return { success: true, data: cat };
+    } catch (err: any) {
+      console.error("[SkillService.createCategory] Error:", err);
+      return { success: false, error: err.message || "Failed to create category" };
+    }
   },
   async deleteCategory(userId: string, id: string): Promise<ActionResult> {
-    await SkillRepository.deleteCategory(id);
-    await AuditRepository.log({ userId, action: "delete", entity: "skill_category", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/skills");
-    return { success: true };
+    try {
+      await SkillRepository.deleteCategory(id);
+      await AuditRepository.log({ userId, action: "delete", entity: "skill_category", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/skills");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[SkillService.deleteCategory] Error:", err);
+      return { success: false, error: err.message || "Failed to delete category" };
+    }
   },
   async getSkills(opts?: any) {
     return SkillRepository.getSkills(opts);
@@ -102,18 +132,28 @@ export const SkillService = {
     return SkillRepository.getPublishedCategoriesWithSkills();
   },
   async createSkill(userId: string, data: any): Promise<ActionResult> {
-    const skill = await SkillRepository.createSkill(data);
-    await AuditRepository.log({ userId, action: "create", entity: "skill", entityId: skill.id });
-    revalidatePath("/");
-    revalidatePath("/admin/skills");
-    return { success: true, data: skill };
+    try {
+      const skill = await SkillRepository.createSkill(data);
+      await AuditRepository.log({ userId, action: "create", entity: "skill", entityId: skill?.id });
+      revalidatePath("/");
+      revalidatePath("/admin/skills");
+      return { success: true, data: skill };
+    } catch (err: any) {
+      console.error("[SkillService.createSkill] Error:", err);
+      return { success: false, error: err.message || "Failed to create skill" };
+    }
   },
   async deleteSkill(userId: string, id: string): Promise<ActionResult> {
-    await SkillRepository.deleteSkill(id);
-    await AuditRepository.log({ userId, action: "delete", entity: "skill", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/skills");
-    return { success: true };
+    try {
+      await SkillRepository.deleteSkill(id);
+      await AuditRepository.log({ userId, action: "delete", entity: "skill", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/skills");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[SkillService.deleteSkill] Error:", err);
+      return { success: false, error: err.message || "Failed to delete skill" };
+    }
   },
 };
 
@@ -126,33 +166,48 @@ export const ExperienceService = {
     return ExperienceRepository.findPublished();
   },
   async createExperience(userId: string, data: any): Promise<ActionResult> {
-    const exp = await ExperienceRepository.create({
-      ...data,
-      startDate: new Date(data.startDate),
-      endDate: data.endDate ? new Date(data.endDate) : undefined,
-    });
-    await AuditRepository.log({ userId, action: "create", entity: "experience", entityId: exp.id });
-    revalidatePath("/");
-    revalidatePath("/admin/experience");
-    return { success: true, data: exp };
+    try {
+      const exp = await ExperienceRepository.create({
+        ...data,
+        startDate: new Date(data.startDate),
+        endDate: data.endDate ? new Date(data.endDate) : undefined,
+      });
+      await AuditRepository.log({ userId, action: "create", entity: "experience", entityId: exp?.id });
+      revalidatePath("/");
+      revalidatePath("/admin/experience");
+      return { success: true, data: exp };
+    } catch (err: any) {
+      console.error("[ExperienceService.createExperience] Error:", err);
+      return { success: false, error: err.message || "Failed to create experience" };
+    }
   },
   async updateExperience(userId: string, id: string, data: any): Promise<ActionResult> {
-    await ExperienceRepository.update(id, {
-      ...data,
-      startDate: new Date(data.startDate),
-      endDate: data.endDate ? new Date(data.endDate) : undefined,
-    });
-    await AuditRepository.log({ userId, action: "update", entity: "experience", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/experience");
-    return { success: true };
+    try {
+      await ExperienceRepository.update(id, {
+        ...data,
+        startDate: new Date(data.startDate),
+        endDate: data.endDate ? new Date(data.endDate) : undefined,
+      });
+      await AuditRepository.log({ userId, action: "update", entity: "experience", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/experience");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[ExperienceService.updateExperience] Error:", err);
+      return { success: false, error: err.message || "Failed to update experience" };
+    }
   },
   async deleteExperience(userId: string, id: string): Promise<ActionResult> {
-    await ExperienceRepository.delete(id);
-    await AuditRepository.log({ userId, action: "delete", entity: "experience", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/experience");
-    return { success: true };
+    try {
+      await ExperienceRepository.delete(id);
+      await AuditRepository.log({ userId, action: "delete", entity: "experience", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/experience");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[ExperienceService.deleteExperience] Error:", err);
+      return { success: false, error: err.message || "Failed to delete experience" };
+    }
   },
 };
 
@@ -165,33 +220,48 @@ export const EducationService = {
     return EducationRepository.findPublished();
   },
   async createEducation(userId: string, data: any): Promise<ActionResult> {
-    const edu = await EducationRepository.create({
-      ...data,
-      startDate: new Date(data.startDate),
-      endDate: data.endDate ? new Date(data.endDate) : undefined,
-    });
-    await AuditRepository.log({ userId, action: "create", entity: "education", entityId: edu.id });
-    revalidatePath("/");
-    revalidatePath("/admin/education");
-    return { success: true, data: edu };
+    try {
+      const edu = await EducationRepository.create({
+        ...data,
+        startDate: new Date(data.startDate),
+        endDate: data.endDate ? new Date(data.endDate) : undefined,
+      });
+      await AuditRepository.log({ userId, action: "create", entity: "education", entityId: edu?.id });
+      revalidatePath("/");
+      revalidatePath("/admin/education");
+      return { success: true, data: edu };
+    } catch (err: any) {
+      console.error("[EducationService.createEducation] Error:", err);
+      return { success: false, error: err.message || "Failed to create education" };
+    }
   },
   async updateEducation(userId: string, id: string, data: any): Promise<ActionResult> {
-    await EducationRepository.update(id, {
-      ...data,
-      startDate: new Date(data.startDate),
-      endDate: data.endDate ? new Date(data.endDate) : undefined,
-    });
-    await AuditRepository.log({ userId, action: "update", entity: "education", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/education");
-    return { success: true };
+    try {
+      await EducationRepository.update(id, {
+        ...data,
+        startDate: new Date(data.startDate),
+        endDate: data.endDate ? new Date(data.endDate) : undefined,
+      });
+      await AuditRepository.log({ userId, action: "update", entity: "education", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/education");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[EducationService.updateEducation] Error:", err);
+      return { success: false, error: err.message || "Failed to update education" };
+    }
   },
   async deleteEducation(userId: string, id: string): Promise<ActionResult> {
-    await EducationRepository.delete(id);
-    await AuditRepository.log({ userId, action: "delete", entity: "education", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/education");
-    return { success: true };
+    try {
+      await EducationRepository.delete(id);
+      await AuditRepository.log({ userId, action: "delete", entity: "education", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/education");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[EducationService.deleteEducation] Error:", err);
+      return { success: false, error: err.message || "Failed to delete education" };
+    }
   },
 };
 
@@ -204,33 +274,48 @@ export const CertificationService = {
     return CertificationRepository.findPublished();
   },
   async createCertification(userId: string, data: any): Promise<ActionResult> {
-    const cert = await CertificationRepository.create({
-      ...data,
-      issueDate: data.issueDate ? new Date(data.issueDate) : undefined,
-      expiryDate: data.expiryDate ? new Date(data.expiryDate) : undefined,
-    });
-    await AuditRepository.log({ userId, action: "create", entity: "certification", entityId: cert.id });
-    revalidatePath("/");
-    revalidatePath("/admin/certifications");
-    return { success: true, data: cert };
+    try {
+      const cert = await CertificationRepository.create({
+        ...data,
+        issueDate: data.issueDate ? new Date(data.issueDate) : undefined,
+        expiryDate: data.expiryDate ? new Date(data.expiryDate) : undefined,
+      });
+      await AuditRepository.log({ userId, action: "create", entity: "certification", entityId: cert?.id });
+      revalidatePath("/");
+      revalidatePath("/admin/certifications");
+      return { success: true, data: cert };
+    } catch (err: any) {
+      console.error("[CertificationService.createCertification] Error:", err);
+      return { success: false, error: err.message || "Failed to create certification" };
+    }
   },
   async updateCertification(userId: string, id: string, data: any): Promise<ActionResult> {
-    await CertificationRepository.update(id, {
-      ...data,
-      issueDate: data.issueDate ? new Date(data.issueDate) : undefined,
-      expiryDate: data.expiryDate ? new Date(data.expiryDate) : undefined,
-    });
-    await AuditRepository.log({ userId, action: "update", entity: "certification", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/certifications");
-    return { success: true };
+    try {
+      await CertificationRepository.update(id, {
+        ...data,
+        issueDate: data.issueDate ? new Date(data.issueDate) : undefined,
+        expiryDate: data.expiryDate ? new Date(data.expiryDate) : undefined,
+      });
+      await AuditRepository.log({ userId, action: "update", entity: "certification", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/certifications");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[CertificationService.updateCertification] Error:", err);
+      return { success: false, error: err.message || "Failed to update certification" };
+    }
   },
   async deleteCertification(userId: string, id: string): Promise<ActionResult> {
-    await CertificationRepository.delete(id);
-    await AuditRepository.log({ userId, action: "delete", entity: "certification", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/certifications");
-    return { success: true };
+    try {
+      await CertificationRepository.delete(id);
+      await AuditRepository.log({ userId, action: "delete", entity: "certification", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/certifications");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[CertificationService.deleteCertification] Error:", err);
+      return { success: false, error: err.message || "Failed to delete certification" };
+    }
   },
 };
 
@@ -243,25 +328,40 @@ export const ServiceOfferingService = {
     return ServiceRepository.findPublished();
   },
   async createService(userId: string, data: any): Promise<ActionResult> {
-    const svc = await ServiceRepository.create(data);
-    await AuditRepository.log({ userId, action: "create", entity: "service", entityId: svc.id });
-    revalidatePath("/");
-    revalidatePath("/admin/services");
-    return { success: true, data: svc };
+    try {
+      const svc = await ServiceRepository.create(data);
+      await AuditRepository.log({ userId, action: "create", entity: "service", entityId: svc?.id });
+      revalidatePath("/");
+      revalidatePath("/admin/services");
+      return { success: true, data: svc };
+    } catch (err: any) {
+      console.error("[ServiceOfferingService.createService] Error:", err);
+      return { success: false, error: err.message || "Failed to create service" };
+    }
   },
   async updateService(userId: string, id: string, data: any): Promise<ActionResult> {
-    await ServiceRepository.update(id, data);
-    await AuditRepository.log({ userId, action: "update", entity: "service", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/services");
-    return { success: true };
+    try {
+      await ServiceRepository.update(id, data);
+      await AuditRepository.log({ userId, action: "update", entity: "service", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/services");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[ServiceOfferingService.updateService] Error:", err);
+      return { success: false, error: err.message || "Failed to update service" };
+    }
   },
   async deleteService(userId: string, id: string): Promise<ActionResult> {
-    await ServiceRepository.delete(id);
-    await AuditRepository.log({ userId, action: "delete", entity: "service", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/services");
-    return { success: true };
+    try {
+      await ServiceRepository.delete(id);
+      await AuditRepository.log({ userId, action: "delete", entity: "service", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/services");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[ServiceOfferingService.deleteService] Error:", err);
+      return { success: false, error: err.message || "Failed to delete service" };
+    }
   },
 };
 
@@ -274,25 +374,40 @@ export const TestimonialService = {
     return TestimonialRepository.findPublished();
   },
   async createTestimonial(userId: string, data: any): Promise<ActionResult> {
-    const t = await TestimonialRepository.create(data);
-    await AuditRepository.log({ userId, action: "create", entity: "testimonial", entityId: t.id });
-    revalidatePath("/");
-    revalidatePath("/admin/testimonials");
-    return { success: true, data: t };
+    try {
+      const t = await TestimonialRepository.create(data);
+      await AuditRepository.log({ userId, action: "create", entity: "testimonial", entityId: t?.id });
+      revalidatePath("/");
+      revalidatePath("/admin/testimonials");
+      return { success: true, data: t };
+    } catch (err: any) {
+      console.error("[TestimonialService.createTestimonial] Error:", err);
+      return { success: false, error: err.message || "Failed to create testimonial" };
+    }
   },
   async updateTestimonial(userId: string, id: string, data: any): Promise<ActionResult> {
-    await TestimonialRepository.update(id, data);
-    await AuditRepository.log({ userId, action: "update", entity: "testimonial", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/testimonials");
-    return { success: true };
+    try {
+      await TestimonialRepository.update(id, data);
+      await AuditRepository.log({ userId, action: "update", entity: "testimonial", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/testimonials");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[TestimonialService.updateTestimonial] Error:", err);
+      return { success: false, error: err.message || "Failed to update testimonial" };
+    }
   },
   async deleteTestimonial(userId: string, id: string): Promise<ActionResult> {
-    await TestimonialRepository.delete(id);
-    await AuditRepository.log({ userId, action: "delete", entity: "testimonial", entityId: id });
-    revalidatePath("/");
-    revalidatePath("/admin/testimonials");
-    return { success: true };
+    try {
+      await TestimonialRepository.delete(id);
+      await AuditRepository.log({ userId, action: "delete", entity: "testimonial", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/testimonials");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[TestimonialService.deleteTestimonial] Error:", err);
+      return { success: false, error: err.message || "Failed to delete testimonial" };
+    }
   },
 };
 
@@ -302,26 +417,41 @@ export const MessageService = {
     return MessageRepository.findMany(opts);
   },
   async submitContact(data: any): Promise<ActionResult> {
-    await MessageRepository.create(data);
-    await MessageRepository.recordConsent({
-      type: "contact_form",
-      consentGiven: true,
-      preferences: { email: data.email, timestamp: new Date().toISOString() },
-    });
-    revalidatePath("/admin/messages");
-    return { success: true };
+    try {
+      await MessageRepository.create(data);
+      await MessageRepository.recordConsent({
+        type: "contact_form",
+        consentGiven: true,
+        preferences: { email: data.email, timestamp: new Date().toISOString() },
+      });
+      revalidatePath("/admin/messages");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[MessageService.submitContact] Error:", err);
+      return { success: false, error: err.message || "Failed to submit message" };
+    }
   },
   async updateStatus(userId: string, id: string, status: any): Promise<ActionResult> {
-    await MessageRepository.updateStatus(id, status);
-    await AuditRepository.log({ userId, action: "update_status", entity: "contact_message", entityId: id, details: { status } });
-    revalidatePath("/admin/messages");
-    return { success: true };
+    try {
+      await MessageRepository.updateStatus(id, status);
+      await AuditRepository.log({ userId, action: "update_status", entity: "contact_message", entityId: id, details: { status } });
+      revalidatePath("/admin/messages");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[MessageService.updateStatus] Error:", err);
+      return { success: false, error: err.message || "Failed to update status" };
+    }
   },
   async deleteMessage(userId: string, id: string): Promise<ActionResult> {
-    await MessageRepository.delete(id);
-    await AuditRepository.log({ userId, action: "delete", entity: "contact_message", entityId: id });
-    revalidatePath("/admin/messages");
-    return { success: true };
+    try {
+      await MessageRepository.delete(id);
+      await AuditRepository.log({ userId, action: "delete", entity: "contact_message", entityId: id });
+      revalidatePath("/admin/messages");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[MessageService.deleteMessage] Error:", err);
+      return { success: false, error: err.message || "Failed to delete message" };
+    }
   },
 };
 
@@ -331,11 +461,16 @@ export const SettingsService = {
     return SettingsRepository.findMany();
   },
   async updateSetting(userId: string, key: string, value: any): Promise<ActionResult> {
-    await SettingsRepository.upsert(key, value);
-    await AuditRepository.log({ userId, action: "update", entity: "site_setting", entityId: key });
-    revalidatePath("/");
-    revalidatePath("/admin/settings");
-    return { success: true };
+    try {
+      await SettingsRepository.upsert(key, value);
+      await AuditRepository.log({ userId, action: "update", entity: "site_setting", entityId: key });
+      revalidatePath("/");
+      revalidatePath("/admin/settings");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[SettingsService.updateSetting] Error:", err);
+      return { success: false, error: err.message || "Failed to update setting" };
+    }
   },
 };
 
@@ -348,27 +483,37 @@ export const LegalService = {
     return LegalRepository.findBySlug(slug);
   },
   async updateDocument(userId: string, id: string, data: any): Promise<ActionResult> {
-    await LegalRepository.update(id, {
-      ...data,
-      effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : undefined,
-    });
-    await LegalRepository.addVersionHistory({
-      documentId: id,
-      version: data.version,
-      content: data.content,
-      changedBy: userId,
-      changeNote: "Version revision update",
-    });
-    await AuditRepository.log({ userId, action: "update", entity: "legal_document", entityId: id });
-    revalidatePath("/admin/legal");
-    revalidatePath(`/legal/${data.slug}`);
-    return { success: true };
+    try {
+      await LegalRepository.update(id, {
+        ...data,
+        effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : undefined,
+      });
+      await LegalRepository.addVersionHistory({
+        documentId: id,
+        version: data.version,
+        content: data.content,
+        changedBy: userId,
+        changeNote: "Version revision update",
+      });
+      await AuditRepository.log({ userId, action: "update", entity: "legal_document", entityId: id });
+      revalidatePath("/admin/legal");
+      revalidatePath(`/legal/${data.slug}`);
+      return { success: true };
+    } catch (err: any) {
+      console.error("[LegalService.updateDocument] Error:", err);
+      return { success: false, error: err.message || "Failed to update document" };
+    }
   },
   async deleteDocument(userId: string, id: string): Promise<ActionResult> {
-    await LegalRepository.delete(id);
-    await AuditRepository.log({ userId, action: "delete", entity: "legal_document", entityId: id });
-    revalidatePath("/admin/legal");
-    return { success: true };
+    try {
+      await LegalRepository.delete(id);
+      await AuditRepository.log({ userId, action: "delete", entity: "legal_document", entityId: id });
+      revalidatePath("/admin/legal");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[LegalService.deleteDocument] Error:", err);
+      return { success: false, error: err.message || "Failed to delete document" };
+    }
   },
 };
 
@@ -378,16 +523,26 @@ export const MediaService = {
     return MediaRepository.findMany(opts);
   },
   async createMedia(userId: string, data: any): Promise<ActionResult> {
-    const item = await MediaRepository.create({ ...data, uploadedBy: userId });
-    await AuditRepository.log({ userId, action: "create", entity: "media_asset", entityId: item.id });
-    revalidatePath("/admin/media");
-    return { success: true, data: item };
+    try {
+      const item = await MediaRepository.create({ ...data, uploadedBy: userId });
+      await AuditRepository.log({ userId, action: "create", entity: "media_asset", entityId: item?.id });
+      revalidatePath("/admin/media");
+      return { success: true, data: item };
+    } catch (err: any) {
+      console.error("[MediaService.createMedia] Error:", err);
+      return { success: false, error: err.message || "Failed to upload media" };
+    }
   },
   async deleteMedia(userId: string, id: string): Promise<ActionResult> {
-    await MediaRepository.delete(id);
-    await AuditRepository.log({ userId, action: "delete", entity: "media_asset", entityId: id });
-    revalidatePath("/admin/media");
-    return { success: true };
+    try {
+      await MediaRepository.delete(id);
+      await AuditRepository.log({ userId, action: "delete", entity: "media_asset", entityId: id });
+      revalidatePath("/admin/media");
+      return { success: true };
+    } catch (err: any) {
+      console.error("[MediaService.deleteMedia] Error:", err);
+      return { success: false, error: err.message || "Failed to delete media" };
+    }
   },
 };
 
@@ -413,4 +568,3 @@ export {
   checkNeonRealtime,
   checkAllNeonServices,
 } from "../../lib/neon";
-

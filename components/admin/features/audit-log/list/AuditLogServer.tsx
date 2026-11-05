@@ -14,6 +14,7 @@ export default async function AdminAuditLogPage({
   const page = Number(params.page) || 1;
 
   const data = await getAuditLogs({ entity, page, limit: 50 });
+  const serializedItems = JSON.parse(JSON.stringify(data.items || []));
 
   return (
     <div className="space-y-6">
@@ -21,7 +22,7 @@ export default async function AdminAuditLogPage({
         title="Security & System Audit Logs"
         description="Immutable record of administrative actions, data modifications, and security events."
       />
-      <AuditLogClient initialData={data.items} />
+      <AuditLogClient initialData={serializedItems} />
     </div>
   );
 }

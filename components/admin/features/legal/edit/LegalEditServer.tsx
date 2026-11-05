@@ -18,13 +18,15 @@ export default async function EditLegalPage({
     notFound();
   }
 
+  const serializedDoc = JSON.parse(JSON.stringify(doc));
+
   return (
     <div className="space-y-6">
       <PageHeader
         title={`Edit Legal Document: ${doc.title}`}
         description="Update statutory document clauses, effective dates, or version history records."
       />
-      <LegalForm initialData={doc} />
+      <LegalForm initialData={serializedDoc} />
     </div>
   );
 }

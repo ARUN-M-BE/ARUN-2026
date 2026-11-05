@@ -18,13 +18,15 @@ export default async function EditCertificationPage({
     notFound();
   }
 
+  const serializedCert = JSON.parse(JSON.stringify(cert));
+
   return (
     <div className="space-y-6">
       <PageHeader
         title={`Edit Certification: ${cert.name}`}
         description="Update license identifier, authority or verification link."
       />
-      <CertificationForm initialData={cert} isEditing />
+      <CertificationForm initialData={serializedCert} isEditing />
     </div>
   );
 }

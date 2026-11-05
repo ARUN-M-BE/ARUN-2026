@@ -18,13 +18,15 @@ export default async function EditExperiencePage({
     notFound();
   }
 
+  const serializedExp = JSON.parse(JSON.stringify(exp));
+
   return (
     <div className="space-y-6">
       <PageHeader
         title={`Edit Milestone: ${exp.position} at ${exp.company}`}
         description="Update role details, dates or achievements."
       />
-      <ExperienceForm initialData={exp} isEditing />
+      <ExperienceForm initialData={serializedExp} isEditing />
     </div>
   );
 }

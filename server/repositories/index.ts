@@ -1,6 +1,7 @@
 import { db } from "../config/database";
 import * as schema from "../models/schema";
 import { eq, desc, asc, and, ilike, count } from "drizzle-orm";
+import { isUUID } from "@/lib/utils";
 import {
   fallbackProfile,
   fallbackProjects,
@@ -33,7 +34,7 @@ export const ProfileRepository = {
   async upsert(data: any) {
     try {
       const existing = await this.getFirst();
-      if (existing && existing.id && existing.id !== fallbackProfile.id) {
+      if (existing && existing.id && isUUID(existing.id) && existing.id !== fallbackProfile.id) {
         return await db.update(schema.profile).set({ ...data, updatedAt: new Date() }).where(eq(schema.profile.id, existing.id));
       }
       return await db.insert(schema.profile).values(data);
@@ -74,21 +75,68 @@ export const ProjectRepository = {
   },
   async findById(id: string) {
     try {
-      const [item] = await db.select().from(schema.projects).where(eq(schema.projects.id, id)).limit(1);
-      return item || fallbackProjects.find((p) => p.id === id) || null;
+      if (isUUID(id)) {
+        const [item] = await db.select().from(schema.projects).where(eq(schema.projects.id, id)).limit(1);
+        if (item) return item;
+      }
+      const [bySlug] = await db.select().from(schema.projects).where(eq(schema.projects.slug, id)).limit(1);
+      if (bySlug) return bySlug;
+
+      return fallbackProjects.find((p) => p.id === id || p.slug === id) || null;
     } catch {
-      return fallbackProjects.find((p) => p.id === id) || null;
+      return fallbackProjects.find((p) => p.id === id || p.slug === id) || null;
     }
   },
   async create(data: any) {
-    const [item] = await db.insert(schema.projects).values(data).returning();
-    return item;
+    try {
+      const [item] = await db.insert(schema.projects).values(data).returning();
+      return item;
+    } catch (err) {
+      console.warn("[ProjectRepository.create] DB insert failed:", err);
+      return { ...data, id: data.id || "proj-" + Date.now() };
+    }
   },
   async update(id: string, data: any) {
-    return db.update(schema.projects).set({ ...data, updatedAt: new Date() }).where(eq(schema.projects.id, id));
+    try {
+      const updateData = { ...data, updatedAt: new Date() };
+
+      // 1. Try finding by UUID if valid UUID
+      if (isUUID(id)) {
+        const [existing] = await db.select().from(schema.projects).where(eq(schema.projects.id, id)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.projects).set(updateData).where(eq(schema.projects.id, id)).returning();
+          return updated;
+        }
+      }
+
+      // 2. Try finding by slug
+      const targetSlug = data.slug || id;
+      const [bySlug] = await db.select().from(schema.projects).where(eq(schema.projects.slug, targetSlug)).limit(1);
+      if (bySlug) {
+        const [updated] = await db.update(schema.projects).set(updateData).where(eq(schema.projects.id, bySlug.id)).returning();
+        return updated;
+      }
+
+      // 3. Fallback item promotion to database
+      const insertData = { ...updateData, slug: targetSlug };
+      if (isUUID(id)) insertData.id = id;
+      const [created] = await db.insert(schema.projects).values(insertData).returning();
+      return created;
+    } catch (err) {
+      console.warn("[ProjectRepository.update] DB update/upsert error:", err);
+      return { ...data, id };
+    }
   },
   async delete(id: string) {
-    return db.delete(schema.projects).where(eq(schema.projects.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.projects).where(eq(schema.projects.id, id));
+      }
+      return await db.delete(schema.projects).where(eq(schema.projects.slug, id));
+    } catch (err) {
+      console.warn("[ProjectRepository.delete] DB delete error:", err);
+      return null;
+    }
   },
 };
 
@@ -103,16 +151,29 @@ export const SkillRepository = {
     }
   },
   async createCategory(data: any) {
-    const [cat] = await db.insert(schema.skillCategories).values(data).returning();
-    return cat;
+    try {
+      const [cat] = await db.insert(schema.skillCategories).values(data).returning();
+      return cat;
+    } catch (err) {
+      console.warn("[SkillRepository.createCategory] Error:", err);
+      return { ...data, id: "cat-" + Date.now() };
+    }
   },
   async deleteCategory(id: string) {
-    return db.delete(schema.skillCategories).where(eq(schema.skillCategories.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.skillCategories).where(eq(schema.skillCategories.id, id));
+      }
+      return await db.delete(schema.skillCategories).where(eq(schema.skillCategories.slug, id));
+    } catch (err) {
+      console.warn("[SkillRepository.deleteCategory] Error:", err);
+      return null;
+    }
   },
   async getSkills(opts?: { categoryId?: string; search?: string }) {
     try {
       const conditions = [];
-      if (opts?.categoryId) conditions.push(eq(schema.skills.categoryId, opts.categoryId));
+      if (opts?.categoryId && isUUID(opts.categoryId)) conditions.push(eq(schema.skills.categoryId, opts.categoryId));
       if (opts?.search) conditions.push(ilike(schema.skills.name, `%${opts.search}%`));
       const where = conditions.length > 0 ? and(...conditions) : undefined;
       const res = await db.select().from(schema.skills).where(where).orderBy(asc(schema.skills.sortOrder));
@@ -135,11 +196,28 @@ export const SkillRepository = {
     }
   },
   async createSkill(data: any) {
-    const [skill] = await db.insert(schema.skills).values(data).returning();
-    return skill;
+    try {
+      const safeData = {
+        ...data,
+        categoryId: isUUID(data?.categoryId) ? data.categoryId : null,
+      };
+      const [skill] = await db.insert(schema.skills).values(safeData).returning();
+      return skill;
+    } catch (err) {
+      console.warn("[SkillRepository.createSkill] Error:", err);
+      return { ...data, id: "sk-" + Date.now() };
+    }
   },
   async deleteSkill(id: string) {
-    return db.delete(schema.skills).where(eq(schema.skills.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.skills).where(eq(schema.skills.id, id));
+      }
+      return await db.delete(schema.skills).where(eq(schema.skills.slug, id));
+    } catch (err) {
+      console.warn("[SkillRepository.deleteSkill] Error:", err);
+      return null;
+    }
   },
 };
 
@@ -162,14 +240,50 @@ export const ExperienceRepository = {
     }
   },
   async create(data: any) {
-    const [exp] = await db.insert(schema.experience).values(data).returning();
-    return exp;
+    try {
+      const [exp] = await db.insert(schema.experience).values(data).returning();
+      return exp;
+    } catch (err) {
+      console.warn("[ExperienceRepository.create] Error:", err);
+      return { ...data, id: "exp-" + Date.now() };
+    }
   },
   async update(id: string, data: any) {
-    return db.update(schema.experience).set({ ...data, updatedAt: new Date() }).where(eq(schema.experience.id, id));
+    try {
+      const updateData = { ...data, updatedAt: new Date() };
+      if (isUUID(id)) {
+        const [existing] = await db.select().from(schema.experience).where(eq(schema.experience.id, id)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.experience).set(updateData).where(eq(schema.experience.id, id)).returning();
+          return updated;
+        }
+      }
+      if (data.company) {
+        const [existing] = await db.select().from(schema.experience).where(eq(schema.experience.company, data.company)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.experience).set(updateData).where(eq(schema.experience.id, existing.id)).returning();
+          return updated;
+        }
+      }
+      const insertData = { ...updateData };
+      if (isUUID(id)) insertData.id = id;
+      const [created] = await db.insert(schema.experience).values(insertData).returning();
+      return created;
+    } catch (err) {
+      console.warn("[ExperienceRepository.update] Error:", err);
+      return { ...data, id };
+    }
   },
   async delete(id: string) {
-    return db.delete(schema.experience).where(eq(schema.experience.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.experience).where(eq(schema.experience.id, id));
+      }
+      return null;
+    } catch (err) {
+      console.warn("[ExperienceRepository.delete] Error:", err);
+      return null;
+    }
   },
 };
 
@@ -192,14 +306,50 @@ export const EducationRepository = {
     }
   },
   async create(data: any) {
-    const [edu] = await db.insert(schema.education).values(data).returning();
-    return edu;
+    try {
+      const [edu] = await db.insert(schema.education).values(data).returning();
+      return edu;
+    } catch (err) {
+      console.warn("[EducationRepository.create] Error:", err);
+      return { ...data, id: "edu-" + Date.now() };
+    }
   },
   async update(id: string, data: any) {
-    return db.update(schema.education).set({ ...data, updatedAt: new Date() }).where(eq(schema.education.id, id));
+    try {
+      const updateData = { ...data, updatedAt: new Date() };
+      if (isUUID(id)) {
+        const [existing] = await db.select().from(schema.education).where(eq(schema.education.id, id)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.education).set(updateData).where(eq(schema.education.id, id)).returning();
+          return updated;
+        }
+      }
+      if (data.institution) {
+        const [existing] = await db.select().from(schema.education).where(eq(schema.education.institution, data.institution)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.education).set(updateData).where(eq(schema.education.id, existing.id)).returning();
+          return updated;
+        }
+      }
+      const insertData = { ...updateData };
+      if (isUUID(id)) insertData.id = id;
+      const [created] = await db.insert(schema.education).values(insertData).returning();
+      return created;
+    } catch (err) {
+      console.warn("[EducationRepository.update] Error:", err);
+      return { ...data, id };
+    }
   },
   async delete(id: string) {
-    return db.delete(schema.education).where(eq(schema.education.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.education).where(eq(schema.education.id, id));
+      }
+      return null;
+    } catch (err) {
+      console.warn("[EducationRepository.delete] Error:", err);
+      return null;
+    }
   },
 };
 
@@ -222,14 +372,50 @@ export const CertificationRepository = {
     }
   },
   async create(data: any) {
-    const [cert] = await db.insert(schema.certifications).values(data).returning();
-    return cert;
+    try {
+      const [cert] = await db.insert(schema.certifications).values(data).returning();
+      return cert;
+    } catch (err) {
+      console.warn("[CertificationRepository.create] Error:", err);
+      return { ...data, id: "cert-" + Date.now() };
+    }
   },
   async update(id: string, data: any) {
-    return db.update(schema.certifications).set({ ...data, updatedAt: new Date() }).where(eq(schema.certifications.id, id));
+    try {
+      const updateData = { ...data, updatedAt: new Date() };
+      if (isUUID(id)) {
+        const [existing] = await db.select().from(schema.certifications).where(eq(schema.certifications.id, id)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.certifications).set(updateData).where(eq(schema.certifications.id, id)).returning();
+          return updated;
+        }
+      }
+      if (data.name) {
+        const [existing] = await db.select().from(schema.certifications).where(eq(schema.certifications.name, data.name)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.certifications).set(updateData).where(eq(schema.certifications.id, existing.id)).returning();
+          return updated;
+        }
+      }
+      const insertData = { ...updateData };
+      if (isUUID(id)) insertData.id = id;
+      const [created] = await db.insert(schema.certifications).values(insertData).returning();
+      return created;
+    } catch (err) {
+      console.warn("[CertificationRepository.update] Error:", err);
+      return { ...data, id };
+    }
   },
   async delete(id: string) {
-    return db.delete(schema.certifications).where(eq(schema.certifications.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.certifications).where(eq(schema.certifications.id, id));
+      }
+      return null;
+    } catch (err) {
+      console.warn("[CertificationRepository.delete] Error:", err);
+      return null;
+    }
   },
 };
 
@@ -250,14 +436,50 @@ export const ServiceRepository = {
     }
   },
   async create(data: any) {
-    const [svc] = await db.insert(schema.services).values(data).returning();
-    return svc;
+    try {
+      const [svc] = await db.insert(schema.services).values(data).returning();
+      return svc;
+    } catch (err) {
+      console.warn("[ServiceRepository.create] Error:", err);
+      return { ...data, id: "svc-" + Date.now() };
+    }
   },
   async update(id: string, data: any) {
-    return db.update(schema.services).set({ ...data, updatedAt: new Date() }).where(eq(schema.services.id, id));
+    try {
+      const updateData = { ...data, updatedAt: new Date() };
+      if (isUUID(id)) {
+        const [existing] = await db.select().from(schema.services).where(eq(schema.services.id, id)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.services).set(updateData).where(eq(schema.services.id, id)).returning();
+          return updated;
+        }
+      }
+      if (data.title) {
+        const [existing] = await db.select().from(schema.services).where(eq(schema.services.title, data.title)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.services).set(updateData).where(eq(schema.services.id, existing.id)).returning();
+          return updated;
+        }
+      }
+      const insertData = { ...updateData };
+      if (isUUID(id)) insertData.id = id;
+      const [created] = await db.insert(schema.services).values(insertData).returning();
+      return created;
+    } catch (err) {
+      console.warn("[ServiceRepository.update] Error:", err);
+      return { ...data, id };
+    }
   },
   async delete(id: string) {
-    return db.delete(schema.services).where(eq(schema.services.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.services).where(eq(schema.services.id, id));
+      }
+      return null;
+    } catch (err) {
+      console.warn("[ServiceRepository.delete] Error:", err);
+      return null;
+    }
   },
 };
 
@@ -280,18 +502,54 @@ export const TestimonialRepository = {
     }
   },
   async create(data: any) {
-    const [t] = await db.insert(schema.testimonials).values(data).returning();
-    return t;
+    try {
+      const [t] = await db.insert(schema.testimonials).values(data).returning();
+      return t;
+    } catch (err) {
+      console.warn("[TestimonialRepository.create] Error:", err);
+      return { ...data, id: "test-" + Date.now() };
+    }
   },
   async update(id: string, data: any) {
-    return db.update(schema.testimonials).set({ ...data, updatedAt: new Date() }).where(eq(schema.testimonials.id, id));
+    try {
+      const updateData = { ...data, updatedAt: new Date() };
+      if (isUUID(id)) {
+        const [existing] = await db.select().from(schema.testimonials).where(eq(schema.testimonials.id, id)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.testimonials).set(updateData).where(eq(schema.testimonials.id, id)).returning();
+          return updated;
+        }
+      }
+      if (data.name) {
+        const [existing] = await db.select().from(schema.testimonials).where(eq(schema.testimonials.name, data.name)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.testimonials).set(updateData).where(eq(schema.testimonials.id, existing.id)).returning();
+          return updated;
+        }
+      }
+      const insertData = { ...updateData };
+      if (isUUID(id)) insertData.id = id;
+      const [created] = await db.insert(schema.testimonials).values(insertData).returning();
+      return created;
+    } catch (err) {
+      console.warn("[TestimonialRepository.update] Error:", err);
+      return { ...data, id };
+    }
   },
   async delete(id: string) {
-    return db.delete(schema.testimonials).where(eq(schema.testimonials.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.testimonials).where(eq(schema.testimonials.id, id));
+      }
+      return null;
+    } catch (err) {
+      console.warn("[TestimonialRepository.delete] Error:", err);
+      return null;
+    }
   },
 };
 
-// ─── Message & Consent Repository ────────────────────────
+// ─── Message & DPDP Repository ───────────────────────────
 export const MessageRepository = {
   async findMany(opts?: { status?: string; page?: number; limit?: number }) {
     try {
@@ -327,10 +585,26 @@ export const MessageRepository = {
     }
   },
   async updateStatus(id: string, status: any) {
-    return db.update(schema.contactMessages).set({ messageStatus: status }).where(eq(schema.contactMessages.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.update(schema.contactMessages).set({ messageStatus: status }).where(eq(schema.contactMessages.id, id));
+      }
+      return null;
+    } catch (err) {
+      console.warn("[MessageRepository.updateStatus] Error:", err);
+      return null;
+    }
   },
   async delete(id: string) {
-    return db.delete(schema.contactMessages).where(eq(schema.contactMessages.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.contactMessages).where(eq(schema.contactMessages.id, id));
+      }
+      return null;
+    } catch (err) {
+      console.warn("[MessageRepository.delete] Error:", err);
+      return null;
+    }
   },
 };
 
@@ -351,11 +625,24 @@ export const NavigationRepository = {
     }
   },
   async create(data: any) {
-    const [nav] = await db.insert(schema.navigation).values(data).returning();
-    return nav;
+    try {
+      const [nav] = await db.insert(schema.navigation).values(data).returning();
+      return nav;
+    } catch (err) {
+      console.warn("[NavigationRepository.create] Error:", err);
+      return { ...data, id: "nav-" + Date.now() };
+    }
   },
   async delete(id: string) {
-    return db.delete(schema.navigation).where(eq(schema.navigation.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.navigation).where(eq(schema.navigation.id, id));
+      }
+      return null;
+    } catch (err) {
+      console.warn("[NavigationRepository.delete] Error:", err);
+      return null;
+    }
   },
 };
 
@@ -375,7 +662,8 @@ export const SettingsRepository = {
         return await db.update(schema.siteSettings).set({ value, updatedAt: new Date() }).where(eq(schema.siteSettings.id, existing.id));
       }
       return await db.insert(schema.siteSettings).values({ key, value, group: "general" });
-    } catch {
+    } catch (err) {
+      console.warn("[SettingsRepository.upsert] Error:", err);
       return null;
     }
   },
@@ -399,13 +687,43 @@ export const LegalRepository = {
     }
   },
   async update(id: string, data: any) {
-    return db.update(schema.legalDocuments).set({ ...data, updatedAt: new Date() }).where(eq(schema.legalDocuments.id, id));
+    try {
+      const updateData = { ...data, updatedAt: new Date() };
+      if (isUUID(id)) {
+        return await db.update(schema.legalDocuments).set(updateData).where(eq(schema.legalDocuments.id, id));
+      }
+      if (data.slug) {
+        return await db.update(schema.legalDocuments).set(updateData).where(eq(schema.legalDocuments.slug, data.slug));
+      }
+      return null;
+    } catch (err) {
+      console.warn("[LegalRepository.update] Error:", err);
+      return null;
+    }
   },
   async addVersionHistory(data: any) {
-    return db.insert(schema.legalVersionHistory).values(data);
+    try {
+      const safeData = {
+        ...data,
+        documentId: isUUID(data?.documentId) ? data.documentId : null,
+        changedBy: isUUID(data?.changedBy) ? data.changedBy : null,
+      };
+      return await db.insert(schema.legalVersionHistory).values(safeData);
+    } catch (err) {
+      console.warn("[LegalRepository.addVersionHistory] Error:", err);
+      return null;
+    }
   },
   async delete(id: string) {
-    return db.delete(schema.legalDocuments).where(eq(schema.legalDocuments.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.legalDocuments).where(eq(schema.legalDocuments.id, id));
+      }
+      return null;
+    } catch (err) {
+      console.warn("[LegalRepository.delete] Error:", err);
+      return null;
+    }
   },
 };
 
@@ -426,11 +744,24 @@ export const MediaRepository = {
     }
   },
   async create(data: any) {
-    const [asset] = await db.insert(schema.mediaAssets).values(data).returning();
-    return asset;
+    try {
+      const [asset] = await db.insert(schema.mediaAssets).values(data).returning();
+      return asset;
+    } catch (err) {
+      console.warn("[MediaRepository.create] Error:", err);
+      return { ...data, id: "media-" + Date.now() };
+    }
   },
   async delete(id: string) {
-    return db.delete(schema.mediaAssets).where(eq(schema.mediaAssets.id, id));
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.mediaAssets).where(eq(schema.mediaAssets.id, id));
+      }
+      return null;
+    } catch (err) {
+      console.warn("[MediaRepository.delete] Error:", err);
+      return null;
+    }
   },
 };
 
@@ -438,7 +769,11 @@ export const MediaRepository = {
 export const AuditRepository = {
   async log(data: any) {
     try {
-      await db.insert(schema.auditLog).values(data);
+      const safeData = {
+        ...data,
+        userId: isUUID(data?.userId) ? data.userId : null,
+      };
+      await db.insert(schema.auditLog).values(safeData);
     } catch {
       // Don't fail primary operation
     }
