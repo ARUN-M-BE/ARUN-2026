@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Compass, Radio, ArrowLeft } from "lucide-react";
+import { Radio, ArrowLeft } from "lucide-react";
 
 export default function NotFound() {
   return (
@@ -25,9 +25,9 @@ export default function NotFound() {
 
         <div className="pt-2">
           <Link href="/">
-            <Button className="h-10 px-6 rounded-full bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-400 hover:to-violet-500 text-white font-semibold text-xs shadow-md shadow-cyan-500/20">
-              <ArrowLeft className="w-4 h-4 mr-1.5" />
-              Return to Core Orbit
+            <Button variant="outline" className="gap-2 border-border/60 hover:bg-muted">
+              <ArrowLeft className="w-4 h-4" />
+              Return to Orbit Center
             </Button>
           </Link>
         </div>

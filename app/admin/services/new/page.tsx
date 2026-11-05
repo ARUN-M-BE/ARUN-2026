@@ -1,17 +1,11 @@
-import { requireAdmin } from "@/lib/auth-guard";
-import { PageHeader } from "@/components/admin/page-header";
-import { ServiceForm } from "../service-form";
+import { Suspense } from "react";
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton";
+import PageContent from "@/components/admin/features/services/create/ServiceCreateServer";
 
-export default async function NewServicePage() {
-  await requireAdmin();
-
+export default function NewServicePage() {
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Create Service Offering"
-        description="Add a technical or consulting service package to your portfolio."
-      />
-      <ServiceForm />
-    </div>
+    <Suspense fallback={<AdminPageSkeleton />}>
+      <PageContent />
+    </Suspense>
   );
 }

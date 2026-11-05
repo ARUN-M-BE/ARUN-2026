@@ -80,7 +80,7 @@ export async function deleteSkill(id: string) {
 }
 
 // ─── Experience ───────────────────────────────────────────
-export async function getExperiences(opts?: any) {
+export async function getExperiences() {
   return ExperienceController.getExperiences();
 }
 export async function getPublicExperience() {
@@ -97,7 +97,7 @@ export async function deleteExperience(id: string) {
 }
 
 // ─── Education ────────────────────────────────────────────
-export async function getEducation(opts?: any) {
+export async function getEducation() {
   return EducationController.getEducation();
 }
 export async function getPublicEducation() {
@@ -114,7 +114,7 @@ export async function deleteEducation(id: string) {
 }
 
 // ─── Certifications ───────────────────────────────────────
-export async function getCertifications(opts?: any) {
+export async function getCertifications() {
   return CertificationController.getCertifications();
 }
 export async function getPublicCertifications() {
@@ -131,7 +131,7 @@ export async function deleteCertification(id: string) {
 }
 
 // ─── Services ─────────────────────────────────────────────
-export async function getServices(opts?: any) {
+export async function getServices() {
   return ServiceController.getServices();
 }
 export async function getPublicServices() {
@@ -148,7 +148,7 @@ export async function deleteService(id: string) {
 }
 
 // ─── Testimonials ─────────────────────────────────────────
-export async function getTestimonials(opts?: any) {
+export async function getTestimonials() {
   return TestimonialController.getTestimonials();
 }
 export async function getPublicTestimonials() {

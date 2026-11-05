@@ -1,17 +1,11 @@
-import { requireAdmin } from "@/lib/auth-guard";
-import { PageHeader } from "@/components/admin/page-header";
-import { EducationForm } from "../education-form";
+import { Suspense } from "react";
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton";
+import PageContent from "@/components/admin/features/education/create/EducationCreateServer";
 
-export default async function NewEducationPage() {
-  await requireAdmin();
-
+export default function NewEducationPage() {
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Add Education Qualification"
-        description="Archive an academic degree or specialized certification program."
-      />
-      <EducationForm />
-    </div>
+    <Suspense fallback={<AdminPageSkeleton />}>
+      <PageContent />
+    </Suspense>
   );
 }

@@ -4,6 +4,10 @@ A world-class, interactive 3D personal developer portfolio engineered with **Nex
 
 Featuring an original futuristic digital universe design, interactive identity sculpture, guided portfolio tour, skills constellation, timeline, and an enterprise-grade `/admin` CMS dashboard.
 
+## Admin Feature Organization
+
+Admin route files are lightweight entry points that render feature Server Components inside a shared Suspense fallback. Feature components live under `components/admin/features/<feature>/`, with data loading and authorization in Server Components, interactive views and forms in Client Components, and shared forms in each feature's `shared/` directory. Database-backed actions, authentication, and public portfolio routes remain unchanged; admin data is not replaced with localStorage mock persistence.
+
 ---
 
 ## 🌟 Visual Identity & Core Architecture

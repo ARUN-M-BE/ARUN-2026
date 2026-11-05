@@ -1,17 +1,11 @@
-import { requireAdmin } from "@/lib/auth-guard";
-import { PageHeader } from "@/components/admin/page-header";
-import { CertificationForm } from "../certification-form";
+import { Suspense } from "react";
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton";
+import PageContent from "@/components/admin/features/certifications/create/CertificationCreateServer";
 
-export default async function NewCertificationPage() {
-  await requireAdmin();
-
+export default function NewCertificationPage() {
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Add Certification"
-        description="Add a verified professional certification or industry license."
-      />
-      <CertificationForm />
-    </div>
+    <Suspense fallback={<AdminPageSkeleton />}>
+      <PageContent />
+    </Suspense>
   );
 }

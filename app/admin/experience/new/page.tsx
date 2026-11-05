@@ -1,17 +1,11 @@
-import { requireAdmin } from "@/lib/auth-guard";
-import { PageHeader } from "@/components/admin/page-header";
-import { ExperienceForm } from "../experience-form";
+import { Suspense } from "react";
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton";
+import PageContent from "@/components/admin/features/experience/create/ExperienceCreateServer";
 
-export default async function NewExperiencePage() {
-  await requireAdmin();
-
+export default function NewExperiencePage() {
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Add Career Milestone"
-        description="Add a new employment history entry to the animated professional timeline."
-      />
-      <ExperienceForm />
-    </div>
+    <Suspense fallback={<AdminPageSkeleton />}>
+      <PageContent />
+    </Suspense>
   );
 }

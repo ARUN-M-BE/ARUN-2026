@@ -1,19 +1,11 @@
-import { requireAdmin } from "@/lib/auth-guard";
-import { getSocialLinks } from "@/lib/actions";
-import { PageHeader } from "@/components/admin/page-header";
-import { SocialLinksClient } from "./social-links-client";
+import { Suspense } from "react";
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton";
+import PageContent from "@/components/admin/features/social-links/SocialLinksServer";
 
-export default async function AdminSocialLinksPage() {
-  await requireAdmin();
-  const links = await getSocialLinks();
-
+export default function AdminSocialLinksPage() {
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Social Media & Developer Handles"
-        description="Connect your GitHub, LinkedIn, Twitter, Discord, and external developer profiles."
-      />
-      <SocialLinksClient initialData={links} />
-    </div>
+    <Suspense fallback={<AdminPageSkeleton />}>
+      <PageContent />
+    </Suspense>
   );
 }

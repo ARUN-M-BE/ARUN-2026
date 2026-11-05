@@ -1,17 +1,11 @@
-import { requireAdmin } from "@/lib/auth-guard";
-import { PageHeader } from "@/components/admin/page-header";
-import { TestimonialForm } from "../testimonial-form";
+import { Suspense } from "react";
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton";
+import PageContent from "@/components/admin/features/testimonials/create/TestimonialCreateServer";
 
-export default async function NewTestimonialPage() {
-  await requireAdmin();
-
+export default function NewTestimonialPage() {
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Add Verified Testimonial"
-        description="Add a genuine recommendation from a former client or engineering collaborator."
-      />
-      <TestimonialForm />
-    </div>
+    <Suspense fallback={<AdminPageSkeleton />}>
+      <PageContent />
+    </Suspense>
   );
 }
