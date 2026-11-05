@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormData } from "@/lib/validations";
@@ -15,7 +14,6 @@ import { toast } from "sonner";
 import Link from "next/link";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -53,7 +51,7 @@ export default function AdminLoginPage() {
 
       const params = new URLSearchParams(window.location.search);
       const destination = params.get("callbackUrl") || "/admin";
-      window.location.href = destination;
+      window.location.assign(destination);
     } catch {
       toast.error("Authentication failed", {
         description: "An unexpected error occurred during sign in.",
