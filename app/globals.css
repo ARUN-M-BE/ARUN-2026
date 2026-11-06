@@ -209,3 +209,75 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
 }
+
+/* VOLDOG Food Design System — Architectural Theme Utilities */
+.font-voldog {
+  font-family: var(--font-manrope), system-ui, -apple-system, sans-serif;
+}
+
+.shadow-pill-halo {
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 34px 0px;
+}
+
+.shadow-finder-glow {
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 30px 6px;
+}
+
+.shadow-toggle-lift {
+  box-shadow: rgba(0, 0, 0, 0.21) 0px 6px 34px 0px;
+}
+
+.shadow-benefit-card {
+  box-shadow: rgba(0, 0, 0, 0.01) 0px 12px 18px -6px;
+}
+
+.bg-butcher {
+  background-color: #204e4a;
+}
+.text-butcher {
+  color: #204e4a;
+}
+.border-butcher {
+  border-color: #204e4a;
+}
+
+.bg-lime-zest {
+  background-color: #e1e53f;
+}
+.text-lime-zest {
+  color: #e1e53f;
+}
+.border-lime-zest {
+  border-color: #e1e53f;
+}
+
+.bg-oat {
+  background-color: #f4f1eb;
+}
+
+.bg-cloud-gray {
+  background-color: #f2f3f4;
+}
+
+.text-paprika {
+  color: #c1452e;
+}
+.bg-paprika {
+  background-color: #c1452e;
+}
+
+.text-carrot {
+  color: #ec7357;
+}
+
+.text-mist {
+  color: #b3c3c1;
+}
+
+.border-sage {
+  border-color: rgba(32, 78, 74, 0.11);
+}
+
+.bg-butcher-fade {
+  background: linear-gradient(rgba(32, 78, 74, 0) 0%, rgb(32, 78, 74) 100%);
+}

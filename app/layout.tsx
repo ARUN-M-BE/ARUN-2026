@@ -1,5 +1,13 @@
 import "./globals.css";
+import { Manrope } from "next/font/google";
 import { ThemeProvider } from "@/context/themeProvider";
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-manrope",
+  display: "swap",
+});
 import { LanguageProvider } from "@/context/languageContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
@@ -138,7 +146,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
         />
       </head>
-      <body className="min-h-full bg-background text-foreground selection:bg-cyan-500/30 selection:text-cyan-200">
+      <body className={`${manrope.variable} min-h-full bg-background text-foreground selection:bg-cyan-500/30 selection:text-cyan-200`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

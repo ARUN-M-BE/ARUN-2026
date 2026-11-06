@@ -7,26 +7,19 @@ import {
   getPublicCertifications,
   getPublicTestimonials,
   getPublicSocialLinks,
+  getSiteSettings,
 } from "@/lib/actions";
 
-import { PortfolioNavbar } from "@/components/portfolio/navbar";
-import { MouseGlow } from "@/components/portfolio/mouse-glow";
-import { HeroSection } from "@/components/portfolio/hero-section";
-import { AboutSection } from "@/components/portfolio/about-section";
-import { ProjectsSection } from "@/components/portfolio/projects-section";
-import { SkillsSection } from "@/components/portfolio/skills-section";
-import { RealtimeTelemetry } from "@/components/portfolio/realtime-telemetry";
-import { ExperienceSection } from "@/components/portfolio/experience-section";
-import { EducationSection } from "@/components/portfolio/education-section";
-import { TestimonialsSection } from "@/components/portfolio/testimonials-section";
-import { ContactSection } from "@/components/portfolio/contact-section";
-import { PortfolioFooter } from "@/components/portfolio/footer";
-import { CookieConsent } from "@/components/portfolio/cookie-consent";
+import { PortfolioClientWrapper } from "@/components/portfolio/portfolio-client-wrapper";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ theme?: string }>;
+}) {
   const [
     profile,
     projects,
@@ -36,6 +29,7 @@ export default async function HomePage() {
     certifications,
     testimonials,
     socialLinks,
+    settings,
   ] = await Promise.all([
     getPublicProfile(),
     getPublicProjects(),
@@ -45,34 +39,39 @@ export default async function HomePage() {
     getPublicCertifications(),
     getPublicTestimonials(),
     getPublicSocialLinks(),
+    getSiteSettings(),
   ]);
 
+  // Determine active theme from backend site_settings
+  const themeSetting = settings?.find((s: any) => s.key === "portfolio_theme");
+  let backendTheme: "cyberpunk" | "voldog" = "voldog";
+  if (themeSetting?.value) {
+    try {
+      const val = typeof themeSetting.value === "string" ? JSON.parse(themeSetting.value) : themeSetting.value;
+      if (val === "cyberpunk" || val === "voldog") {
+        backendTheme = val;
+      }
+    } catch {}
+  }
+
+  // Handle URL override if provided
+  const resolvedParams = searchParams ? await searchParams : undefined;
+  const initialTheme =
+    resolvedParams?.theme === "cyberpunk" || resolvedParams?.theme === "voldog"
+      ? (resolvedParams.theme as "cyberpunk" | "voldog")
+      : backendTheme;
+
   return (
-    <div className="min-h-screen bg-background text-foreground relative selection:bg-primary/20 selection:text-primary transition-colors duration-300 overflow-x-hidden">
-      {/* Ambient Interactive Cursor Glow */}
-      <MouseGlow />
-
-      {/* Global Fixed Floating Glass Navbar */}
-      <PortfolioNavbar />
-
-      {/* Main Sections */}
-      <main className="relative z-10 space-y-8">
-        <HeroSection profile={profile} />
-        <AboutSection profile={profile} />
-        <ProjectsSection projects={projects} />
-        <SkillsSection categoriesWithSkills={categoriesWithSkills} />
-        <RealtimeTelemetry />
-        <ExperienceSection experiences={experiences} />
-        <EducationSection education={education} certifications={certifications} />
-        <TestimonialsSection testimonials={testimonials} />
-        <ContactSection profile={profile} socialLinks={socialLinks} />
-      </main>
-
-      {/* Footer & Compliance Notice */}
-      <PortfolioFooter />
-
-      {/* DPDP Act 2023 Compliant Cookie Consent Banner */}
-      <CookieConsent />
-    </div>
+    <PortfolioClientWrapper
+      initialTheme={initialTheme}
+      profile={profile}
+      projects={projects}
+      categoriesWithSkills={categoriesWithSkills}
+      experiences={experiences}
+      education={education}
+      certifications={certifications}
+      testimonials={testimonials}
+      socialLinks={socialLinks}
+    />
   );
 }
