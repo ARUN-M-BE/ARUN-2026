@@ -184,14 +184,7 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
               </span>
             </div>
           </a>
-
-          <div className="hidden xl:inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-            </span>
-            <span>{t("nav.statusOnline", "Cluster Active")} • 60 FPS</span>
-          </div>
+          
         </div>
 
         {/* Desktop Nav Links */}
@@ -225,31 +218,6 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
 
         {/* Right Action Cluster */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Quick Socials (Navbar Placement) */}
-          {(() => {
-            const navbarSocials = (socialLinks || []).filter(
-              (s) => s.isActive !== false && (!s.placements || s.placements.includes("navbar"))
-            );
-            if (navbarSocials.length === 0) return null;
-            return (
-              <div className="hidden xl:flex items-center gap-1">
-                {navbarSocials.slice(0, 3).map((item) => (
-                  <a
-                    key={item.id}
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={item.label || item.platform}
-                    title={item.label || item.platform}
-                    className="size-9 rounded-xl border border-border bg-card/60 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all text-xs"
-                    style={item.color ? { color: item.color } : undefined}
-                  >
-                    <span className="font-mono text-[10px] font-bold">{item.platform.slice(0, 2).toUpperCase()}</span>
-                  </a>
-                ))}
-              </div>
-            );
-          })()}
 
           {/* Command Palette */}
           <CommandPalette />
