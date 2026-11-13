@@ -83,21 +83,21 @@ export function AboutSection({ profile }: AboutSectionProps) {
             {/* Quick Specs Pill Grid */}
             <div className="pt-6 border-t border-border grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs font-mono">
               <div className="p-3 rounded-xl bg-card/60 border border-border">
-                <span className="text-muted-foreground block text-[11px] mb-1 flex items-center gap-1">
+                <span className="text-muted-foreground text-[11px] mb-1 flex items-center gap-1">
                   <Terminal className="w-3 h-3 text-sky-500" />
                   {language === "ar" ? "اللغات الأساسية" : "Primary Stack"}
                 </span>
                 <span className="text-sky-600 dark:text-sky-400 font-bold">TypeScript & Go</span>
               </div>
               <div className="p-3 rounded-xl bg-card/60 border border-border">
-                <span className="text-muted-foreground block text-[11px] mb-1 flex items-center gap-1">
+                <span className="text-muted-foreground text-[11px] mb-1 flex items-center gap-1">
                   <Database className="w-3 h-3 text-indigo-500" />
                   {language === "ar" ? "قواعد البيانات" : "Database Engine"}
                 </span>
                 <span className="text-foreground font-bold">PostgreSQL & Drizzle</span>
               </div>
               <div className="p-3 rounded-xl bg-card/60 border border-border col-span-2 sm:col-span-1">
-                <span className="text-muted-foreground block text-[11px] mb-1 flex items-center gap-1">
+                <span className="text-muted-foreground text-[11px] mb-1 flex items-center gap-1">
                   <Globe2 className="w-3 h-3 text-emerald-500" />
                   {language === "ar" ? "محرك الجرافيكس" : "3D Graphics"}
                 </span>
