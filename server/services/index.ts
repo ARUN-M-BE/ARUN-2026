@@ -17,7 +17,7 @@ import { revalidatePath } from "next/cache";
 
 function safeRevalidate(path: string) {
   try {
-    safeRevalidate(path);
+    revalidatePath(path);
   } catch {
     // Safe no-op outside Next server context (CLI / unit tests)
   }

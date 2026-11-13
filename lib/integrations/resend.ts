@@ -29,17 +29,18 @@ export interface SendEmailPayload {
 const RESEND_API_BASE = "https://api.resend.com";
 
 class ResendClient {
-  private apiKey: string | null;
-  private defaultFrom: string;
+  get apiKey(): string | null {
+    return (process.env.RESEND_API_KEY || "").replace(/^["']|["']$/g, "").trim() || null;
+  }
+  get defaultFrom(): string {
+    return (process.env.RESEND_FROM_EMAIL || "").replace(/^["']|["']$/g, "").trim() || "Arun M <onboarding@resend.dev>";
+  }
   private inMemoryAudiences: ResendAudience[] = [
     { id: "aud_free_default", name: "Portfolio Subscribers (Free)", created_at: new Date().toISOString() },
   ];
   private inMemoryContacts: ResendContact[] = [];
 
-  constructor() {
-    this.apiKey = process.env.RESEND_API_KEY || null;
-    this.defaultFrom = process.env.RESEND_FROM_EMAIL || "Arun M <onboarding@resend.dev>";
-  }
+  constructor() {}
 
   isConfigured(): boolean {
     return Boolean(this.apiKey && this.apiKey.startsWith("re_"));
@@ -83,6 +84,11 @@ class ResendClient {
 
       const data = await res.json() as { id?: string; message?: string; error?: string };
       if (!res.ok) {
+        // Automatic onboarding fallback if custom domain is not yet DNS verified in Resend
+        if (data.message && data.message.toLowerCase().includes("not verified") && (payload.from || this.defaultFrom) !== "onboarding@resend.dev") {
+          console.warn("[Resend] Domain not yet verified. Falling back to free onboarding@resend.dev sender.");
+          return this.sendEmail({ ...payload, from: "onboarding@resend.dev" });
+        }
         return { success: false, error: data.message || data.error || `HTTP ${res.status}`, mode: "resend_api" };
       }
 

@@ -25,13 +25,13 @@ const fallbackStats: MonkeytypeStats = {
 };
 
 class MonkeytypeClient {
-  private apeKey: string | null;
+  get apeKey(): string | null {
+    return (process.env.MONKEYTYPE_APE_KEY || "").replace(/^["']|["']$/g, "").trim() || null;
+  }
   private cache: { data: MonkeytypeStats; timestamp: number } | null = null;
   private cacheTTLMs = 60000; // 60-second cache to easily stay under free 30 req/min limit
 
-  constructor() {
-    this.apeKey = process.env.MONKEYTYPE_APE_KEY || null;
-  }
+  constructor() {}
 
   isConfigured(): boolean {
     return Boolean(this.apeKey && this.apeKey.length > 5);
