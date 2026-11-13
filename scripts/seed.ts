@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import * as dotenv from "dotenv";
 import { eq } from "drizzle-orm";
 import * as schema from "../lib/db/schema";
+import { fallbackNavigation, fallbackWebsiteSections } from "../server/repositories/fallback-data";
 
 dotenv.config({ path: ".env.local" });
 
@@ -277,6 +278,48 @@ async function seed() {
       { platform: "Twitter", url: "https://x.com", label: "X / Twitter", isActive: true },
     ]);
     console.log("✅ Social links seeded");
+  }
+
+  // 11. Navigation (required so admin edits map to real rows)
+  const navCount = await db.select().from(schema.navigation);
+  if (navCount.length === 0) {
+    await db.insert(schema.navigation).values(
+      fallbackNavigation.map((item) => ({
+        label: item.label,
+        href: item.href,
+        icon: item.icon,
+        color: item.color,
+        badge: item.badge,
+        style: item.style,
+        isExternal: item.isExternal,
+        sortOrder: item.sortOrder,
+        isActive: item.isActive,
+        status: item.status,
+        group: item.group,
+      }))
+    );
+    console.log("✅ Navigation seeded");
+  }
+
+  // 12. Website Sections (required so admin edits map to real rows)
+  const sectionCount = await db.select().from(schema.websiteSections);
+  if (sectionCount.length === 0) {
+    await db.insert(schema.websiteSections).values(
+      fallbackWebsiteSections.map((section) => ({
+        sectionKey: section.sectionKey,
+        title: section.title,
+        subtitle: section.subtitle,
+        badge: section.badge,
+        description: section.description,
+        content: section.content,
+        componentType: section.componentType,
+        sortOrder: section.sortOrder,
+        status: section.status,
+        styles: section.styles,
+        metadata: section.metadata,
+      }))
+    );
+    console.log("✅ Website sections seeded");
   }
 
   console.log("\n🎉 Database fully prepared with rich editable records!");

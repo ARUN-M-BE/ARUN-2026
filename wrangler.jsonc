@@ -23,6 +23,12 @@
     "AUTH_SECRET": "dev-secret-change-in-production-openssl-rand-base64-32",
     "NEXTAUTH_SECRET": "dev-secret-change-in-production-openssl-rand-base64-32",
     "ADMIN_EMAIL": "arun@arun-m.in",
-    "ADMIN_PASSWORD": "Admin@123"
+    "ADMIN_PASSWORD": "Admin@123",
+    "NEXT_PUBLIC_API_URL": "https://api.arun-m.in",
+    "API_MANAGEMENT_URL": "https://api.arun-m.in",
+    "MONKEYTYPE_APE_KEY": "NmFmNzIxMTJmZjk5Y2MxYzgwMmFmOTk1LkxmM3hNZE41czZYY05vSXlJV01mcFZwVXVZeTdSSnZG",
+    "IPSTACK_API_KEY": "6a55615f589fec8cd4176b1df8e79d42",
+    "UPSTASH_REDIS_REST_URL": "https://divine-quail-200838.upstash.io",
+    "UPSTASH_REDIS_REST_TOKEN": "gQAAAAAAAxCGAAIgcDIwZDRhNzEzNTFiNGE0NGJiODg5M2YwYjIxZTA4NzNiOA"
   }
 }

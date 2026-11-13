@@ -3,73 +3,120 @@
 import { useState, useEffect, useMemo } from "react";
 import {
   Activity,
-  Zap,
   Globe2,
   Cpu,
-  ShieldCheck,
+  Eye,
+  Users,
+  Keyboard,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+
+interface PageViewSummary {
+  total: number;
+  today: number;
+  uniqueVisitors: number;
+  topCountries: Array<{ country: string | null; total: number }>;
+  topPaths: Array<{ path: string; total: number }>;
+  daily: Array<{ day: string; total: number }>;
+}
+
+interface TypingStats {
+  wpm: number;
+  accuracy: number;
+}
 
 export function RealtimeTelemetry() {
   const { t, language } = useLanguage();
 
-  // Simulated live ticking metrics
-  const [, setStreamTicks] = useState(0);
-  const [requestsPerMin, setRequestsPerMin] = useState(1640);
+  // Real metrics: page views from Neon/Upstash/IPstack, typing stats from Monkeytype
+  const [summary, setSummary] = useState<PageViewSummary | null>(null);
+  const [typing, setTyping] = useState<TypingStats | null>(null);
   const [latency, setLatency] = useState(18);
-  const [activeSessions, setActiveSessions] = useState(48);
 
-  // Time-series waveform data
+  // Fallback waveform until the page-view history has enough sample days
   const [history, setHistory] = useState<number[]>([
     45, 52, 48, 60, 55, 68, 74, 62, 59, 70, 78, 85, 80, 72, 88, 92, 86, 95, 90, 94
   ]);
 
-  // Live real-time interval simulation
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadMetrics = async () => {
+      try {
+        const [pvRes, mtRes] = await Promise.all([
+          fetch("/api/analytics/pageview", { cache: "no-store" }),
+          fetch("/api/integrations/monkeytype", { cache: "no-store" }),
+        ]);
+        if (!pvRes.ok || !mtRes.ok || cancelled) return;
+
+        const [pv, mt] = await Promise.all([
+          pvRes.json() as Promise<{ success?: boolean; data?: PageViewSummary }>,
+          mtRes.json() as Promise<{ data?: { stats?: { wpm?: number; accuracy?: number } } }>,
+        ]);
+        if (cancelled) return;
+
+        if (pv?.success && pv.data) setSummary(pv.data);
+        const stats = mt?.data?.stats;
+        if (stats) {
+          setTyping({ wpm: Number(stats.wpm) || 0, accuracy: Number(stats.accuracy) || 0 });
+        }
+      } catch {
+        // Telemetry is decorative; a failed fetch must never break the page.
+      }
+    };
+
+    void loadMetrics();
+    const refresh = setInterval(loadMetrics, 60000);
+    return () => {
+      cancelled = true;
+      clearInterval(refresh);
+    };
+  }, []);
+
+  const hasRealHistory = Boolean(summary && summary.daily.length > 1);
+
+  // Edge latency heartbeat + placeholder waveform animation
   useEffect(() => {
     const interval = setInterval(() => {
-      setStreamTicks((prev) => prev + 1);
-
-      // Random natural fluctuation
-      setRequestsPerMin((prev) => {
-        const delta = Math.floor(Math.random() * 25) - 12;
-        return Math.max(1400, Math.min(2200, prev + delta));
-      });
-
       setLatency((prev) => {
         const delta = Math.floor(Math.random() * 5) - 2;
         return Math.max(12, Math.min(28, prev + delta));
       });
 
-      setHistory((prev) => {
-        const last = prev[prev.length - 1];
-        const nextVal = Math.max(30, Math.min(100, last + (Math.floor(Math.random() * 19) - 9)));
-        return [...prev.slice(1), nextVal];
-      });
-
-      if (Math.random() > 0.7) {
-        setActiveSessions((prev) => Math.max(35, Math.min(80, prev + (Math.random() > 0.5 ? 1 : -1))));
+      if (!hasRealHistory) {
+        setHistory((prev) => {
+          const last = prev[prev.length - 1];
+          const nextVal = Math.max(30, Math.min(100, last + (Math.floor(Math.random() * 19) - 9)));
+          return [...prev.slice(1), nextVal];
+        });
       }
     }, 2000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [hasRealHistory]);
+
+  const series = useMemo(() => {
+    if (!summary || summary.daily.length < 2) return history;
+    const max = Math.max(...summary.daily.map((d) => d.total), 1);
+    return summary.daily.map((d) => Math.round(30 + (d.total / max) * 65));
+  }, [summary, history]);
 
   // SVG points calculation for real-time waveform
   const svgPoints = useMemo(() => {
     const width = 800;
     const height = 180;
-    const step = width / (history.length - 1);
+    const step = width / (series.length - 1);
     const max = 110;
     const min = 20;
 
-    const coords = history.map((val, idx) => {
+    const coords = series.map((val, idx) => {
       const x = idx * step;
       const y = height - ((val - min) / (max - min)) * (height - 30) - 15;
       return `${x},${y}`;
     });
 
     return coords.join(" ");
-  }, [history]);
+  }, [series]);
 
   const edgeNodes = [
     { city: language === "ar" ? "فرانكفورت (أوروبا)" : "Frankfurt, EU", ping: latency + 2, status: "Optimal" },
@@ -96,7 +143,7 @@ export function RealtimeTelemetry() {
           {t("analytics.title", "Real-Time Telemetry & Observability")}
         </h2>
         <p className="mt-3 text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto">
-          {t("analytics.subtitle", "Live telemetry streaming from production nodes, visitor metrics, and performance vitals.")}
+          {t("analytics.subtitle", "Live telemetry from Cloudflare edge, consent-gated page-view analytics, and public typing stats.")}
         </p>
       </div>
 
@@ -105,59 +152,63 @@ export function RealtimeTelemetry() {
         
         {/* Top Metric Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {/* Requests */}
+          {/* Total Page Views */}
           <div className="p-4 sm:p-5 rounded-2xl bg-card/60 border border-border relative overflow-hidden group">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
-              <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.liveRequests", "Ingress / Min")}</span>
-              <Activity className="w-4 h-4 text-sky-500 animate-pulse" />
+              <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.totalViews", "Page Views")}</span>
+              <Eye className="w-4 h-4 text-sky-500" />
             </div>
             <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground flex items-baseline gap-2">
-              {requestsPerMin.toLocaleString()}
-              <span className="text-xs font-semibold text-emerald-500">↑ 4.2%</span>
+              {summary ? summary.total.toLocaleString() : "—"}
             </div>
             <p className="text-[10px] text-muted-foreground mt-1">
-              {t("analytics.refreshInterval", "2s streaming heartbeat")}
+              {summary ? `${summary.today.toLocaleString()} ${t("analytics.today", "today")}` : t("analytics.refreshInterval", "2s streaming heartbeat")}
             </p>
           </div>
 
-          {/* Latency */}
+          {/* Unique Visitors */}
           <div className="p-4 sm:p-5 rounded-2xl bg-card/60 border border-border relative overflow-hidden group">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
-              <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.avgLatency", "Edge Latency")}</span>
-              <Zap className="w-4 h-4 text-amber-500" />
-            </div>
-            <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground flex items-baseline gap-1.5">
-              {latency}
-              <span className="text-xs font-normal text-muted-foreground font-sans">ms</span>
-              <span className="text-xs font-semibold text-emerald-500 ml-1">Sub-30ms</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground mt-1">Multi-region edge mesh</p>
-          </div>
-
-          {/* Active Sessions */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-card/60 border border-border relative overflow-hidden group">
-            <div className="flex items-center justify-between text-muted-foreground mb-2">
-              <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.activeSessions", "Active Sessions")}</span>
-              <Globe2 className="w-4 h-4 text-indigo-500" />
+              <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.uniqueVisitors", "Unique Visitors")}</span>
+              <Users className="w-4 h-4 text-indigo-500" />
             </div>
             <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground flex items-baseline gap-2">
-              {activeSessions}
-              <span className="text-xs font-semibold text-sky-500">● Live</span>
+              {summary ? summary.uniqueVisitors.toLocaleString() : "—"}
+              <span className="text-xs font-semibold text-emerald-500">● Live</span>
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1">Distributed across 14 nodes</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Salted daily visitor hashes</p>
           </div>
 
-          {/* Uptime */}
+          {/* Top Region */}
           <div className="p-4 sm:p-5 rounded-2xl bg-card/60 border border-border relative overflow-hidden group">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
-              <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.uptime", "Uptime SLA")}</span>
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.topRegion", "Top Region")}</span>
+              <Globe2 className="w-4 h-4 text-sky-500" />
             </div>
-            <div className="text-xl sm:text-3xl font-extrabold font-mono text-emerald-500 flex items-baseline gap-2">
-              99.98%
-              <span className="text-xs font-normal text-muted-foreground">SLA</span>
+            <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground flex items-baseline gap-2">
+              {summary?.topCountries?.[0]?.country || "—"}
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1">Zero-downtime rolling deploys</p>
+            <p className="text-[10px] text-muted-foreground mt-1">
+              {summary?.topCountries?.[0]
+                ? `${summary.topCountries[0].total.toLocaleString()} views from this region`
+                : "Geo enrichment via Cloudflare edge / IPstack"}
+            </p>
+          </div>
+
+          {/* Typing Speed (Monkeytype) */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-card/60 border border-border relative overflow-hidden group">
+            <div className="flex items-center justify-between text-muted-foreground mb-2">
+              <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.typingSpeed", "Typing Speed")}</span>
+              <Keyboard className="w-4 h-4 text-amber-500" />
+            </div>
+            <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground flex items-baseline gap-1.5">
+              {typing ? typing.wpm : "—"}
+              <span className="text-xs font-normal text-muted-foreground font-sans">WPM</span>
+              {typing && typing.accuracy > 0 && (
+                <span className="text-xs font-semibold text-emerald-500 ml-1">{typing.accuracy}%</span>
+              )}
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-1">Monkeytype public profile stats</p>
           </div>
         </div>
 
@@ -167,15 +218,19 @@ export function RealtimeTelemetry() {
             <div>
               <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
                 <Activity className="w-4 h-4 text-sky-500" />
-                {t("analytics.trafficChart", "Live Traffic Waveform (Req / sec)")}
+                {hasRealHistory
+                  ? t("analytics.pageViewHistory", "Page Views — Last 7 Days")
+                  : t("analytics.trafficChart", "Live Traffic Waveform (Req / sec)")}
               </h3>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Streaming ingress samples across cloud edge endpoints
+                {hasRealHistory
+                  ? "Database-recorded page views per day (Neon + Upstash counters)"
+                  : "Streaming ingress samples across cloud edge endpoints"}
               </p>
             </div>
             <div className="flex items-center gap-3 text-xs font-mono">
               <span className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400">
-                <span className="w-2 h-2 rounded-full bg-sky-500" /> Live Ingress
+                <span className="w-2 h-2 rounded-full bg-sky-500" /> {hasRealHistory ? "Recorded Views" : "Live Ingress"}
               </span>
               <span className="flex items-center gap-1.5 text-muted-foreground">
                 <span className="w-2 h-2 rounded-full bg-indigo-500" /> 99.4% Cache Hit

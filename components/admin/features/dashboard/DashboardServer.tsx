@@ -34,6 +34,14 @@ export default async function AdminDashboardPage() {
 
   const statCards = [
     {
+      title: "Page Views",
+      value: stats.views,
+      desc: `${stats.viewsToday} today • ${stats.uniqueVisitors} unique visitors`,
+      icon: Eye,
+      color: "from-fuchsia-500/20 to-fuchsia-500/5 text-fuchsia-400 border-fuchsia-500/20",
+      href: "/admin/api-management",
+    },
+    {
       title: "Sections",
       value: stats.sections,
       desc: `${stats.publishedSections} published, ${stats.draftSections} drafts`,
@@ -256,6 +264,84 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Live Page View Analytics (Upstash + IPstack/Cloudflare geo) */}
+      <Card className="bg-gradient-to-br from-card to-card/60 border-border">
+        <CardHeader className="pb-3 flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="text-sm font-semibold text-white flex items-center gap-2">
+              <Eye className="w-4 h-4 text-fuchsia-400" />
+              Visitor Analytics & Geo Telemetry
+            </CardTitle>
+            <CardDescription className="text-xs text-muted-foreground mt-0.5">
+              Consent-first page views persisted in PostgreSQL, enriched with IPstack / Cloudflare geo headers and Upstash counters.
+            </CardDescription>
+          </div>
+          <Link href="/admin/api-management">
+            <Button variant="ghost" size="sm" className="text-xs text-fuchsia-400 hover:text-fuchsia-300 h-8">
+              API Monitor
+              <ArrowRight className="w-3 h-3 ml-1" />
+            </Button>
+          </Link>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+            <div className="p-3 rounded-xl bg-fuchsia-500/10 border border-fuchsia-500/20">
+              <div className="text-xl font-bold text-fuchsia-400 font-mono">{stats.views.toLocaleString()}</div>
+              <div className="text-[10px] uppercase font-mono text-fuchsia-400/80 mt-1">Total Views</div>
+            </div>
+            <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20">
+              <div className="text-xl font-bold text-sky-400 font-mono">{stats.viewsToday.toLocaleString()}</div>
+              <div className="text-[10px] uppercase font-mono text-sky-400/80 mt-1">Views Today</div>
+            </div>
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <div className="text-xl font-bold text-emerald-400 font-mono">{stats.uniqueVisitors.toLocaleString()}</div>
+              <div className="text-[10px] uppercase font-mono text-emerald-400/80 mt-1">Unique Visitors</div>
+            </div>
+            <div className="p-3 rounded-xl bg-secondary/50 border border-border">
+              <div className="text-sm font-bold text-white font-mono truncate">{stats.topCountry || "—"}</div>
+              <div className="text-[10px] uppercase font-mono text-muted-foreground mt-1">Top Region</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-xl border border-border/70 bg-secondary/40 p-3">
+              <div className="text-[11px] font-mono uppercase text-muted-foreground mb-2">Top Pages</div>
+              {stats.topPages.length === 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  No page views recorded yet. Visit the public site and accept analytics cookies to populate this panel.
+                </p>
+              ) : (
+                <div className="space-y-1.5">
+                  {stats.topPages.map((page) => (
+                    <div key={page.path} className="flex items-center justify-between text-xs gap-3">
+                      <span className="font-mono text-muted-foreground truncate">{page.path}</span>
+                      <span className="font-mono text-white shrink-0">{page.total.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="rounded-xl border border-border/70 bg-secondary/40 p-3">
+              <div className="text-[11px] font-mono uppercase text-muted-foreground mb-2">Country Split</div>
+              {stats.topCountries.length === 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  Geo enrichment activates automatically once views are recorded (IPstack free tier / Cloudflare edge headers).
+                </p>
+              ) : (
+                <div className="space-y-1.5">
+                  {stats.topCountries.map((country) => (
+                    <div key={country.country || "unknown"} className="flex items-center justify-between text-xs gap-3">
+                      <span className="text-muted-foreground truncate">{country.country || "Unknown"}</span>
+                      <span className="font-mono text-white shrink-0">{country.total.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Profile quick banner */}
       <Card className="bg-gradient-to-r from-card to-card/60 border-border/80 overflow-hidden relative">

@@ -1,7 +1,7 @@
 import { db } from "../config/database";
 import * as schema from "../models/schema";
 import type { Status, MessageStatus, MediaAsset } from "@/types";
-import { eq, desc, asc, and, or, ilike, count } from "drizzle-orm";
+import { eq, desc, asc, and, or, ilike, count, sql, gte, isNotNull } from "drizzle-orm";
 import { isUUID } from "@/lib/utils";
 import {
   fallbackProfile,
@@ -49,8 +49,8 @@ export const ProfileRepository = {
       const [inserted] = await db.insert(schema.profile).values(cleanData as typeof schema.profile.$inferInsert).returning();
       return inserted;
     } catch (err) {
-      console.warn("[ProfileRepository.upsert] DB update bypassed or failed:", err);
-      return null;
+      console.error("[ProfileRepository.upsert] DB write failed:", err);
+      throw err;
     }
   },
 };
@@ -107,8 +107,8 @@ export const ProjectRepository = {
       const [item] = await db.insert(schema.projects).values(cleanData as typeof schema.projects.$inferInsert).returning();
       return item;
     } catch (err) {
-      console.warn("[ProjectRepository.create] DB insert failed:", err);
-      return { ...data, id: data.id || "proj-" + Date.now() };
+      console.error("[ProjectRepository.create] DB insert failed:", err);
+      throw err;
     }
   },
   async update(id: string, data: Record<string, unknown>) {
@@ -142,8 +142,8 @@ export const ProjectRepository = {
       const [created] = await db.insert(schema.projects).values(insertData as typeof schema.projects.$inferInsert).returning();
       return created;
     } catch (err) {
-      console.warn("[ProjectRepository.update] DB update/upsert error:", err);
-      return { ...data, id };
+      console.error("[ProjectRepository.update] DB update/upsert error:", err);
+      throw err;
     }
   },
   async delete(id: string) {
@@ -156,8 +156,8 @@ export const ProjectRepository = {
         or(eq(schema.projects.slug, id), eq(schema.projects.slug, cleanSlug))
       );
     } catch (err) {
-      console.warn("[ProjectRepository.delete] DB delete error:", err);
-      return null;
+      console.error("[ProjectRepository.delete] DB delete error:", err);
+      throw err;
     }
   },
 };
@@ -178,8 +178,8 @@ export const SkillRepository = {
       const [cat] = await db.insert(schema.skillCategories).values(cleanData as typeof schema.skillCategories.$inferInsert).returning();
       return cat;
     } catch (err) {
-      console.warn("[SkillRepository.createCategory] Error:", err);
-      return { ...data, id: "cat-" + Date.now() };
+      console.error("[SkillRepository.createCategory] Error:", err);
+      throw err;
     }
   },
   async updateCategory(id: string, data: Record<string, unknown>) {
@@ -211,8 +211,8 @@ export const SkillRepository = {
       } as typeof schema.skillCategories.$inferInsert).returning();
       return created;
     } catch (err) {
-      console.warn("[SkillRepository.updateCategory] Error:", err);
-      return { ...data, id };
+      console.error("[SkillRepository.updateCategory] Error:", err);
+      throw err;
     }
   },
   async deleteCategory(id: string) {
@@ -225,8 +225,8 @@ export const SkillRepository = {
         or(eq(schema.skillCategories.slug, id), eq(schema.skillCategories.slug, cleanSlug))
       );
     } catch (err) {
-      console.warn("[SkillRepository.deleteCategory] Error:", err);
-      return null;
+      console.error("[SkillRepository.deleteCategory] Error:", err);
+      throw err;
     }
   },
   async getSkills(opts?: { categoryId?: string; search?: string }) {
@@ -264,8 +264,8 @@ export const SkillRepository = {
       const [skill] = await db.insert(schema.skills).values(safeData as typeof schema.skills.$inferInsert).returning();
       return skill;
     } catch (err) {
-      console.warn("[SkillRepository.createSkill] Error:", err);
-      return { ...data, id: "sk-" + Date.now() };
+      console.error("[SkillRepository.createSkill] Error:", err);
+      throw err;
     }
   },
   async updateSkill(id: string, data: Record<string, unknown>) {
@@ -305,8 +305,8 @@ export const SkillRepository = {
       } as typeof schema.skills.$inferInsert).returning();
       return created;
     } catch (err) {
-      console.warn("[SkillRepository.updateSkill] Error:", err);
-      return { ...data, id };
+      console.error("[SkillRepository.updateSkill] Error:", err);
+      throw err;
     }
   },
   async deleteSkill(id: string) {
@@ -319,8 +319,8 @@ export const SkillRepository = {
         or(eq(schema.skills.slug, id), eq(schema.skills.slug, cleanSlug))
       );
     } catch (err) {
-      console.warn("[SkillRepository.deleteSkill] Error:", err);
-      return null;
+      console.error("[SkillRepository.deleteSkill] Error:", err);
+      throw err;
     }
   },
 };
@@ -349,8 +349,8 @@ export const ExperienceRepository = {
       const [exp] = await db.insert(schema.experience).values(cleanData as typeof schema.experience.$inferInsert).returning();
       return exp;
     } catch (err) {
-      console.warn("[ExperienceRepository.create] Error:", err);
-      return { ...data, id: "exp-" + Date.now() };
+      console.error("[ExperienceRepository.create] Error:", err);
+      throw err;
     }
   },
   async update(id: string, data: Record<string, unknown>) {
@@ -376,8 +376,8 @@ export const ExperienceRepository = {
       const [created] = await db.insert(schema.experience).values(insertData as typeof schema.experience.$inferInsert).returning();
       return created;
     } catch (err) {
-      console.warn("[ExperienceRepository.update] Error:", err);
-      return { ...data, id };
+      console.error("[ExperienceRepository.update] Error:", err);
+      throw err;
     }
   },
   async delete(id: string) {
@@ -387,8 +387,8 @@ export const ExperienceRepository = {
       }
       return null;
     } catch (err) {
-      console.warn("[ExperienceRepository.delete] Error:", err);
-      return null;
+      console.error("[ExperienceRepository.delete] Error:", err);
+      throw err;
     }
   },
 };
@@ -417,8 +417,8 @@ export const EducationRepository = {
       const [edu] = await db.insert(schema.education).values(cleanData as typeof schema.education.$inferInsert).returning();
       return edu;
     } catch (err) {
-      console.warn("[EducationRepository.create] Error:", err);
-      return { ...data, id: "edu-" + Date.now() };
+      console.error("[EducationRepository.create] Error:", err);
+      throw err;
     }
   },
   async update(id: string, data: Record<string, unknown>) {
@@ -444,8 +444,8 @@ export const EducationRepository = {
       const [created] = await db.insert(schema.education).values(insertData as typeof schema.education.$inferInsert).returning();
       return created;
     } catch (err) {
-      console.warn("[EducationRepository.update] Error:", err);
-      return { ...data, id };
+      console.error("[EducationRepository.update] Error:", err);
+      throw err;
     }
   },
   async delete(id: string) {
@@ -455,8 +455,8 @@ export const EducationRepository = {
       }
       return null;
     } catch (err) {
-      console.warn("[EducationRepository.delete] Error:", err);
-      return null;
+      console.error("[EducationRepository.delete] Error:", err);
+      throw err;
     }
   },
 };
@@ -485,8 +485,8 @@ export const CertificationRepository = {
       const [cert] = await db.insert(schema.certifications).values(cleanData as typeof schema.certifications.$inferInsert).returning();
       return cert;
     } catch (err) {
-      console.warn("[CertificationRepository.create] Error:", err);
-      return { ...data, id: "cert-" + Date.now() };
+      console.error("[CertificationRepository.create] Error:", err);
+      throw err;
     }
   },
   async update(id: string, data: Record<string, unknown>) {
@@ -512,8 +512,8 @@ export const CertificationRepository = {
       const [created] = await db.insert(schema.certifications).values(insertData as typeof schema.certifications.$inferInsert).returning();
       return created;
     } catch (err) {
-      console.warn("[CertificationRepository.update] Error:", err);
-      return { ...data, id };
+      console.error("[CertificationRepository.update] Error:", err);
+      throw err;
     }
   },
   async delete(id: string) {
@@ -523,8 +523,8 @@ export const CertificationRepository = {
       }
       return null;
     } catch (err) {
-      console.warn("[CertificationRepository.delete] Error:", err);
-      return null;
+      console.error("[CertificationRepository.delete] Error:", err);
+      throw err;
     }
   },
 };
@@ -551,8 +551,8 @@ export const ServiceRepository = {
       const [svc] = await db.insert(schema.services).values(cleanData as typeof schema.services.$inferInsert).returning();
       return svc;
     } catch (err) {
-      console.warn("[ServiceRepository.create] Error:", err);
-      return { ...data, id: "svc-" + Date.now() };
+      console.error("[ServiceRepository.create] Error:", err);
+      throw err;
     }
   },
   async update(id: string, data: Record<string, unknown>) {
@@ -578,8 +578,8 @@ export const ServiceRepository = {
       const [created] = await db.insert(schema.services).values(insertData as typeof schema.services.$inferInsert).returning();
       return created;
     } catch (err) {
-      console.warn("[ServiceRepository.update] Error:", err);
-      return { ...data, id };
+      console.error("[ServiceRepository.update] Error:", err);
+      throw err;
     }
   },
   async delete(id: string) {
@@ -589,8 +589,8 @@ export const ServiceRepository = {
       }
       return null;
     } catch (err) {
-      console.warn("[ServiceRepository.delete] Error:", err);
-      return null;
+      console.error("[ServiceRepository.delete] Error:", err);
+      throw err;
     }
   },
 };
@@ -619,8 +619,8 @@ export const TestimonialRepository = {
       const [t] = await db.insert(schema.testimonials).values(cleanData as typeof schema.testimonials.$inferInsert).returning();
       return t;
     } catch (err) {
-      console.warn("[TestimonialRepository.create] Error:", err);
-      return { ...data, id: "test-" + Date.now() };
+      console.error("[TestimonialRepository.create] Error:", err);
+      throw err;
     }
   },
   async update(id: string, data: Record<string, unknown>) {
@@ -646,8 +646,8 @@ export const TestimonialRepository = {
       const [created] = await db.insert(schema.testimonials).values(insertData as typeof schema.testimonials.$inferInsert).returning();
       return created;
     } catch (err) {
-      console.warn("[TestimonialRepository.update] Error:", err);
-      return { ...data, id };
+      console.error("[TestimonialRepository.update] Error:", err);
+      throw err;
     }
   },
   async delete(id: string) {
@@ -657,8 +657,8 @@ export const TestimonialRepository = {
       }
       return null;
     } catch (err) {
-      console.warn("[TestimonialRepository.delete] Error:", err);
-      return null;
+      console.error("[TestimonialRepository.delete] Error:", err);
+      throw err;
     }
   },
 };
@@ -687,16 +687,16 @@ export const MessageRepository = {
       const { id: _ignored, ...cleanData } = data;
       return await db.insert(schema.contactMessages).values(cleanData as typeof schema.contactMessages.$inferInsert);
     } catch (err) {
-      console.warn("[MessageRepository.create] Stored in local fallback log:", err);
-      return null;
+      console.error("[MessageRepository.create] DB insert failed:", err);
+      throw err;
     }
   },
   async recordConsent(data: Record<string, unknown>) {
     try {
       return await db.insert(schema.consentRecords).values(data as typeof schema.consentRecords.$inferInsert);
     } catch (err) {
-      console.warn("[MessageRepository.recordConsent] Consent recorded in fallback mode:", err);
-      return null;
+      console.error("[MessageRepository.recordConsent] DB insert failed:", err);
+      throw err;
     }
   },
   async updateStatus(id: string, status: MessageStatus) {
@@ -706,8 +706,8 @@ export const MessageRepository = {
       }
       return null;
     } catch (err) {
-      console.warn("[MessageRepository.updateStatus] Error:", err);
-      return null;
+      console.error("[MessageRepository.updateStatus] Error:", err);
+      throw err;
     }
   },
   async delete(id: string) {
@@ -717,8 +717,8 @@ export const MessageRepository = {
       }
       return null;
     } catch (err) {
-      console.warn("[MessageRepository.delete] Error:", err);
-      return null;
+      console.error("[MessageRepository.delete] Error:", err);
+      throw err;
     }
   },
 };
@@ -775,8 +775,8 @@ export const NavigationRepository = {
       const [nav] = await db.insert(schema.navigation).values(cleanData as typeof schema.navigation.$inferInsert).returning();
       return nav;
     } catch (err) {
-      console.warn("[NavigationRepository.create] Error:", err);
-      return { ...data, id: "nav-" + Date.now() };
+      console.error("[NavigationRepository.create] Error:", err);
+      throw err;
     }
   },
   async update(id: string, data: Record<string, unknown>) {
@@ -822,8 +822,8 @@ export const NavigationRepository = {
       } as typeof schema.navigation.$inferInsert).returning();
       return created;
     } catch (err) {
-      console.warn("[NavigationRepository.update] Error:", err);
-      return { ...data, id };
+      console.error("[NavigationRepository.update] Error:", err);
+      throw err;
     }
   },
   async delete(id: string) {
@@ -840,8 +840,8 @@ export const NavigationRepository = {
         )
       );
     } catch (err) {
-      console.warn("[NavigationRepository.delete] Error:", err);
-      return null;
+      console.error("[NavigationRepository.delete] Error:", err);
+      throw err;
     }
   },
   async reorder(orderedIds: string[]) {
@@ -855,8 +855,8 @@ export const NavigationRepository = {
       await Promise.all(promises);
       return true;
     } catch (err) {
-      console.warn("[NavigationRepository.reorder] Error:", err);
-      return false;
+      console.error("[NavigationRepository.reorder] Error:", err);
+      throw err;
     }
   },
 };
@@ -908,8 +908,8 @@ export const SectionRepository = {
       const [sec] = await db.insert(schema.websiteSections).values(cleanData as typeof schema.websiteSections.$inferInsert).returning();
       return sec;
     } catch (err) {
-      console.warn("[SectionRepository.create] Error:", err);
-      return { ...data, id: "sec-" + Date.now() };
+      console.error("[SectionRepository.create] Error:", err);
+      throw err;
     }
   },
   async update(id: string, data: Record<string, unknown>) {
@@ -962,8 +962,8 @@ export const SectionRepository = {
         .returning();
       return created;
     } catch (err) {
-      console.warn("[SectionRepository.update] Error:", err);
-      return { ...data, id };
+      console.error("[SectionRepository.update] Error:", err);
+      throw err;
     }
   },
   async duplicate(id: string) {
@@ -986,8 +986,8 @@ export const SectionRepository = {
       };
       return await this.create(duplicatedData);
     } catch (err) {
-      console.warn("[SectionRepository.duplicate] Error:", err);
-      return null;
+      console.error("[SectionRepository.duplicate] Error:", err);
+      throw err;
     }
   },
   async delete(id: string) {
@@ -1000,8 +1000,8 @@ export const SectionRepository = {
         or(eq(schema.websiteSections.sectionKey, id), eq(schema.websiteSections.sectionKey, cleanKey))
       );
     } catch (err) {
-      console.warn("[SectionRepository.delete] Error:", err);
-      return null;
+      console.error("[SectionRepository.delete] Error:", err);
+      throw err;
     }
   },
   async reorder(orderedIds: string[]) {
@@ -1018,8 +1018,8 @@ export const SectionRepository = {
       await Promise.all(promises);
       return true;
     } catch (err) {
-      console.warn("[SectionRepository.reorder] Error:", err);
-      return false;
+      console.error("[SectionRepository.reorder] Error:", err);
+      throw err;
     }
   },
 };
@@ -1041,8 +1041,8 @@ export const SettingsRepository = {
       }
       return await db.insert(schema.siteSettings).values({ key, value, group: "general" });
     } catch (err) {
-      console.warn("[SettingsRepository.upsert] Error:", err);
-      return null;
+      console.error("[SettingsRepository.upsert] Error:", err);
+      throw err;
     }
   },
 };
@@ -1076,8 +1076,8 @@ export const LegalRepository = {
       }
       return null;
     } catch (err) {
-      console.warn("[LegalRepository.update] Error:", err);
-      return null;
+      console.error("[LegalRepository.update] Error:", err);
+      throw err;
     }
   },
   async addVersionHistory(data: Record<string, unknown>) {
@@ -1089,8 +1089,8 @@ export const LegalRepository = {
       };
       return await db.insert(schema.legalVersionHistory).values(safeData as typeof schema.legalVersionHistory.$inferInsert);
     } catch (err) {
-      console.warn("[LegalRepository.addVersionHistory] Error:", err);
-      return null;
+      console.error("[LegalRepository.addVersionHistory] Error:", err);
+      throw err;
     }
   },
   async delete(id: string) {
@@ -1100,8 +1100,8 @@ export const LegalRepository = {
       }
       return null;
     } catch (err) {
-      console.warn("[LegalRepository.delete] Error:", err);
-      return null;
+      console.error("[LegalRepository.delete] Error:", err);
+      throw err;
     }
   },
 };
@@ -1137,27 +1137,8 @@ export const MediaRepository = {
       const [asset] = await db.insert(schema.mediaAssets).values(cleanData as typeof schema.mediaAssets.$inferInsert).returning();
       return asset;
     } catch (err) {
-      console.warn("[MediaRepository.create] Error:", err);
-      const fallbackItem: MediaAsset = {
-        id: "media-" + Date.now(),
-        filename: String(data.filename || "file"),
-        originalFilename: String(data.originalFilename || "file"),
-        mimeType: String(data.mimeType || "application/octet-stream"),
-        size: Number(data.size || 0),
-        url: String(data.url || ""),
-        altText: (data.altText as string) || null,
-        caption: (data.caption as string) || null,
-        width: typeof data.width === "number" ? data.width : null,
-        height: typeof data.height === "number" ? data.height : null,
-        folder: (data.folder as string) || null,
-        copyright: (data.copyright as string) || null,
-        license: (data.license as string) || null,
-        attribution: (data.attribution as string) || null,
-        uploadedBy: (data.uploadedBy as string) || null,
-        createdAt: new Date(),
-      };
-      inMemoryMediaAssets.unshift(fallbackItem);
-      return fallbackItem;
+      console.error("[MediaRepository.create] DB insert failed:", err);
+      throw err;
     }
   },
   async delete(id: string) {
@@ -1169,8 +1150,8 @@ export const MediaRepository = {
       if (idx !== -1) inMemoryMediaAssets.splice(idx, 1);
       return null;
     } catch (err) {
-      console.warn("[MediaRepository.delete] Error:", err);
-      return null;
+      console.error("[MediaRepository.delete] Error:", err);
+      throw err;
     }
   },
 };
@@ -1197,8 +1178,11 @@ export const AuditRepository = {
         userId: typeof data?.userId === "string" && isUUID(data.userId) ? data.userId : null,
       };
       await db.insert(schema.auditLog).values(safeData as typeof schema.auditLog.$inferInsert);
-    } catch {
-      // Offline fallback preserved in memory
+    } catch (err) {
+      // The primary write already committed; audit logging must not fake success
+      // silently. Surface the failure loudly so it can be investigated.
+      console.error("[AuditRepository.log] Audit insert FAILED (kept in memory only):", err);
+      throw err;
     }
   },
   async findMany(opts?: { page?: number; limit?: number }) {
@@ -1213,6 +1197,95 @@ export const AuditRepository = {
       return { items, total, page, limit, pages: Math.ceil(total / limit) };
     } catch {
       return { items: [], total: 0, page: 1, limit: 50, pages: 1 };
+    }
+  },
+};
+
+// --- Page View Analytics Repository ----------------------
+const EMPTY_ANALYTICS = {
+  total: 0,
+  today: 0,
+  uniqueVisitors: 0,
+  topCountries: [] as Array<{ country: string | null; total: number }>,
+  topPaths: [] as Array<{ path: string; total: number }>,
+  daily: [] as Array<{ day: string; total: number }>,
+};
+
+export const PageViewRepository = {
+  /**
+   * Persists a single page view. Errors are rethrown so callers never report
+   * a fake success when the database write was rejected.
+   */
+  async create(data: {
+    path: string;
+    referrer?: string | null;
+    countryCode?: string | null;
+    countryName?: string | null;
+    city?: string | null;
+    device?: string | null;
+    visitorHash?: string | null;
+  }) {
+    const [row] = await db
+      .insert(schema.pageViews)
+      .values({
+        path: data.path,
+        referrer: data.referrer ?? null,
+        countryCode: data.countryCode ?? null,
+        countryName: data.countryName ?? null,
+        city: data.city ?? null,
+        device: data.device ?? null,
+        visitorHash: data.visitorHash ?? null,
+      })
+      .returning();
+    return row;
+  },
+  async getSummary() {
+    try {
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+
+      const [totalRow] = await db.select({ total: count() }).from(schema.pageViews);
+      const [todayRow] = await db
+        .select({ total: count() })
+        .from(schema.pageViews)
+        .where(gte(schema.pageViews.createdAt, startOfToday));
+      const [uniqueRow] = await db
+        .select({ total: sql<number>`count(distinct ${schema.pageViews.visitorHash})` })
+        .from(schema.pageViews);
+      const topCountries = await db
+        .select({ country: schema.pageViews.countryName, total: count() })
+        .from(schema.pageViews)
+        .where(isNotNull(schema.pageViews.countryName))
+        .groupBy(schema.pageViews.countryName)
+        .orderBy(sql`count(*) desc`)
+        .limit(5);
+      const topPaths = await db
+        .select({ path: schema.pageViews.path, total: count() })
+        .from(schema.pageViews)
+        .groupBy(schema.pageViews.path)
+        .orderBy(sql`count(*) desc`)
+        .limit(5);
+      const daily = await db
+        .select({
+          day: sql<string>`to_char(date_trunc('day', ${schema.pageViews.createdAt}), 'YYYY-MM-DD')`,
+          total: count(),
+        })
+        .from(schema.pageViews)
+        .where(gte(schema.pageViews.createdAt, new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)))
+        .groupBy(sql`date_trunc('day', ${schema.pageViews.createdAt})`)
+        .orderBy(sql`date_trunc('day', ${schema.pageViews.createdAt})`);
+
+      return {
+        total: Number(totalRow?.total ?? 0),
+        today: Number(todayRow?.total ?? 0),
+        uniqueVisitors: Number(uniqueRow?.total ?? 0),
+        topCountries: topCountries.map((c) => ({ country: c.country, total: Number(c.total) })),
+        topPaths: topPaths.map((p) => ({ path: p.path, total: Number(p.total) })),
+        daily: daily.map((d) => ({ day: d.day, total: Number(d.total) })),
+      };
+    } catch (err) {
+      console.warn("[PageViewRepository.getSummary] Analytics query failed:", err);
+      return { ...EMPTY_ANALYTICS };
     }
   },
 };

@@ -20,6 +20,7 @@ import {
   SectionRepository,
   MessageRepository,
 } from "@/server/repositories";
+import { AnalyticsService } from "@/server/services";
 import { fallbackSocialLinks, fallbackWebsiteSections } from "@/server/repositories/fallback-data";
 import { db } from "@/server/config/database";
 import * as schema from "@/server/models/schema";
@@ -201,7 +202,15 @@ export async function recordConsent(data: {
   userAgent?: string;
   expiresAt?: Date;
 }) {
-  return MessageRepository.recordConsent(data);
+  try {
+    await MessageRepository.recordConsent(data);
+    return { success: true };
+  } catch (err: unknown) {
+    // Consent preferences are already stored in the browser by the banner, so a
+    // DB failure must not throw into the UI — but it must be visible in logs.
+    console.error("[actions.recordConsent] Failed to persist consent record:", err);
+    return { success: false, error: err instanceof Error ? err.message : "Failed to record consent" };
+  }
 }
 
 // ─── Social Links ─────────────────────────────────────────
@@ -236,159 +245,107 @@ export async function getPublicSocialLinks(placement?: string): Promise<SocialLi
 }
 export async function createSocialLink(data: SocialLinkFormData): Promise<{ success: boolean; data?: SocialLink; error?: string }> {
   await requireAdmin();
-  const newItem = {
-    ...data,
-    id: "soc-" + Date.now(),
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  } as SocialLink;
-  fallbackSocialLinks.push(newItem);
-
   try {
     const { id: _ignored, ...cleanData } = data as Record<string, unknown>;
-    const [item] = await db.insert(schema.socialLinks).values(cleanData as typeof schema.socialLinks.$inferInsert).returning();
-    if (item) {
-      const idx = fallbackSocialLinks.findIndex((l) => l.id === newItem.id);
-      if (idx !== -1) fallbackSocialLinks[idx] = item as SocialLink;
-    }
+    const [item] = await db
+      .insert(schema.socialLinks)
+      .values({
+        ...cleanData,
+        size: data.size || "md",
+        style: data.style || "default",
+        placements: data.placements || ["footer", "contact"],
+        status: data.status || "published",
+        updatedAt: new Date(),
+      } as typeof schema.socialLinks.$inferInsert)
+      .returning();
     revalidatePath("/");
     revalidatePath("/admin/social-links");
-    return { success: true, data: (item || newItem) as SocialLink };
+    return { success: true, data: item as SocialLink };
   } catch (err: unknown) {
-    console.warn("[actions.createSocialLink] Error:", err);
-    revalidatePath("/");
-    revalidatePath("/admin/social-links");
-    return { success: true, data: newItem };
+    console.error("[actions.createSocialLink] DB insert failed:", err);
+    return { success: false, error: err instanceof Error ? err.message : "Failed to create social link" };
   }
 }
 export async function updateSocialLink(id: string, data: Partial<SocialLinkFormData>): Promise<{ success: boolean; data?: SocialLink; error?: string }> {
   await requireAdmin();
-  const platformToMatch = data.platform || (id.startsWith("soc-") ? id.replace(/^soc-/, "") : null);
-  const fallbackIdx = fallbackSocialLinks.findIndex(
-    (l) => l.id === id || (platformToMatch && l.platform.toLowerCase() === platformToMatch.toLowerCase())
-  );
-  const fallbackItem = fallbackIdx !== -1 ? fallbackSocialLinks[fallbackIdx] : undefined;
-  if (fallbackIdx !== -1) {
-    fallbackSocialLinks[fallbackIdx] = {
-      ...fallbackSocialLinks[fallbackIdx],
-      ...data,
-      updatedAt: new Date(),
-    } as SocialLink;
-  }
-
   try {
     const { id: _ignored, ...cleanData } = data as Record<string, unknown>;
     const updateData = { ...cleanData, updatedAt: new Date() };
 
-    // 1. Try direct UUID update
-    if (isUUID(id)) {
-      const [existing] = await db.select().from(schema.socialLinks).where(eq(schema.socialLinks.id, id)).limit(1);
-      if (existing) {
-        const [item] = await db.update(schema.socialLinks).set(updateData).where(eq(schema.socialLinks.id, id)).returning();
-        if (fallbackIdx !== -1 && item) fallbackSocialLinks[fallbackIdx] = item as SocialLink;
-        revalidatePath("/");
-        revalidatePath("/admin/social-links");
-        return { success: true, data: item as SocialLink };
-      }
+    const [item] = isUUID(id)
+      ? await db.update(schema.socialLinks).set(updateData as Partial<typeof schema.socialLinks.$inferInsert>).where(eq(schema.socialLinks.id, id)).returning()
+      : await db
+          .update(schema.socialLinks)
+          .set(updateData as Partial<typeof schema.socialLinks.$inferInsert>)
+          .where(ilike(schema.socialLinks.platform, data.platform || id.replace(/^soc-/, "")))
+          .returning();
+
+    if (item) {
+      revalidatePath("/");
+      revalidatePath("/admin/social-links");
+      return { success: true, data: item as SocialLink };
     }
 
-    // 2. Try match by platform (e.g. GitHub, LinkedIn, X, Instagram, YouTube)
-    if (platformToMatch) {
-      const [existingPlatform] = await db
-        .select()
-        .from(schema.socialLinks)
-        .where(ilike(schema.socialLinks.platform, platformToMatch))
-        .limit(1);
-
-      if (existingPlatform) {
-        const [item] = await db.update(schema.socialLinks).set(updateData).where(eq(schema.socialLinks.id, existingPlatform.id)).returning();
-        if (fallbackIdx !== -1 && item) fallbackSocialLinks[fallbackIdx] = item as SocialLink;
-        revalidatePath("/");
-        revalidatePath("/admin/social-links");
-        return { success: true, data: item as SocialLink };
-      }
-    }
-
-    // 3. Insert fresh into DB
-    const [inserted] = await db.insert(schema.socialLinks).values({
-      platform: data.platform || fallbackItem?.platform || "Custom",
-      url: data.url || fallbackItem?.url || "https://arun-m.in",
-      icon: data.icon !== undefined ? data.icon : (fallbackItem?.icon ?? null),
-      label: data.label || fallbackItem?.label || data.platform || "Link",
-      color: data.color !== undefined ? data.color : (fallbackItem?.color ?? null),
-      size: data.size || fallbackItem?.size || "md",
-      style: data.style || fallbackItem?.style || "default",
-      placements: data.placements || fallbackItem?.placements || ["footer", "contact"],
-      sortOrder: typeof data.sortOrder === "number" ? data.sortOrder : (fallbackItem?.sortOrder ?? 0),
-      isActive: typeof data.isActive === "boolean" ? data.isActive : (fallbackItem?.isActive ?? true),
-      status: data.status || fallbackItem?.status || "published",
-      updatedAt: new Date(),
-    }).returning();
-
-    if (fallbackIdx !== -1 && inserted) fallbackSocialLinks[fallbackIdx] = inserted as SocialLink;
+    // Promote the edited row into a real database row instead of mutating memory.
+    const [inserted] = await db
+      .insert(schema.socialLinks)
+      .values({
+        platform: data.platform || "Custom",
+        url: data.url || "https://arun-m.in",
+        label: data.label || data.platform || "Link",
+        icon: data.icon ?? null,
+        color: data.color ?? null,
+        size: data.size || "md",
+        style: data.style || "default",
+        placements: data.placements || ["footer", "contact"],
+        sortOrder: typeof data.sortOrder === "number" ? data.sortOrder : 0,
+        isActive: typeof data.isActive === "boolean" ? data.isActive : true,
+        status: data.status || "published",
+        updatedAt: new Date(),
+      } as typeof schema.socialLinks.$inferInsert)
+      .returning();
     revalidatePath("/");
     revalidatePath("/admin/social-links");
     return { success: true, data: inserted as SocialLink };
   } catch (err: unknown) {
-    console.warn("[actions.updateSocialLink] Error:", err);
-    revalidatePath("/");
-    revalidatePath("/admin/social-links");
-    return { success: true, data: (fallbackIdx !== -1 ? fallbackSocialLinks[fallbackIdx] : { ...data, id }) as SocialLink };
+    console.error("[actions.updateSocialLink] DB update failed:", err);
+    return { success: false, error: err instanceof Error ? err.message : "Failed to update social link" };
   }
 }
 export async function deleteSocialLink(id: string): Promise<{ success: boolean; error?: string }> {
   await requireAdmin();
-  const platformToMatch = id.replace(/^soc-/, "");
-  const fallbackIdx = fallbackSocialLinks.findIndex(
-    (l) => l.id === id || l.platform.toLowerCase() === platformToMatch.toLowerCase()
-  );
-  if (fallbackIdx !== -1) {
-    fallbackSocialLinks.splice(fallbackIdx, 1);
-  }
-
   try {
     if (isUUID(id)) {
       await db.delete(schema.socialLinks).where(eq(schema.socialLinks.id, id));
     } else {
-      await db.delete(schema.socialLinks).where(ilike(schema.socialLinks.platform, platformToMatch));
+      await db.delete(schema.socialLinks).where(ilike(schema.socialLinks.platform, id.replace(/^soc-/, "")));
     }
     revalidatePath("/");
     revalidatePath("/admin/social-links");
     return { success: true };
   } catch (err: unknown) {
-    console.warn("[actions.deleteSocialLink] Error:", err);
-    revalidatePath("/");
-    revalidatePath("/admin/social-links");
-    return { success: true };
+    console.error("[actions.deleteSocialLink] DB delete failed:", err);
+    return { success: false, error: err instanceof Error ? err.message : "Failed to delete social link" };
   }
 }
 export async function reorderSocialLinks(orderedIds: string[]): Promise<{ success: boolean; error?: string }> {
   await requireAdmin();
-  const idMap = new Map(orderedIds.map((id, index) => [id, index + 1]));
-  for (const item of fallbackSocialLinks) {
-    if (idMap.has(item.id)) {
-      item.sortOrder = idMap.get(item.id)!;
-    }
-  }
-  fallbackSocialLinks.sort((a, b) => a.sortOrder - b.sortOrder);
-
   try {
-    const promises = orderedIds.map((id, index) => {
-      if (isUUID(id)) {
-        return db.update(schema.socialLinks).set({ sortOrder: index + 1, updatedAt: new Date() }).where(eq(schema.socialLinks.id, id));
-      }
-      return Promise.resolve();
-    });
-    await Promise.all(promises);
+    await Promise.all(
+      orderedIds.map((id, index) =>
+        isUUID(id)
+          ? db.update(schema.socialLinks).set({ sortOrder: index + 1, updatedAt: new Date() }).where(eq(schema.socialLinks.id, id))
+          : Promise.resolve()
+      )
+    );
     revalidatePath("/");
     revalidatePath("/admin/social-links");
     return { success: true };
   } catch (err: unknown) {
-    console.warn("[actions.reorderSocialLinks] Error:", err);
-    return { success: true };
+    console.error("[actions.reorderSocialLinks] DB update failed:", err);
+    return { success: false, error: err instanceof Error ? err.message : "Failed to reorder social links" };
   }
 }
-
 // ─── Navigation ───────────────────────────────────────────
 export async function getNavigation(): Promise<NavigationItem[]> {
   return NavigationRepository.findMany();
@@ -634,6 +591,7 @@ export async function getDashboardStats() {
       testimonialCount,
       serviceCount,
       allSections,
+      analytics,
     ] = await Promise.all([
       db.select({ total: count() }).from(schema.projects).catch(() => [{ total: 12 }]),
       db.select({ total: count() }).from(schema.projects).where(eq(schema.projects.status, "published")).catch(() => [{ total: 10 }]),
@@ -646,6 +604,7 @@ export async function getDashboardStats() {
       db.select({ total: count() }).from(schema.testimonials).catch(() => [{ total: 3 }]),
       db.select({ total: count() }).from(schema.services).catch(() => [{ total: 6 }]),
       SectionRepository.findMany().catch(() => fallbackWebsiteSections),
+      AnalyticsService.getSummary(),
     ]);
 
     const sectionsList = allSections && allSections.length > 0 ? allSections : fallbackWebsiteSections;
@@ -664,7 +623,13 @@ export async function getDashboardStats() {
       unreadMessages: Number(messageCount?.[0]?.total ?? 0),
       testimonials: Number(testimonialCount?.[0]?.total ?? 3),
       services: Number(serviceCount?.[0]?.total ?? 6),
-      views: 18420,
+      views: analytics.total,
+      viewsToday: analytics.today,
+      uniqueVisitors: analytics.uniqueVisitors,
+      topCountry: analytics.topCountries[0]?.country || null,
+      topCountries: analytics.topCountries,
+      topPages: analytics.topPaths,
+      dailyViews: analytics.daily,
       sections: sectionsList.length,
       publishedSections: publishedSec,
       draftSections: draftSec,
@@ -683,7 +648,13 @@ export async function getDashboardStats() {
       unreadMessages: 0,
       testimonials: 3,
       services: 6,
-      views: 18420,
+      views: 0,
+      viewsToday: 0,
+      uniqueVisitors: 0,
+      topCountry: null,
+      topCountries: [] as Array<{ country: string | null; total: number }>,
+      topPages: [] as Array<{ path: string; total: number }>,
+      dailyViews: [] as Array<{ day: string; total: number }>,
       sections: 9,
       publishedSections: 9,
       draftSections: 0,

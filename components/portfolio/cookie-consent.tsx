@@ -14,6 +14,12 @@ export function CookieConsent() {
   const [showPreferences, setShowPreferences] = useState(false);
   const [analyticsConsent, setAnalyticsConsent] = useState(false);
 
+  const persistPreferences = (prefs: { essential: boolean; analytics: boolean }) => {
+    localStorage.setItem("cookie_consent_preferences", JSON.stringify(prefs));
+    // Notify the page-view tracker so analytics starts instantly after consent.
+    window.dispatchEvent(new Event("cookie-consent-updated"));
+  };
+
   useEffect(() => {
     const saved = localStorage.getItem("cookie_consent_preferences");
     if (!saved) {
@@ -25,7 +31,7 @@ export function CookieConsent() {
 
   const handleAcceptAll = async () => {
     const prefs = { essential: true, analytics: true };
-    localStorage.setItem("cookie_consent_preferences", JSON.stringify(prefs));
+    persistPreferences(prefs);
     setVisible(false);
     await recordConsent({
       type: "cookie_all",
@@ -36,7 +42,7 @@ export function CookieConsent() {
 
   const handleAcceptEssential = async () => {
     const prefs = { essential: true, analytics: false };
-    localStorage.setItem("cookie_consent_preferences", JSON.stringify(prefs));
+    persistPreferences(prefs);
     setVisible(false);
     await recordConsent({
       type: "cookie_essential_only",
@@ -47,7 +53,7 @@ export function CookieConsent() {
 
   const handleSaveCustom = async () => {
     const prefs = { essential: true, analytics: analyticsConsent };
-    localStorage.setItem("cookie_consent_preferences", JSON.stringify(prefs));
+    persistPreferences(prefs);
     setVisible(false);
     await recordConsent({
       type: "cookie_custom",
