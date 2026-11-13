@@ -1,11 +1,11 @@
 "use client";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/admin/empty-state";
-import { History, Shield } from "lucide-react";
+import { History } from "lucide-react";
+import type { AuditLogEntry } from "@/types";
 
-export function AuditLogClient({ initialData }: { initialData: any[] }) {
+export function AuditLogClient({ initialData }: { initialData: AuditLogEntry[] }) {
   return (
     <div>
       {initialData.length === 0 ? (

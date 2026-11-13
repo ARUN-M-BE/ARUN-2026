@@ -1,11 +1,12 @@
 "use client";
 
-import { GraduationCap, Award, ExternalLink, Calendar, MapPin, CheckCircle2 } from "lucide-react";
+import { GraduationCap, Award, ExternalLink } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+import type { Education, Certification } from "@/types";
 
 interface EducationSectionProps {
-  education: any[];
-  certifications: any[];
+  education: Education[];
+  certifications: Certification[];
 }
 
 export function EducationSection({ education = [], certifications = [] }: EducationSectionProps) {
@@ -83,7 +84,7 @@ export function EducationSection({ education = [], certifications = [] }: Educat
                       <div className="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-0.5">{cert.issuer}</div>
                     </div>
                     <div className="text-[11px] font-mono text-muted-foreground shrink-0">
-                      {new Date(cert.issueDate).getFullYear()}
+                      {cert.issueDate ? new Date(cert.issueDate).getFullYear() : ""}
                     </div>
                   </div>
 

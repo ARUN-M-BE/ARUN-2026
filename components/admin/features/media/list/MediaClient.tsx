@@ -9,10 +9,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { DeleteDialog } from "@/components/admin/delete-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
 import { createMediaAsset, deleteMediaAsset } from "@/lib/actions";
-import { Plus, Trash2, Image, Copy, ExternalLink, Loader2 } from "lucide-react";
+import { Plus, Trash2, Image, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import type { MediaAsset } from "@/types";
 
-export function MediaClient({ initialData }: { initialData: any[] }) {
+export function MediaClient({ initialData }: { initialData: MediaAsset[] }) {
   const router = useRouter();
   const [items, setItems] = useState(initialData);
   const [isOpen, setIsOpen] = useState(false);
@@ -125,10 +126,10 @@ export function MediaClient({ initialData }: { initialData: any[] }) {
                   <h4 className="font-medium text-xs text-white truncate" title={item.filename}>
                     {item.filename}
                   </h4>
-                  <p className="text-[10px] text-muted-foreground truncate" title={item.altText}>
+                  <p className="text-[10px] text-muted-foreground truncate" title={item.altText ?? undefined}>
                     Alt: {item.altText || "No accessible description"}
                   </p>
-                  <p className="text-[10px] text-muted-foreground font-mono truncate" title={item.copyright}>
+                  <p className="text-[10px] text-muted-foreground font-mono truncate" title={item.copyright ?? undefined}>
                     {item.copyright || "All Rights Reserved"}
                   </p>
                 </div>
