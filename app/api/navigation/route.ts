@@ -4,9 +4,9 @@ import { requireAdmin } from "@/server/middleware/auth-guard";
 import { navigationSchema } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 
-export async function GET(request?: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request?.url || "http://localhost:3000/api/navigation");
+    const { searchParams } = new URL(request.url);
     const publishedOnly = searchParams.get("published") === "true";
     const items = publishedOnly ? await NavigationRepository.findActive() : await NavigationRepository.findMany();
     return NextResponse.json({ success: true, data: items });

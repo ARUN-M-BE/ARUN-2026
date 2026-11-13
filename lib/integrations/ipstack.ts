@@ -26,13 +26,13 @@ const fallbackGeo: GeoLocationResult = {
 };
 
 class GeoLocationClient {
-  private ipstackKey: string | null;
+  get ipstackKey(): string | null {
+    return (process.env.IPSTACK_API_KEY || "").replace(/^["']|["']$/g, "").trim() || null;
+  }
   private cache = new Map<string, { data: GeoLocationResult; timestamp: number }>();
   private cacheTTLMs = 3600000; // 1-hour cache per IP to preserve free quotas
 
-  constructor() {
-    this.ipstackKey = process.env.IPSTACK_API_KEY || null;
-  }
+  constructor() {}
 
   isConfigured(): boolean {
     return Boolean(this.ipstackKey && this.ipstackKey.length > 5);

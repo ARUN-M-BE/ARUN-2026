@@ -28,7 +28,7 @@ const apisToTest: ApiTestDefinition[] = [
     name: "System Health API",
     endpoint: "/api/health",
     method: "GET",
-    execute: async () => healthGet(),
+    execute: async () => healthGet(new Request("http://localhost:3000/api/health")),
   },
   {
     name: "Projects API",
@@ -43,7 +43,7 @@ const apisToTest: ApiTestDefinition[] = [
     name: "Navigation API",
     endpoint: "/api/navigation",
     method: "GET",
-    execute: async () => navGet(),
+    execute: async () => navGet(new NextRequest("http://localhost:3000/api/navigation")),
   },
   {
     name: "Website Sections API",
@@ -58,7 +58,7 @@ const apisToTest: ApiTestDefinition[] = [
     name: "Social Links API",
     endpoint: "/api/social-links",
     method: "GET",
-    execute: async () => socialLinksGet(),
+    execute: async () => socialLinksGet(new NextRequest("http://localhost:3000/api/social-links")),
   },
   {
     name: "Resend Audiences & Status",

@@ -12,15 +12,16 @@ export interface RateLimitResult {
 }
 
 class UpstashService {
-  private restUrl: string | null;
-  private restToken: string | null;
+  get restUrl(): string | null {
+    return (process.env.UPSTASH_REDIS_REST_URL || "").replace(/^["']|["']$/g, "").trim() || null;
+  }
+  get restToken(): string | null {
+    return (process.env.UPSTASH_REDIS_REST_TOKEN || "").replace(/^["']|["']$/g, "").trim() || null;
+  }
   // Local sliding-window memory store for fallback rate limiting
   private memoryStore = new Map<string, number[]>();
 
-  constructor() {
-    this.restUrl = process.env.UPSTASH_REDIS_REST_URL || null;
-    this.restToken = process.env.UPSTASH_REDIS_REST_TOKEN || null;
-  }
+  constructor() {}
 
   isConfigured(): boolean {
     return Boolean(this.restUrl && this.restToken && this.restUrl.startsWith("https://"));
