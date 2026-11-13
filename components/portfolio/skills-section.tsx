@@ -26,8 +26,7 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
     .map((c) => ({
       ...c,
       skills: (c.skills || []).filter((s: any) => s.level >= minProficiency),
-    }))
-    .filter((c) => c.skills.length > 0);
+    }));
 
   return (
     <section id="skills" className="py-20 sm:py-28 relative overflow-hidden">
@@ -99,55 +98,89 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
         </div>
 
         {/* Skill Clusters Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredClusters.map((cluster) => {
-            const ClusterIcon = getCategoryIcon(cluster.name);
-            return (
-              <div
-                key={cluster.id}
-                className="glass-panel rounded-3xl p-6 sm:p-7 space-y-5 border border-border hover:border-sky-500/40 transition-colors shadow-xs"
-              >
-                <div className="flex items-center justify-between pb-3 border-b border-border">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500 border border-sky-500/20">
-                      <ClusterIcon className="w-4 h-4" />
+        {filteredClusters.length === 0 ? (
+          <div className="text-center py-16 border border-dashed border-border rounded-3xl p-8 bg-card/40 max-w-lg mx-auto">
+            <Cpu className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+            <h3 className="text-sm font-semibold text-foreground">
+              {language === "ar" ? "لا توجد كفاءات مسجلة" : "No competencies found"}
+            </h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              {language === "ar" ? "جرب تخفيض مستوى الكفاءة أو إعادة ضبط الفلتر" : "Try lowering the minimum proficiency slider or resetting the filter."}
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setActiveCluster("All");
+                setMinProficiency(0);
+              }}
+              className="mt-4 text-xs rounded-xl"
+            >
+              Reset Filter
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredClusters.map((cluster) => {
+              const ClusterIcon = getCategoryIcon(cluster.name);
+              return (
+                <div
+                  key={cluster.id}
+                  className="glass-panel rounded-3xl p-6 sm:p-7 space-y-5 border border-border hover:border-sky-500/40 transition-colors shadow-xs"
+                >
+                  <div className="flex items-center justify-between pb-3 border-b border-border">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500 border border-sky-500/20">
+                        <ClusterIcon className="w-4 h-4" />
+                      </div>
+                      <h3 className="font-bold text-sm sm:text-base text-foreground tracking-tight">
+                        {cluster.name}
+                      </h3>
                     </div>
-                    <h3 className="font-bold text-sm sm:text-base text-foreground tracking-tight">
-                      {cluster.name}
-                    </h3>
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {cluster.skills.length} {language === "ar" ? "مهارات" : "skills"}
+                    </span>
                   </div>
-                  <span className="text-xs font-mono text-muted-foreground">
-                    {cluster.skills.length} {language === "ar" ? "مهارات" : "skills"}
-                  </span>
-                </div>
 
-                <div className="space-y-4">
-                  {cluster.skills.map((skill: any) => (
-                    <div key={skill.id} className="space-y-1.5 group">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5 font-medium text-foreground group-hover:text-sky-500 transition-colors">
-                          <span>{skill.name}</span>
-                          {skill.isFeatured && (
-                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                          )}
-                        </div>
-                        <span className="font-mono text-muted-foreground">{skill.level}%</span>
-                      </div>
-
-                      {/* Progress Bar with Gradient */}
-                      <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 transition-all duration-700"
-                          style={{ width: `${skill.level}%` }}
-                        />
-                      </div>
+                  {cluster.skills.length === 0 ? (
+                    <div className="py-6 text-center space-y-1.5 border border-dashed border-border/60 rounded-2xl bg-secondary/20 p-4">
+                      <p className="text-xs text-muted-foreground italic">
+                        {minProficiency > 0
+                          ? `No skills matching ≥ ${minProficiency}% proficiency.`
+                          : "No skills in this category yet."}
+                      </p>
+                      <span className="text-[10px] font-mono text-sky-500/80">Active Constellation Expansion</span>
                     </div>
-                  ))}
+                  ) : (
+                    <div className="space-y-4">
+                      {cluster.skills.map((skill: any) => (
+                        <div key={skill.id} className="space-y-1.5 group">
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-1.5 font-medium text-foreground group-hover:text-sky-500 transition-colors">
+                              <span>{skill.name}</span>
+                              {skill.isFeatured && (
+                                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                              )}
+                            </div>
+                            <span className="font-mono text-muted-foreground">{skill.level}%</span>
+                          </div>
+
+                          {/* Progress Bar with Gradient */}
+                          <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 transition-all duration-700"
+                              style={{ width: `${skill.level}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

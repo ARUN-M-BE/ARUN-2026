@@ -23,10 +23,17 @@ import {
 import { fallbackSocialLinks, fallbackWebsiteSections } from "@/server/repositories/fallback-data";
 import { db } from "@/server/config/database";
 import * as schema from "@/server/models/schema";
-import { count, eq, and } from "drizzle-orm";
+import { count, eq, and, ilike } from "drizzle-orm";
 import { isUUID } from "@/lib/utils";
 import { requireAdmin } from "@/server/middleware/auth-guard";
 import { revalidatePath } from "next/cache";
+import type {
+  SocialLinkFormData,
+  NavigationFormData,
+  SectionFormData,
+  SeoMetadataFormData,
+} from "@/lib/validations";
+import type { SocialLink, NavigationItem, WebsiteSection } from "@/types";
 
 // ─── Profile ──────────────────────────────────────────────
 export async function getProfile() {
@@ -40,7 +47,7 @@ export async function updateProfile(data: unknown) {
 }
 
 // ─── Projects ─────────────────────────────────────────────
-export async function getProjects(opts?: any) {
+export async function getProjects(opts?: { search?: string; status?: string; page?: number; limit?: number }) {
   return ProjectController.getProjects(opts);
 }
 export async function getPublicProjects() {
@@ -66,10 +73,13 @@ export async function getSkillCategories() {
 export async function createSkillCategory(data: unknown) {
   return SkillController.createCategory(data);
 }
+export async function updateSkillCategory(id: string, data: unknown) {
+  return SkillController.updateCategory(id, data);
+}
 export async function deleteSkillCategory(id: string) {
   return SkillController.deleteCategory(id);
 }
-export async function getSkills(opts?: any) {
+export async function getSkills(opts?: { categoryId?: string; search?: string }) {
   return SkillController.getSkills(opts);
 }
 export async function getPublicSkills() {
@@ -77,6 +87,9 @@ export async function getPublicSkills() {
 }
 export async function createSkill(data: unknown) {
   return SkillController.createSkill(data);
+}
+export async function updateSkill(id: string, data: unknown) {
+  return SkillController.updateSkill(id, data);
 }
 export async function deleteSkill(id: string) {
   return SkillController.deleteSkill(id);
@@ -230,13 +243,56 @@ export async function createSocialLink(data: any): Promise<{ success: boolean; d
 export async function updateSocialLink(id: string, data: any): Promise<{ success: boolean; data?: any; error?: string }> {
   await requireAdmin();
   try {
+    const { id: _ignored, ...cleanData } = data;
+    const updateData = { ...cleanData, updatedAt: new Date() };
+
+    // 1. Try direct UUID update
     if (isUUID(id)) {
-      const [item] = await db.update(schema.socialLinks).set({ ...data, updatedAt: new Date() }).where(eq(schema.socialLinks.id, id)).returning();
-      revalidatePath("/");
-      revalidatePath("/admin/social-links");
-      return { success: true, data: item };
+      const [existing] = await db.select().from(schema.socialLinks).where(eq(schema.socialLinks.id, id)).limit(1);
+      if (existing) {
+        const [item] = await db.update(schema.socialLinks).set(updateData).where(eq(schema.socialLinks.id, id)).returning();
+        revalidatePath("/");
+        revalidatePath("/admin/social-links");
+        return { success: true, data: item };
+      }
     }
-    return { success: true, data: { ...data, id } };
+
+    // 2. Try match by platform (e.g. GitHub, LinkedIn, X, Instagram, YouTube)
+    const platformToMatch = data.platform || (id.startsWith("soc-") ? id.replace(/^soc-/, "") : null);
+    if (platformToMatch) {
+      const [existingPlatform] = await db
+        .select()
+        .from(schema.socialLinks)
+        .where(ilike(schema.socialLinks.platform, platformToMatch))
+        .limit(1);
+
+      if (existingPlatform) {
+        const [item] = await db.update(schema.socialLinks).set(updateData).where(eq(schema.socialLinks.id, existingPlatform.id)).returning();
+        revalidatePath("/");
+        revalidatePath("/admin/social-links");
+        return { success: true, data: item };
+      }
+    }
+
+    // 3. Insert fresh into DB
+    const [inserted] = await db.insert(schema.socialLinks).values({
+      platform: cleanData.platform || "Custom",
+      url: cleanData.url || "https://arun-m.in",
+      icon: cleanData.icon || null,
+      label: cleanData.label || cleanData.platform || "Link",
+      color: cleanData.color || null,
+      size: cleanData.size || "md",
+      style: cleanData.style || "default",
+      placements: cleanData.placements || ["footer", "contact"],
+      sortOrder: typeof cleanData.sortOrder === "number" ? cleanData.sortOrder : 0,
+      isActive: typeof cleanData.isActive === "boolean" ? cleanData.isActive : true,
+      status: cleanData.status || "published",
+      updatedAt: new Date(),
+    }).returning();
+
+    revalidatePath("/");
+    revalidatePath("/admin/social-links");
+    return { success: true, data: inserted };
   } catch (err: any) {
     console.warn("[actions.updateSocialLink] Error:", err);
     return { success: true, data: { ...data, id } };
@@ -247,6 +303,9 @@ export async function deleteSocialLink(id: string): Promise<{ success: boolean; 
   try {
     if (isUUID(id)) {
       await db.delete(schema.socialLinks).where(eq(schema.socialLinks.id, id));
+    } else {
+      const platformToMatch = id.replace(/^soc-/, "");
+      await db.delete(schema.socialLinks).where(ilike(schema.socialLinks.platform, platformToMatch));
     }
     revalidatePath("/");
     revalidatePath("/admin/social-links");

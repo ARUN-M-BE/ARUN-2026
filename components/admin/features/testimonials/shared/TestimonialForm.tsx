@@ -12,8 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Loader2, ArrowLeft, Save } from "lucide-react";
+import { Toggle } from "@/components/ui/toggle";
+import { Loader2, ArrowLeft, Save, Star, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -144,22 +144,34 @@ export function TestimonialForm({ initialData, isEditing = false }: { initialDat
               </Select>
             </div>
 
-            <div className="flex items-center gap-3 pt-6">
-              <Switch
-                checked={watch("isVerified")}
-                onCheckedChange={(checked) => setValue("isVerified", checked)}
-              />
+            <div className="flex items-center gap-2.5 pt-6">
+              <Toggle
+                pressed={watch("isVerified")}
+                onPressedChange={(checked) => setValue("isVerified", checked)}
+                variant="emerald"
+                size="sm"
+                className="font-mono text-xs"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 mr-1" />
+                {watch("isVerified") ? "Verified" : "Unverified"}
+              </Toggle>
               <div>
                 <Label className="text-xs font-medium text-zinc-300">Verified Claim</Label>
                 <p className="text-[11px] text-muted-foreground">Authentic claim compliance</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 pt-6">
-              <Switch
-                checked={watch("isFeatured")}
-                onCheckedChange={(checked) => setValue("isFeatured", checked)}
-              />
+            <div className="flex items-center gap-2.5 pt-6">
+              <Toggle
+                pressed={watch("isFeatured")}
+                onPressedChange={(checked) => setValue("isFeatured", checked)}
+                variant="amber"
+                size="sm"
+                className="font-mono text-xs"
+              >
+                <Star className="w-3.5 h-3.5 mr-1" />
+                {watch("isFeatured") ? "Featured" : "Standard"}
+              </Toggle>
               <div>
                 <Label className="text-xs font-medium text-zinc-300">Featured</Label>
                 <p className="text-[11px] text-muted-foreground">Show in hero carousel</p>

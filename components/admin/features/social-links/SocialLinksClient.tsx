@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Toggle } from "@/components/ui/toggle";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { DeleteDialog } from "@/components/admin/delete-dialog";
@@ -680,19 +681,17 @@ export function SocialLinksClient({ initialData }: { initialData: SocialLink[] }
                 ].map((item) => {
                   const isChecked = placements.includes(item.key);
                   return (
-                    <button
+                    <Toggle
                       key={item.key}
-                      type="button"
-                      onClick={() => togglePlacement(item.key)}
-                      className={`flex items-center justify-between p-2 rounded-xl border text-xs font-medium transition-all ${
-                        isChecked
-                          ? "bg-primary/10 border-primary text-primary"
-                          : "bg-background/40 border-border text-muted-foreground hover:bg-muted"
-                      }`}
+                      pressed={isChecked}
+                      onPressedChange={() => togglePlacement(item.key)}
+                      variant="primary"
+                      size="sm"
+                      className="justify-between w-full h-9 rounded-xl border"
                     >
                       <span>{item.label}</span>
                       {isChecked && <Check className="w-3.5 h-3.5 text-primary" />}
-                    </button>
+                    </Toggle>
                   );
                 })}
               </div>
@@ -705,7 +704,15 @@ export function SocialLinksClient({ initialData }: { initialData: SocialLink[] }
                   Enable or disable this social channel globally
                 </span>
               </div>
-              <Switch checked={isActive} onCheckedChange={setIsActive} />
+              <Toggle
+                pressed={isActive}
+                onPressedChange={setIsActive}
+                variant="emerald"
+                size="sm"
+                className="font-mono text-xs px-3"
+              >
+                {isActive ? "Active (Live)" : "Disabled"}
+              </Toggle>
             </div>
 
             <DialogFooter className="pt-3">

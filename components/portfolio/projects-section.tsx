@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { TiltCard } from "@/components/ui/tilt-card";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle";
 import {
   FolderGit2,
   ExternalLink,
@@ -105,26 +106,33 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
             )}
 
             {/* Grid / List Switcher */}
-            <div className="inline-flex items-center p-1 rounded-xl bg-card border border-border">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setViewMode("grid")}
-                className={`h-8 w-8 rounded-lg ${viewMode === "grid" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground"}`}
+            <ToggleGroup
+              type="single"
+              value={viewMode}
+              onValueChange={(val) => {
+                if (val === "grid" || val === "list") setViewMode(val);
+              }}
+              className="p-1 rounded-xl bg-card border border-border"
+            >
+              <ToggleGroupItem
+                value="grid"
+                size="icon-sm"
+                variant={viewMode === "grid" ? "primary" : "ghost"}
                 title="Grid View"
+                aria-label="Grid View"
               >
                 <LayoutGrid className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setViewMode("list")}
-                className={`h-8 w-8 rounded-lg ${viewMode === "list" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground"}`}
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="list"
+                size="icon-sm"
+                variant={viewMode === "list" ? "primary" : "ghost"}
                 title="List View"
+                aria-label="List View"
               >
                 <List className="w-4 h-4" />
-              </Button>
-            </div>
+              </ToggleGroupItem>
+            </ToggleGroup>
 
             <div className="relative w-full sm:w-64">
               <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
@@ -174,6 +182,8 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((project) => {
               const isSelectedForCompare = compareIds.includes(project.id);
+              const projectThumbnail = project.thumbnail || project.thumbnailUrl;
+              const projectGallery = (project.images && project.images.length > 0 ? project.images : project.galleryImages) || [];
               return (
                 <TiltCard
                   key={project.id}
@@ -183,9 +193,9 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                 >
                   {/* Visual Thumbnail */}
                   <div className="aspect-[16/10] bg-muted relative overflow-hidden flex items-center justify-center">
-                    {project.thumbnailUrl ? (
+                    {projectThumbnail ? (
                       <img
-                        src={project.thumbnailUrl}
+                        src={projectThumbnail}
                         alt={project.title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
@@ -204,10 +214,10 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                     )}
 
                     {/* Gallery indicator */}
-                    {project.galleryImages && project.galleryImages.length > 0 && (
+                    {projectGallery.length > 0 && (
                       <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-mono text-white flex items-center gap-1">
                         <Images className="w-3 h-3 text-cyan-400" />
-                        <span>+{project.galleryImages.length}</span>
+                        <span>+{projectGallery.length}</span>
                       </div>
                     )}
 
@@ -312,6 +322,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
           <div className="space-y-4">
             {filtered.map((project) => {
               const isSelectedForCompare = compareIds.includes(project.id);
+              const projectThumbnail = project.thumbnail || project.thumbnailUrl;
               return (
                 <div
                   key={project.id}
@@ -320,8 +331,8 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                 >
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 min-w-0 flex-1">
                     <div className="w-full sm:w-36 h-24 rounded-xl overflow-hidden bg-muted shrink-0 relative">
-                      {project.thumbnailUrl ? (
-                        <img src={project.thumbnailUrl} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                      {projectThumbnail ? (
+                        <img src={projectThumbnail} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                       ) : (
                         <div className="w-full h-full bg-secondary flex items-center justify-center">
                           <FolderGit2 className="w-6 h-6 text-muted-foreground" />
@@ -421,17 +432,27 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
 
               {/* Media Visual Showcase */}
               {(() => {
-                const allImages = [
-                  ...(activeProject.thumbnailUrl ? [activeProject.thumbnailUrl] : []),
-                  ...((activeProject.galleryImages as string[]) || []),
-                ];
-                const currentImg = allImages[activeImageIndex] || activeProject.thumbnailUrl;
+                const projectThumbnail = activeProject.thumbnail || activeProject.thumbnailUrl;
+                const projectGallery = (activeProject.images && activeProject.images.length > 0 ? activeProject.images : activeProject.galleryImages) || [];
+                const allImages = Array.from(
+                  new Set(
+                    [
+                      ...(projectThumbnail ? [projectThumbnail] : []),
+                      ...projectGallery,
+                    ].filter(Boolean) as string[]
+                  )
+                );
+                const currentImg = allImages[activeImageIndex] || projectThumbnail;
 
                 return (
                   <div className="space-y-3">
-                    {currentImg && (
+                    {currentImg ? (
                       <div className="aspect-video rounded-2xl overflow-hidden border border-border bg-black/40">
                         <img src={currentImg} alt={activeProject.title} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="aspect-video rounded-2xl overflow-hidden border border-border bg-gradient-to-tr from-sky-950/40 to-indigo-950/40 flex items-center justify-center">
+                        <FolderGit2 className="w-14 h-14 text-sky-500/40" />
                       </div>
                     )}
 

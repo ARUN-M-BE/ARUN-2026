@@ -119,6 +119,18 @@ export const SkillService = {
       return { success: false, error: err.message || "Failed to create category" };
     }
   },
+  async updateCategory(userId: string, id: string, data: any): Promise<ActionResult> {
+    try {
+      const cat = await SkillRepository.updateCategory(id, data);
+      await AuditRepository.log({ userId, action: "update", entity: "skill_category", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/skills");
+      return { success: true, data: cat };
+    } catch (err: any) {
+      console.error("[SkillService.updateCategory] Error:", err);
+      return { success: false, error: err.message || "Failed to update category" };
+    }
+  },
   async deleteCategory(userId: string, id: string): Promise<ActionResult> {
     try {
       await SkillRepository.deleteCategory(id);
@@ -147,6 +159,18 @@ export const SkillService = {
     } catch (err: any) {
       console.error("[SkillService.createSkill] Error:", err);
       return { success: false, error: err.message || "Failed to create skill" };
+    }
+  },
+  async updateSkill(userId: string, id: string, data: any): Promise<ActionResult> {
+    try {
+      const skill = await SkillRepository.updateSkill(id, data);
+      await AuditRepository.log({ userId, action: "update", entity: "skill", entityId: id });
+      revalidatePath("/");
+      revalidatePath("/admin/skills");
+      return { success: true, data: skill };
+    } catch (err: any) {
+      console.error("[SkillService.updateSkill] Error:", err);
+      return { success: false, error: err.message || "Failed to update skill" };
     }
   },
   async deleteSkill(userId: string, id: string): Promise<ActionResult> {

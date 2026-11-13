@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { DeleteDialog } from "@/components/admin/delete-dialog";
@@ -293,44 +294,47 @@ export function SectionsClient({ initialData }: { initialData: WebsiteSection[] 
       {/* Tabs & Controls Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-card border border-border shadow-xs">
         {/* Tab Filters */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-muted/40 border border-border/50">
-          <button
-            type="button"
-            onClick={() => setActiveTab("all")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === "all" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-            }`}
+        <ToggleGroup
+          type="single"
+          value={activeTab}
+          onValueChange={(val) => {
+            if (val) setActiveTab(val as "all" | "published" | "draft" | "unpublished");
+          }}
+          className="p-1 rounded-xl bg-muted/40 border border-border/50"
+        >
+          <ToggleGroupItem
+            value="all"
+            size="sm"
+            variant={activeTab === "all" ? "default" : "ghost"}
+            className="text-xs font-semibold px-3"
           >
             All ({sections.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("published")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === "published" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-xs" : "text-muted-foreground hover:text-foreground"
-            }`}
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="published"
+            size="sm"
+            variant={activeTab === "published" ? "emerald" : "ghost"}
+            className="text-xs font-semibold px-3"
           >
             Published ({publishedCount})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("draft")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === "draft" ? "bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-xs" : "text-muted-foreground hover:text-foreground"
-            }`}
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="draft"
+            size="sm"
+            variant={activeTab === "draft" ? "amber" : "ghost"}
+            className="text-xs font-semibold px-3"
           >
             Drafts ({draftCount})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("unpublished")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === "unpublished" ? "bg-background text-zinc-300 shadow-xs" : "text-muted-foreground hover:text-foreground"
-            }`}
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="unpublished"
+            size="sm"
+            variant={activeTab === "unpublished" ? "secondary" : "ghost"}
+            className="text-xs font-semibold px-3"
           >
             Unpublished ({unpublishedCount})
-          </button>
-        </div>
+          </ToggleGroupItem>
+        </ToggleGroup>
 
         {/* Add button */}
         <Button

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Toggle, ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { DeleteDialog } from "@/components/admin/delete-dialog";
@@ -404,36 +405,46 @@ export function NavigationClient({ initialData }: { initialData: NavigationItem[
               </div>
 
               {/* Viewport & Theme controls */}
-              <div className="flex items-center gap-1.5 bg-muted/40 p-1 rounded-xl border border-border/50">
-                <button
-                  type="button"
-                  onClick={() => setPreviewDevice("desktop")}
-                  className={`p-1.5 rounded-lg transition-colors ${
-                    previewDevice === "desktop" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground"
-                  }`}
-                  title="Desktop Preview"
+              <div className="flex items-center gap-1.5">
+                <ToggleGroup
+                  type="single"
+                  value={previewDevice}
+                  onValueChange={(val) => {
+                    if (val === "desktop" || val === "mobile") setPreviewDevice(val);
+                  }}
+                  className="bg-muted/40 p-0.5 rounded-lg border border-border/50"
                 >
-                  <Laptop className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPreviewDevice("mobile")}
-                  className={`p-1.5 rounded-lg transition-colors ${
-                    previewDevice === "mobile" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground"
-                  }`}
-                  title="Mobile Preview"
-                >
-                  <Smartphone className="w-3.5 h-3.5" />
-                </button>
+                  <ToggleGroupItem
+                    value="desktop"
+                    size="icon-sm"
+                    variant={previewDevice === "desktop" ? "primary" : "ghost"}
+                    title="Desktop Preview"
+                    aria-label="Desktop Preview"
+                  >
+                    <Laptop className="w-3.5 h-3.5" />
+                  </ToggleGroupItem>
+                  <ToggleGroupItem
+                    value="mobile"
+                    size="icon-sm"
+                    variant={previewDevice === "mobile" ? "primary" : "ghost"}
+                    title="Mobile Preview"
+                    aria-label="Mobile Preview"
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                  </ToggleGroupItem>
+                </ToggleGroup>
+
                 <div className="w-[1px] h-3 bg-border mx-0.5" />
-                <button
-                  type="button"
-                  onClick={() => setPreviewTheme(previewTheme === "dark" ? "light" : "dark")}
-                  className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+
+                <Toggle
+                  pressed={previewTheme === "dark"}
+                  onPressedChange={(pressed) => setPreviewTheme(pressed ? "dark" : "light")}
+                  size="icon-sm"
+                  variant="ghost"
                   title="Toggle Light/Dark Theme"
                 >
-                  {previewTheme === "dark" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-                </button>
+                  {previewTheme === "dark" ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5" />}
+                </Toggle>
               </div>
             </div>
 
@@ -644,7 +655,15 @@ export function NavigationClient({ initialData }: { initialData: NavigationItem[
 
               <div className="flex items-center justify-between pt-6">
                 <Label className="text-xs text-foreground">Active in Live Menu</Label>
-                <Switch checked={isActive} onCheckedChange={setIsActive} />
+                <Toggle
+                  pressed={isActive}
+                  onPressedChange={setIsActive}
+                  variant="emerald"
+                  size="sm"
+                  className="font-mono text-xs"
+                >
+                  {isActive ? "Visible" : "Hidden"}
+                </Toggle>
               </div>
             </div>
 

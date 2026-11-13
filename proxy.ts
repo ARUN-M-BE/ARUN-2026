@@ -7,7 +7,7 @@ const authSecret =
   process.env.NEXTAUTH_SECRET ||
   "dev-secret-change-in-production-openssl-rand-base64-32";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Intercept missing static assets to prevent Next server RSC 404 fallback loop and Error 1102
@@ -81,7 +81,7 @@ export async function middleware(request: NextRequest) {
         });
       }
     } catch (tokenErr) {
-      console.warn("[middleware] Token verification failed:", tokenErr);
+      console.warn("[proxy] Token verification failed:", tokenErr);
     }
   }
 
@@ -124,8 +124,8 @@ export async function middleware(request: NextRequest) {
   });
 }
 
-// Next.js 16 forward compatibility export
-export const proxy = middleware;
+// Next.js 15/16 backward compatibility alias
+export const middleware = proxy;
 
 export const config = {
   matcher: [
