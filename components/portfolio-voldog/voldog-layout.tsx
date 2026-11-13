@@ -13,16 +13,26 @@ import { VoldogFaq } from "./voldog-faq";
 import { VoldogCta } from "./voldog-cta";
 import { VoldogFooter } from "./voldog-footer";
 import { CookieConsent } from "@/components/portfolio/cookie-consent";
+import type {
+  Profile,
+  Project,
+  SkillCategoryWithSkills,
+  Experience,
+  Education,
+  Certification,
+  Testimonial,
+  SocialLink,
+} from "@/types";
 
 interface VoldogLayoutProps {
-  profile?: any;
-  projects?: any[];
-  categoriesWithSkills?: any[];
-  experiences?: any[];
-  education?: any[];
-  certifications?: any[];
-  testimonials?: any[];
-  socialLinks?: any[];
+  profile?: Profile | null;
+  projects?: Project[];
+  categoriesWithSkills?: SkillCategoryWithSkills[];
+  experiences?: Experience[];
+  education?: Education[];
+  certifications?: Certification[];
+  testimonials?: Testimonial[];
+  socialLinks?: SocialLink[];
   onSwitchTheme?: () => void;
 }
 

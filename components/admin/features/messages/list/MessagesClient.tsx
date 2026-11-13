@@ -11,15 +11,16 @@ import { EmptyState } from "@/components/admin/empty-state";
 import { updateMessageStatus, deleteMessage } from "@/lib/actions";
 import { Mail, Trash2, Eye, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+import type { ContactMessage } from "@/types";
 
-export function MessagesClient({ initialData, totalPages: _totalPages }: { initialData: any[]; totalPages?: number }) {
+export function MessagesClient({ initialData, totalPages: _totalPages }: { initialData: ContactMessage[]; totalPages?: number }) {
   const router = useRouter();
-  const [messages, setMessages] = useState(initialData);
-  const [selectedMsg, setSelectedMsg] = useState<any | null>(null);
+  const [messages, setMessages] = useState<ContactMessage[]>(initialData);
+  const [selectedMsg, setSelectedMsg] = useState<ContactMessage | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleStatusChange = async (id: string, newStatus: string) => {
+  const handleStatusChange = async (id: string, newStatus: ContactMessage["messageStatus"]) => {
     try {
       const res = await updateMessageStatus(id, newStatus);
       if (res.success) {
@@ -28,7 +29,7 @@ export function MessagesClient({ initialData, totalPages: _totalPages }: { initi
           prev.map((m) => (m.id === id ? { ...m, messageStatus: newStatus } : m))
         );
         if (selectedMsg && selectedMsg.id === id) {
-          setSelectedMsg((prev: any) => ({ ...prev, messageStatus: newStatus }));
+          setSelectedMsg((prev) => (prev ? { ...prev, messageStatus: newStatus } : null));
         }
         router.refresh();
       }
@@ -54,7 +55,7 @@ export function MessagesClient({ initialData, totalPages: _totalPages }: { initi
     }
   };
 
-  const openMessageModal = (msg: any) => {
+  const openMessageModal = (msg: ContactMessage) => {
     setSelectedMsg(msg);
     if (msg.messageStatus === "unread") {
       handleStatusChange(msg.id, "read");
@@ -107,7 +108,7 @@ export function MessagesClient({ initialData, totalPages: _totalPages }: { initi
                   <TableCell className="py-3">
                     <Select
                       value={msg.messageStatus}
-                      onValueChange={(val) => handleStatusChange(msg.id, val)}
+                      onValueChange={(val: ContactMessage["messageStatus"]) => handleStatusChange(msg.id, val)}
                     >
                       <SelectTrigger className="h-7 text-[11px] w-28 bg-background/50 border-border">
                         <SelectValue />

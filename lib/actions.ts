@@ -26,165 +26,195 @@ import { count, eq } from "drizzle-orm";
 import { isUUID } from "@/lib/utils";
 import { requireAdmin } from "@/server/middleware/auth-guard";
 import { revalidatePath } from "next/cache";
+import type {
+  Profile,
+  Project,
+  Skill,
+  SkillCategory,
+  SkillCategoryWithSkills,
+  Experience,
+  Education,
+  Certification,
+  ServiceOffering,
+  Testimonial,
+  SocialLink,
+  SocialLinkInsert,
+  ContactMessage,
+  SiteSetting,
+  NavigationItem,
+  NavigationItemInsert,
+  SeoMetadata,
+  SeoMetadataInsert,
+  LegalDocument,
+  MediaAsset,
+  MediaAssetInsert,
+  AuditLogEntry,
+  PaginationParams,
+  PaginatedResponse,
+  ActionResult,
+  ConsentRecordInsert,
+  DashboardStats,
+} from "@/types";
 
 // ─── Profile ──────────────────────────────────────────────
-export async function getProfile() {
+export async function getProfile(): Promise<Profile | null> {
   return ProfileController.getProfile();
 }
-export async function getPublicProfile() {
+export async function getPublicProfile(): Promise<Profile | null> {
   return ProfileController.getPublicProfile();
 }
-export async function updateProfile(data: unknown) {
+export async function updateProfile(data: unknown): Promise<ActionResult> {
   return ProfileController.updateProfile(data);
 }
 
 // ─── Projects ─────────────────────────────────────────────
-export async function getProjects(opts?: any) {
+export async function getProjects(opts?: PaginationParams): Promise<PaginatedResponse<Project>> {
   return ProjectController.getProjects(opts);
 }
-export async function getPublicProjects() {
+export async function getPublicProjects(): Promise<Project[]> {
   return ProjectController.getPublicProjects();
 }
-export async function getProjectById(id: string) {
+export async function getProjectById(id: string): Promise<Project | null> {
   return ProjectController.getProjectById(id);
 }
-export async function createProject(data: unknown) {
+export async function createProject(data: unknown): Promise<ActionResult> {
   return ProjectController.createProject(data);
 }
-export async function updateProject(id: string, data: unknown) {
+export async function updateProject(id: string, data: unknown): Promise<ActionResult> {
   return ProjectController.updateProject(id, data);
 }
-export async function deleteProject(id: string) {
+export async function deleteProject(id: string): Promise<ActionResult> {
   return ProjectController.deleteProject(id);
 }
 
 // ─── Skills ───────────────────────────────────────────────
-export async function getSkillCategories() {
+export async function getSkillCategories(): Promise<SkillCategory[]> {
   return SkillController.getCategories();
 }
-export async function createSkillCategory(data: unknown) {
+export async function createSkillCategory(data: unknown): Promise<ActionResult> {
   return SkillController.createCategory(data);
 }
-export async function deleteSkillCategory(id: string) {
+export async function deleteSkillCategory(id: string): Promise<ActionResult> {
   return SkillController.deleteCategory(id);
 }
-export async function getSkills(opts?: any) {
+export async function getSkills(opts?: PaginationParams): Promise<Skill[]> {
   return SkillController.getSkills(opts);
 }
-export async function getPublicSkills() {
+export async function getPublicSkills(): Promise<SkillCategoryWithSkills[]> {
   return SkillController.getPublicSkills();
 }
-export async function createSkill(data: unknown) {
+export async function createSkill(data: unknown): Promise<ActionResult> {
   return SkillController.createSkill(data);
 }
-export async function deleteSkill(id: string) {
+export async function deleteSkill(id: string): Promise<ActionResult> {
   return SkillController.deleteSkill(id);
 }
 
 // ─── Experience ───────────────────────────────────────────
-export async function getExperiences() {
+export async function getExperiences(): Promise<Experience[]> {
   return ExperienceController.getExperiences();
 }
-export async function getPublicExperience() {
+export async function getPublicExperience(): Promise<Experience[]> {
   return ExperienceController.getPublicExperience();
 }
-export async function createExperience(data: unknown) {
+export async function createExperience(data: unknown): Promise<ActionResult> {
   return ExperienceController.createExperience(data);
 }
-export async function updateExperience(id: string, data: unknown) {
+export async function updateExperience(id: string, data: unknown): Promise<ActionResult> {
   return ExperienceController.updateExperience(id, data);
 }
-export async function deleteExperience(id: string) {
+export async function deleteExperience(id: string): Promise<ActionResult> {
   return ExperienceController.deleteExperience(id);
 }
 
 // ─── Education ────────────────────────────────────────────
-export async function getEducation() {
+export async function getEducation(): Promise<Education[]> {
   return EducationController.getEducation();
 }
-export async function getPublicEducation() {
+export async function getPublicEducation(): Promise<Education[]> {
   return EducationController.getPublicEducation();
 }
-export async function createEducation(data: unknown) {
+export async function createEducation(data: unknown): Promise<ActionResult> {
   return EducationController.createEducation(data);
 }
-export async function updateEducation(id: string, data: unknown) {
+export async function updateEducation(id: string, data: unknown): Promise<ActionResult> {
   return EducationController.updateEducation(id, data);
 }
-export async function deleteEducation(id: string) {
+export async function deleteEducation(id: string): Promise<ActionResult> {
   return EducationController.deleteEducation(id);
 }
 
 // ─── Certifications ───────────────────────────────────────
-export async function getCertifications() {
+export async function getCertifications(): Promise<Certification[]> {
   return CertificationController.getCertifications();
 }
-export async function getPublicCertifications() {
+export async function getPublicCertifications(): Promise<Certification[]> {
   return CertificationController.getPublicCertifications();
 }
-export async function createCertification(data: unknown) {
+export async function createCertification(data: unknown): Promise<ActionResult> {
   return CertificationController.createCertification(data);
 }
-export async function updateCertification(id: string, data: unknown) {
+export async function updateCertification(id: string, data: unknown): Promise<ActionResult> {
   return CertificationController.updateCertification(id, data);
 }
-export async function deleteCertification(id: string) {
+export async function deleteCertification(id: string): Promise<ActionResult> {
   return CertificationController.deleteCertification(id);
 }
 
 // ─── Services ─────────────────────────────────────────────
-export async function getServices() {
+export async function getServices(): Promise<ServiceOffering[]> {
   return ServiceController.getServices();
 }
-export async function getPublicServices() {
+export async function getPublicServices(): Promise<ServiceOffering[]> {
   return ServiceController.getPublicServices();
 }
-export async function createService(data: unknown) {
+export async function createService(data: unknown): Promise<ActionResult> {
   return ServiceController.createService(data);
 }
-export async function updateService(id: string, data: unknown) {
+export async function updateService(id: string, data: unknown): Promise<ActionResult> {
   return ServiceController.updateService(id, data);
 }
-export async function deleteService(id: string) {
+export async function deleteService(id: string): Promise<ActionResult> {
   return ServiceController.deleteService(id);
 }
 
 // ─── Testimonials ─────────────────────────────────────────
-export async function getTestimonials() {
+export async function getTestimonials(): Promise<Testimonial[]> {
   return TestimonialController.getTestimonials();
 }
-export async function getPublicTestimonials() {
+export async function getPublicTestimonials(): Promise<Testimonial[]> {
   return TestimonialController.getPublicTestimonials();
 }
-export async function createTestimonial(data: unknown) {
+export async function createTestimonial(data: unknown): Promise<ActionResult> {
   return TestimonialController.createTestimonial(data);
 }
-export async function updateTestimonial(id: string, data: unknown) {
+export async function updateTestimonial(id: string, data: unknown): Promise<ActionResult> {
   return TestimonialController.updateTestimonial(id, data);
 }
-export async function deleteTestimonial(id: string) {
+export async function deleteTestimonial(id: string): Promise<ActionResult> {
   return TestimonialController.deleteTestimonial(id);
 }
 
 // ─── Messages & Consent ───────────────────────────────────
-export async function getContactMessages(opts?: any) {
+export async function getContactMessages(opts?: PaginationParams): Promise<PaginatedResponse<ContactMessage>> {
   return MessageController.getContactMessages(opts);
 }
-export async function submitContactForm(data: unknown) {
+export async function submitContactForm(data: unknown): Promise<ActionResult> {
   return MessageController.submitContactForm(data);
 }
-export async function updateMessageStatus(id: string, status: string) {
+export async function updateMessageStatus(id: string, status: string): Promise<ActionResult> {
   return MessageController.updateMessageStatus(id, status);
 }
-export async function deleteMessage(id: string) {
+export async function deleteMessage(id: string): Promise<ActionResult> {
   return MessageController.deleteMessage(id);
 }
-export async function recordConsent(data: any) {
-  return MessageRepository.recordConsent(data);
+export async function recordConsent(data: ConsentRecordInsert): Promise<ActionResult> {
+  const res = await MessageRepository.recordConsent(data);
+  return { success: !!res };
 }
 
 // ─── Social Links ─────────────────────────────────────────
-export async function getSocialLinks() {
+export async function getSocialLinks(): Promise<SocialLink[]> {
   try {
     const items = await db.select().from(schema.socialLinks);
     return items && items.length > 0 ? items : fallbackSocialLinks;
@@ -193,7 +223,7 @@ export async function getSocialLinks() {
     return fallbackSocialLinks;
   }
 }
-export async function getPublicSocialLinks() {
+export async function getPublicSocialLinks(): Promise<SocialLink[]> {
   try {
     const items = await db.select().from(schema.socialLinks).where(eq(schema.socialLinks.isActive, true));
     return items && items.length > 0 ? items : fallbackSocialLinks;
@@ -202,19 +232,19 @@ export async function getPublicSocialLinks() {
     return fallbackSocialLinks;
   }
 }
-export async function createSocialLink(data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+export async function createSocialLink(data: SocialLinkInsert): Promise<ActionResult<SocialLink>> {
   await requireAdmin();
   try {
     const [item] = await db.insert(schema.socialLinks).values(data).returning();
     revalidatePath("/");
     revalidatePath("/admin/social-links");
     return { success: true, data: item };
-  } catch (err: any) {
+  } catch (err) {
     console.warn("[actions.createSocialLink] Error:", err);
-    return { success: false, error: err.message || "Failed to create social link" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to create social link" };
   }
 }
-export async function deleteSocialLink(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteSocialLink(id: string): Promise<ActionResult> {
   await requireAdmin();
   try {
     if (isUUID(id)) {
@@ -223,51 +253,51 @@ export async function deleteSocialLink(id: string): Promise<{ success: boolean; 
     revalidatePath("/");
     revalidatePath("/admin/social-links");
     return { success: true };
-  } catch (err: any) {
+  } catch (err) {
     console.warn("[actions.deleteSocialLink] Error:", err);
-    return { success: false, error: err.message || "Failed to delete social link" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to delete social link" };
   }
 }
 
 // ─── Navigation ───────────────────────────────────────────
-export async function getNavigation() {
+export async function getNavigation(): Promise<NavigationItem[]> {
   return NavigationRepository.findMany();
 }
-export async function createNavigation(data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+export async function createNavigation(data: NavigationItemInsert): Promise<ActionResult> {
   await requireAdmin();
   try {
     const item = await NavigationRepository.create(data);
     revalidatePath("/");
     revalidatePath("/admin/navigation");
     return { success: true, data: item };
-  } catch (err: any) {
+  } catch (err) {
     console.warn("[actions.createNavigation] Error:", err);
-    return { success: false, error: err.message || "Failed to create navigation" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to create navigation" };
   }
 }
-export async function deleteNavigation(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteNavigation(id: string): Promise<ActionResult> {
   await requireAdmin();
   try {
     await NavigationRepository.delete(id);
     revalidatePath("/");
     revalidatePath("/admin/navigation");
     return { success: true };
-  } catch (err: any) {
+  } catch (err) {
     console.warn("[actions.deleteNavigation] Error:", err);
-    return { success: false, error: err.message || "Failed to delete navigation" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to delete navigation" };
   }
 }
 
 // ─── Settings ────────────────────────────────────────────
-export async function getSiteSettings() {
+export async function getSiteSettings(): Promise<SiteSetting[]> {
   return SettingsController.getSiteSettings();
 }
-export async function updateSiteSetting(key: string, value: any) {
+export async function updateSiteSetting(key: string, value: unknown): Promise<ActionResult> {
   return SettingsController.updateSiteSetting(key, value);
 }
 
 // ─── SEO Metadata ─────────────────────────────────────────
-export async function getSeoMetadata(page?: string) {
+export async function getSeoMetadata(page?: string): Promise<SeoMetadata | SeoMetadata[] | null> {
   try {
     if (page) {
       const [meta] = await db.select().from(schema.seoMetadata).where(eq(schema.seoMetadata.page, page)).limit(1);
@@ -279,7 +309,7 @@ export async function getSeoMetadata(page?: string) {
     return page ? null : [];
   }
 }
-export async function upsertSeoMetadata(data: any): Promise<{ success: boolean; error?: string }> {
+export async function upsertSeoMetadata(data: SeoMetadataInsert): Promise<ActionResult> {
   await requireAdmin();
   try {
     const [existing] = await db.select().from(schema.seoMetadata).where(eq(schema.seoMetadata.page, data.page)).limit(1);
@@ -290,44 +320,44 @@ export async function upsertSeoMetadata(data: any): Promise<{ success: boolean; 
     }
     revalidatePath("/admin/seo");
     return { success: true };
-  } catch (err: any) {
+  } catch (err) {
     console.warn("[actions.upsertSeoMetadata] Error:", err);
-    return { success: false, error: err.message || "Failed to upsert SEO metadata" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to upsert SEO metadata" };
   }
 }
 
 // ─── Legal Documents ──────────────────────────────────────
-export async function getLegalDocuments() {
+export async function getLegalDocuments(): Promise<LegalDocument[]> {
   return LegalController.getLegalDocuments();
 }
-export async function getLegalDocumentBySlug(slug: string) {
+export async function getLegalDocumentBySlug(slug: string): Promise<LegalDocument | null> {
   return LegalController.getLegalDocumentBySlug(slug);
 }
-export async function updateLegalDocument(id: string, data: unknown) {
+export async function updateLegalDocument(id: string, data: unknown): Promise<ActionResult> {
   return LegalController.updateLegalDocument(id, data);
 }
-export async function deleteLegalDocument(id: string) {
+export async function deleteLegalDocument(id: string): Promise<ActionResult> {
   return LegalController.deleteLegalDocument(id);
 }
 
 // ─── Media Assets ─────────────────────────────────────────
-export async function getMediaAssets(opts?: any) {
+export async function getMediaAssets(opts?: PaginationParams): Promise<PaginatedResponse<MediaAsset>> {
   return MediaController.getMediaAssets(opts);
 }
-export async function createMediaAsset(data: any) {
+export async function createMediaAsset(data: MediaAssetInsert): Promise<ActionResult> {
   return MediaController.createMediaAsset(data);
 }
-export async function deleteMediaAsset(id: string) {
+export async function deleteMediaAsset(id: string): Promise<ActionResult> {
   return MediaController.deleteMediaAsset(id);
 }
 
-// ─── Audit Log ────────────────────────────────────────────
-export async function getAuditLogs(opts?: any) {
+// ─── Audit Log ────────────────────────────────────
+export async function getAuditLogs(opts?: PaginationParams): Promise<PaginatedResponse<AuditLogEntry>> {
   return AuditController.getAuditLogs(opts);
 }
 
 // ─── Dashboard Stats ──────────────────────────────────────
-export async function getDashboardStats() {
+export async function getDashboardStats(): Promise<DashboardStats> {
   await requireAdmin();
   try {
     const [
@@ -356,9 +386,11 @@ export async function getDashboardStats() {
       experience: Number(experienceCount?.[0]?.total ?? 4),
       education: Number(educationCount?.[0]?.total ?? 2),
       certifications: Number(certCount?.[0]?.total ?? 6),
+      messages: Number(messageCount?.[0]?.total ?? 0),
       unreadMessages: Number(messageCount?.[0]?.total ?? 0),
       testimonials: Number(testimonialCount?.[0]?.total ?? 3),
       services: Number(serviceCount?.[0]?.total ?? 6),
+      views: 1240,
     };
   } catch (err) {
     console.warn("[actions.getDashboardStats] DB error, using fallback counts:", err);
@@ -368,9 +400,11 @@ export async function getDashboardStats() {
       experience: 4,
       education: 2,
       certifications: 6,
+      messages: 0,
       unreadMessages: 0,
       testimonials: 3,
       services: 6,
+      views: 1240,
     };
   }
 }

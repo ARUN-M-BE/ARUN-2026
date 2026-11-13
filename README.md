@@ -156,3 +156,15 @@ This repository, source code, 3D WebGL assets, design systems, algorithms, datab
 - **No Unauthorized Distribution:** No permission is granted to copy, download, modify, merge, publish, distribute, sublicense, duplicate, or sell this software, repository, or any portion thereof without explicit written permission from the copyright holder.
 - **Inquiries:** For licensing inquiries, permissions, or architectural consultations, visit [arun-m.in](https://arun-m.in) or email `arun@arun-m.in`.
 
+
+---
+
+## ⚖️ Copyright & License
+
+Copyright © 2026 **Arun M** ([arun-m.in](https://arun-m.in)). All Rights Reserved.
+
+This repository, source code, 3D WebGL assets, design systems, algorithms, database schemas, and documentation are proprietary and confidential.
+
+- **No Unauthorized Distribution:** No permission is granted to copy, download, modify, merge, publish, distribute, sublicense, duplicate, or sell this software, repository, or any portion thereof without explicit written permission from the copyright holder.
+- **Inquiries:** For licensing inquiries, permissions, or architectural consultations, visit [arun-m.in](https://arun-m.in) or email `arun@arun-m.in`.
+

@@ -12,8 +12,9 @@ import { EmptyState } from "@/components/admin/empty-state";
 import { createSocialLink, deleteSocialLink } from "@/lib/actions";
 import { Plus, Trash2, ExternalLink, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import type { SocialLink } from "@/types";
 
-export function SocialLinksClient({ initialData }: { initialData: any[] }) {
+export function SocialLinksClient({ initialData }: { initialData: SocialLink[] }) {
   const router = useRouter();
   const [links, setLinks] = useState(initialData);
   const [isOpen, setIsOpen] = useState(false);
@@ -38,7 +39,8 @@ export function SocialLinksClient({ initialData }: { initialData: any[] }) {
 
       if (res.success && res.data) {
         toast.success("Social link added");
-        setLinks((prev) => [...prev, res.data]);
+        const newLink = res.data as SocialLink;
+        setLinks((prev) => [...prev, newLink]);
         setPlatform("");
         setUrl("");
         setLabel("");

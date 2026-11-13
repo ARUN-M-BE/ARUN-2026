@@ -12,8 +12,9 @@ import { EmptyState } from "@/components/admin/empty-state";
 import { deleteProject } from "@/lib/actions";
 import { Edit2, Trash2, ExternalLink, Star, Search, FolderGit2 } from "lucide-react";
 import { toast } from "sonner";
+import type { Project } from "@/types";
 
-export function ProjectListClient({ initialData }: { initialData: any[] }) {
+export function ProjectListClient({ initialData }: { initialData: Project[] }) {
   const router = useRouter();
   const [projects, setProjects] = useState(initialData);
   const [search, setSearch] = useState("");

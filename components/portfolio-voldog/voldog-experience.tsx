@@ -2,56 +2,14 @@
 
 import { CheckCircle2 } from "lucide-react";
 import { LimeUnderlineSwoosh, CarrotThreeLineSpark } from "./voldog-doodles";
+import type { Experience } from "@/types";
+import { fallbackExperiences } from "@/server/repositories/fallback-data";
 
 interface VoldogExperienceProps {
-  experiences?: any[];
+  experiences?: Experience[];
 }
 
 export function VoldogExperience({ experiences }: VoldogExperienceProps) {
-  const fallbackExperiences = [
-    {
-      id: "exp-1",
-      position: "Lead Distributed Cloud Architect",
-      company: "Autonomous Infrastructure Labs",
-      location: "Bangalore, IN",
-      startDate: "2023",
-      endDate: "Present",
-      description: "Spearheading distributed edge microservices across Cloudflare Workers and Neon PostgreSQL. Engineered sub-35ms p99 latency routes handling 12M+ daily active requests.",
-      highlights: [
-        "Architected serverless HTTP database connection pools using @neondatabase/serverless.",
-        "Implemented end-to-end DPDP Act 2023 compliance auditing and automated consent ledgers.",
-        "Reduced cloud compute overhead by 42% through aggressive edge static caching.",
-      ],
-    },
-    {
-      id: "exp-2",
-      position: "Senior Full-Stack Architect & 3D Engineer",
-      company: "HyperScale Spatial Studios",
-      location: "Remote / Global",
-      startDate: "2021",
-      endDate: "2023",
-      description: "Led development of interactive 3D WebGL platforms utilizing React Three Fiber, GLSL shaders, and Next.js App Router for enterprise clients worldwide.",
-      highlights: [
-        "Crafted custom Three.js post-processing pipelines running at 60 FPS across mobile and desktop.",
-        "Integrated type-safe Drizzle ORM schemas with PostgreSQL and automated CI migrations.",
-        "Mentored a team of 14 full-stack and creative frontend engineers.",
-      ],
-    },
-    {
-      id: "exp-3",
-      position: "Systems Software Engineer",
-      company: "Core Cloud Technologies",
-      location: "Bangalore, IN",
-      startDate: "2019",
-      endDate: "2021",
-      description: "Developed microservices, REST APIs, and automated telemetry collectors with Node.js, TypeScript, and Docker container orchestration.",
-      highlights: [
-        "Containerized legacy monoliths into Kubernetes clusters with zero scheduled downtime.",
-        "Established automated integration testing pipelines with Vitest and Playwright.",
-      ],
-    },
-  ];
-
   const exps = experiences && experiences.length > 0 ? experiences : fallbackExperiences;
 
   return (
@@ -78,9 +36,9 @@ export function VoldogExperience({ experiences }: VoldogExperienceProps) {
 
       {/* Experience Cards */}
       <div className="space-y-6 max-w-4xl mx-auto">
-        {exps.map((exp: any, idx: number) => {
+        {exps.map((exp, idx: number) => {
           const dateRange = exp.startDate
-            ? `${exp.startDate} — ${exp.endDate || "Present"}`
+            ? `${new Date(exp.startDate).getFullYear()} — ${exp.endDate ? new Date(exp.endDate).getFullYear() : "Present"}`
             : "2022 — Present";
 
           return (
@@ -110,10 +68,10 @@ export function VoldogExperience({ experiences }: VoldogExperienceProps) {
                 {exp.description}
               </p>
 
-              {/* Highlights */}
-              {exp.highlights && Array.isArray(exp.highlights) && (
+              {/* Achievements / Highlights */}
+              {exp.achievements && Array.isArray(exp.achievements) && (
                 <div className="space-y-2 pt-2 border-t border-[#e4e8e6]">
-                  {exp.highlights.map((h: string, hIdx: number) => (
+                  {exp.achievements.map((h: string, hIdx: number) => (
                     <div key={hIdx} className="flex items-start gap-2.5 text-sm text-[#204e4a]/80">
                       <CheckCircle2 className="w-4 h-4 text-[#e1e53f] shrink-0 mt-0.5 fill-[#204e4a]" />
                       <span>{h}</span>

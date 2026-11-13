@@ -3,52 +3,15 @@
 import { useState } from "react";
 import { Server, Box, ShieldCheck, Code2 } from "lucide-react";
 import { LimeUnderlineSwoosh, CarrotThreeLineSpark } from "./voldog-doodles";
+import type { SkillCategoryWithSkills } from "@/types";
+import { fallbackSkillCategories } from "@/server/repositories/fallback-data";
 
 interface VoldogSkillsProps {
-  categoriesWithSkills?: any[];
+  categoriesWithSkills?: SkillCategoryWithSkills[];
 }
 
 export function VoldogSkills({ categoriesWithSkills }: VoldogSkillsProps) {
-  const fallbackCategories = [
-    {
-      id: "cat-cloud",
-      name: "Cloud & Distributed Systems",
-      slug: "cloud",
-      icon: "server",
-      skills: [
-        { name: "Cloudflare Workers & OpenNext", proficiency: "Architect / 98%", metric: "Sub-20ms Edge" },
-        { name: "Neon PostgreSQL (HTTP Driver)", proficiency: "Advanced / 95%", metric: "Serverless Pooling" },
-        { name: "Docker & Kubernetes Swarm", proficiency: "Production / 92%", metric: "Zero Downtime" },
-        { name: "Drizzle ORM & Migrations", proficiency: "Architect / 96%", metric: "Type-Safe SQL" },
-      ],
-    },
-    {
-      id: "cat-frontend",
-      name: "Modern Frontend & 3D WebGL",
-      slug: "frontend",
-      icon: "box",
-      skills: [
-        { name: "Next.js 16 App Router (RSC)", proficiency: "Mastery / 99%", metric: "Streaming SSR" },
-        { name: "React 19 & Concurrent Mode", proficiency: "Expert / 96%", metric: "Hydration Guard" },
-        { name: "Three.js & React Three Fiber", proficiency: "Advanced / 94%", metric: "60 FPS Shaders" },
-        { name: "TailwindCSS & Bespoke Systems", proficiency: "Mastery / 98%", metric: "Zero Layout Shift" },
-      ],
-    },
-    {
-      id: "cat-security",
-      name: "Security, Auth & Compliance",
-      slug: "security",
-      icon: "shield",
-      skills: [
-        { name: "DPDP Act 2023 Architecture", proficiency: "Compliant / 100%", metric: "Consent Ledger" },
-        { name: "NextAuth v5 / Auth.js Guards", proficiency: "Expert / 95%", metric: "JWT / Session Proxy" },
-        { name: "OWASP Hardening & CSRF", proficiency: "Strict / 96%", metric: "Defense in Depth" },
-        { name: "Automated Vitest & End-to-End", proficiency: "Verified / 94%", metric: "Regression-Proof" },
-      ],
-    },
-  ];
-
-  const categories = categoriesWithSkills && categoriesWithSkills.length > 0 ? categoriesWithSkills : fallbackCategories;
+  const categories = categoriesWithSkills && categoriesWithSkills.length > 0 ? categoriesWithSkills : fallbackSkillCategories;
   const [activeIdx, setActiveIdx] = useState(0);
   const activeCategory = categories[activeIdx] || categories[0];
 
@@ -109,7 +72,7 @@ export function VoldogSkills({ categoriesWithSkills }: VoldogSkillsProps) {
       {/* Grid of Cloud Gray Skill Tiles */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {activeCategory.skills &&
-          activeCategory.skills.map((skill: any, idx: number) => (
+          activeCategory.skills.map((skill, idx: number) => (
             <div
               key={skill.id || skill.name || idx}
               className="bg-[#f2f3f4] rounded-[30px] p-8 flex flex-col justify-between space-y-6 transition-all hover:bg-[#eaecee] hover:-translate-y-1"
@@ -121,7 +84,7 @@ export function VoldogSkills({ categoriesWithSkills }: VoldogSkillsProps) {
                   </div>
                   {/* Paprika metric */}
                   <span className="text-[#c1452e] font-mono text-xs font-bold">
-                    {skill.metric || "Production"}
+                    {skill.level ? `${skill.level}%` : "Production"}
                   </span>
                 </div>
 
@@ -133,7 +96,7 @@ export function VoldogSkills({ categoriesWithSkills }: VoldogSkillsProps) {
               <div className="pt-4 border-t border-[#204e4a]/10 flex items-center justify-between text-xs text-[#204e4a]/70">
                 <span>Proficiency Level</span>
                 <span className="font-semibold text-[#204e4a]">
-                  {skill.proficiency || `${skill.level || 95}%`}
+                  {skill.level}%
                 </span>
               </div>
             </div>

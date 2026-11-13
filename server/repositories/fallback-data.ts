@@ -1,9 +1,21 @@
 /**
  * Production Fallback Data for Arun M's Portfolio
  * Ensures zero-downtime display even if database is offline, initializing, or during static pre-rendering.
+ * Strictly typed with exact domain types from @/types to guarantee type integrity.
  */
 
-export const fallbackProfile = {
+import type {
+  Profile,
+  Project,
+  SkillCategoryWithSkills,
+  Experience,
+  Education,
+  Certification,
+  Testimonial,
+  SocialLink,
+} from "@/types";
+
+export const fallbackProfile: Profile = {
   id: "profile-arun-m",
   fullName: "Arun M",
   title: "Senior Full-Stack Architect & 3D Creative Engineer",
@@ -27,7 +39,7 @@ export const fallbackProfile = {
   updatedAt: new Date("2026-01-01"),
 };
 
-export const fallbackProjects = [
+export const fallbackProjects: Project[] = [
   {
     id: "proj-nexus-neural-cloud",
     title: "Nexus Neural Cloud Engine",
@@ -42,7 +54,11 @@ export const fallbackProjects = [
     status: "published",
     liveUrl: "https://arun-m.in",
     githubUrl: "https://github.com/arun-m",
-    thumbnailUrl: "/projects/nexus.jpg",
+    thumbnail: "/projects/nexus.jpg",
+    images: [],
+    startDate: null,
+    endDate: null,
+    metadata: {},
     createdAt: new Date("2025-01-10"),
     updatedAt: new Date("2026-01-15"),
   },
@@ -60,7 +76,11 @@ export const fallbackProjects = [
     status: "published",
     liveUrl: "https://arun-m.in",
     githubUrl: "https://github.com/arun-m",
-    thumbnailUrl: "/projects/aura.jpg",
+    thumbnail: "/projects/aura.jpg",
+    images: [],
+    startDate: null,
+    endDate: null,
+    metadata: {},
     createdAt: new Date("2025-03-20"),
     updatedAt: new Date("2026-02-01"),
   },
@@ -78,7 +98,11 @@ export const fallbackProjects = [
     status: "published",
     liveUrl: "https://arun-m.in",
     githubUrl: "https://github.com/arun-m",
-    thumbnailUrl: "/projects/ecommerce.jpg",
+    thumbnail: "/projects/ecommerce.jpg",
+    images: [],
+    startDate: null,
+    endDate: null,
+    metadata: {},
     createdAt: new Date("2025-06-15"),
     updatedAt: new Date("2026-02-10"),
   },
@@ -96,61 +120,78 @@ export const fallbackProjects = [
     status: "published",
     liveUrl: "https://arun-m.in",
     githubUrl: "https://github.com/arun-m",
-    thumbnailUrl: "/projects/sentinel.jpg",
+    thumbnail: "/projects/sentinel.jpg",
+    images: [],
+    startDate: null,
+    endDate: null,
+    metadata: {},
     createdAt: new Date("2025-08-01"),
     updatedAt: new Date("2026-02-20"),
   },
 ];
 
-export const fallbackSkillCategories = [
+export const fallbackSkillCategories: SkillCategoryWithSkills[] = [
   {
     id: "cat-frontend-3d",
     name: "Frontend & 3D WebGL",
     slug: "frontend-3d",
+    icon: null,
+    color: null,
     sortOrder: 1,
     status: "published",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2026-01-01"),
     skills: [
-      { id: "sk-nextjs", name: "React / Next.js 16", slug: "nextjs", level: 95, categoryId: "cat-frontend-3d", isFeatured: true, status: "published", sortOrder: 1 },
-      { id: "sk-threejs", name: "Three.js & React Three Fiber", slug: "threejs", level: 90, categoryId: "cat-frontend-3d", isFeatured: true, status: "published", sortOrder: 2 },
-      { id: "sk-typescript", name: "TypeScript & Strict Type Systems", slug: "typescript", level: 95, categoryId: "cat-frontend-3d", isFeatured: true, status: "published", sortOrder: 3 },
-      { id: "sk-tailwind", name: "Tailwind CSS & Modern Motion", slug: "tailwind", level: 92, categoryId: "cat-frontend-3d", isFeatured: true, status: "published", sortOrder: 4 },
+      { id: "sk-nextjs", name: "React / Next.js 16", slug: "nextjs", level: 95, categoryId: "cat-frontend-3d", isFeatured: true, icon: null, status: "published", sortOrder: 1, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
+      { id: "sk-threejs", name: "Three.js & React Three Fiber", slug: "threejs", level: 90, categoryId: "cat-frontend-3d", isFeatured: true, icon: null, status: "published", sortOrder: 2, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
+      { id: "sk-typescript", name: "TypeScript & Strict Type Systems", slug: "typescript", level: 95, categoryId: "cat-frontend-3d", isFeatured: true, icon: null, status: "published", sortOrder: 3, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
+      { id: "sk-tailwind", name: "Tailwind CSS & Modern Motion", slug: "tailwind", level: 92, categoryId: "cat-frontend-3d", isFeatured: true, icon: null, status: "published", sortOrder: 4, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
     ],
   },
   {
     id: "cat-backend-systems",
     name: "Backend & Systems",
     slug: "backend-systems",
+    icon: null,
+    color: null,
     sortOrder: 2,
     status: "published",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2026-01-01"),
     skills: [
-      { id: "sk-nodejs", name: "Node.js & Go Runtime", slug: "nodejs", level: 88, categoryId: "cat-backend-systems", isFeatured: true, status: "published", sortOrder: 1 },
-      { id: "sk-postgres", name: "PostgreSQL & Drizzle ORM", slug: "postgresql", level: 92, categoryId: "cat-backend-systems", isFeatured: true, status: "published", sortOrder: 2 },
-      { id: "sk-microservices", name: "Distributed Microservices & REST/gRPC", slug: "microservices", level: 85, categoryId: "cat-backend-systems", isFeatured: true, status: "published", sortOrder: 3 },
-      { id: "sk-redis", name: "Redis Caching & Pub/Sub", slug: "redis", level: 87, categoryId: "cat-backend-systems", isFeatured: true, status: "published", sortOrder: 4 },
+      { id: "sk-nodejs", name: "Node.js & Go Runtime", slug: "nodejs", level: 88, categoryId: "cat-backend-systems", isFeatured: true, icon: null, status: "published", sortOrder: 1, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
+      { id: "sk-postgres", name: "PostgreSQL & Drizzle ORM", slug: "postgresql", level: 92, categoryId: "cat-backend-systems", isFeatured: true, icon: null, status: "published", sortOrder: 2, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
+      { id: "sk-microservices", name: "Distributed Microservices & REST/gRPC", slug: "microservices", level: 85, categoryId: "cat-backend-systems", isFeatured: true, icon: null, status: "published", sortOrder: 3, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
+      { id: "sk-redis", name: "Redis Caching & Pub/Sub", slug: "redis", level: 87, categoryId: "cat-backend-systems", isFeatured: true, icon: null, status: "published", sortOrder: 4, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
     ],
   },
   {
     id: "cat-cloud-security",
     name: "Cloud & Security Architecture",
     slug: "cloud-security",
+    icon: null,
+    color: null,
     sortOrder: 3,
     status: "published",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2026-01-01"),
     skills: [
-      { id: "sk-docker", name: "Docker & Kubernetes Orchestration", slug: "kubernetes", level: 85, categoryId: "cat-cloud-security", isFeatured: true, status: "published", sortOrder: 1 },
-      { id: "sk-security", name: "DPDP Act 2023 & Security Auditing", slug: "security", level: 90, categoryId: "cat-cloud-security", isFeatured: true, status: "published", sortOrder: 2 },
-      { id: "sk-cicd", name: "CI/CD & High-Availability Cloud", slug: "cicd", level: 88, categoryId: "cat-cloud-security", isFeatured: true, status: "published", sortOrder: 3 },
-      { id: "sk-observability", name: "Distributed Telemetry & OpenTelemetry", slug: "observability", level: 86, categoryId: "cat-cloud-security", isFeatured: true, status: "published", sortOrder: 4 },
+      { id: "sk-docker", name: "Docker & Kubernetes Orchestration", slug: "kubernetes", level: 85, categoryId: "cat-cloud-security", isFeatured: true, icon: null, status: "published", sortOrder: 1, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
+      { id: "sk-security", name: "DPDP Act 2023 & Security Auditing", slug: "security", level: 90, categoryId: "cat-cloud-security", isFeatured: true, icon: null, status: "published", sortOrder: 2, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
+      { id: "sk-cicd", name: "CI/CD & High-Availability Cloud", slug: "cicd", level: 88, categoryId: "cat-cloud-security", isFeatured: true, icon: null, status: "published", sortOrder: 3, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
+      { id: "sk-observability", name: "Distributed Telemetry & OpenTelemetry", slug: "observability", level: 86, categoryId: "cat-cloud-security", isFeatured: true, icon: null, status: "published", sortOrder: 4, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
     ],
   },
 ];
 
-export const fallbackExperiences = [
+export const fallbackExperiences: Experience[] = [
   {
     id: "exp-principal",
     company: "Apex Cloud Architecture",
     position: "Principal Software Architect",
     location: "Bangalore, India / Remote",
     startDate: new Date("2023-01-01"),
+    endDate: null,
     isCurrent: true,
     description: "Leading the core technical design of high-concurrency cloud distributed services. Oversaw database normalization, sub-second latency optimizations, and zero-downtime deployment pipelines.",
     achievements: [
@@ -158,8 +199,15 @@ export const fallbackExperiences = [
       "Cut p99 database query response latency by 64% via Drizzle connection pools and indexed partitioning",
       "Architected real-time WebSocket telemetry cluster serving 50k concurrent sessions"
     ],
-    technologies: ["Next.js 16", "PostgreSQL", "Docker", "TypeScript", "Redis", "Kafka"],
+    techStack: ["Next.js 16", "PostgreSQL", "Docker", "TypeScript", "Redis", "Kafka"],
+    type: "full-time",
+    companyLogo: null,
+    companyUrl: null,
+    isFeatured: true,
+    sortOrder: 1,
     status: "published",
+    createdAt: new Date("2023-01-01"),
+    updatedAt: new Date("2026-01-01"),
   },
   {
     id: "exp-senior",
@@ -175,12 +223,19 @@ export const fallbackExperiences = [
       "Engineered automated CI/CD pipeline reducing release cycles from days to 15 minutes",
       "Maintained 99.98% uptime SLA across all production client services"
     ],
-    technologies: ["React", "Node.js", "Three.js", "PostgreSQL", "GraphQL"],
+    techStack: ["React", "Node.js", "Three.js", "PostgreSQL", "GraphQL"],
+    type: "full-time",
+    companyLogo: null,
+    companyUrl: null,
+    isFeatured: true,
+    sortOrder: 2,
     status: "published",
+    createdAt: new Date("2020-06-01"),
+    updatedAt: new Date("2022-12-31"),
   },
 ];
 
-export const fallbackEducation = [
+export const fallbackEducation: Education[] = [
   {
     id: "edu-btech",
     institution: "National Institute of Technology",
@@ -191,11 +246,17 @@ export const fallbackEducation = [
     endDate: new Date("2020-05-30"),
     isCurrent: false,
     description: "Graduated with Honors. Specialized in distributed operating systems, relational database theory, algorithms, and cryptographic computing.",
+    grade: "Honors",
+    logo: null,
+    url: null,
+    sortOrder: 1,
     status: "published",
+    createdAt: new Date("2016-08-01"),
+    updatedAt: new Date("2020-05-30"),
   },
 ];
 
-export const fallbackCertifications = [
+export const fallbackCertifications: Certification[] = [
   {
     id: "cert-aws",
     name: "AWS Certified Solutions Architect - Professional",
@@ -203,8 +264,13 @@ export const fallbackCertifications = [
     credentialId: "AWS-PSA-98421",
     credentialUrl: "https://aws.amazon.com",
     issueDate: new Date("2023-04-15"),
+    expiryDate: null,
+    image: null,
     isFeatured: true,
+    sortOrder: 1,
     status: "published",
+    createdAt: new Date("2023-04-15"),
+    updatedAt: new Date("2026-01-01"),
   },
   {
     id: "cert-cka",
@@ -213,12 +279,17 @@ export const fallbackCertifications = [
     credentialId: "CKA-77412",
     credentialUrl: "https://www.cncf.io",
     issueDate: new Date("2022-09-10"),
+    expiryDate: null,
+    image: null,
     isFeatured: true,
+    sortOrder: 2,
     status: "published",
+    createdAt: new Date("2022-09-10"),
+    updatedAt: new Date("2026-01-01"),
   },
 ];
 
-export const fallbackTestimonials = [
+export const fallbackTestimonials: Testimonial[] = [
   {
     id: "test-david",
     name: "David Vance",
@@ -227,8 +298,13 @@ export const fallbackTestimonials = [
     content: "Arun is a phenomenal software architect. His rare ability to combine deeply resilient backend systems with jaw-dropping 3D interactive frontends elevated our flagship platform beyond expectations.",
     rating: 5,
     isFeatured: true,
+    isVerified: true,
+    projectId: null,
+    sortOrder: 1,
     status: "published",
     avatar: "/avatars/david.jpg",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2026-01-01"),
   },
   {
     id: "test-elena",
@@ -238,14 +314,19 @@ export const fallbackTestimonials = [
     content: "Working with Arun transformed our user experience. He delivered a high-performance WebGL digital twin interface with 60 FPS performance and flawless mobile responsiveness.",
     rating: 5,
     isFeatured: true,
+    isVerified: true,
+    projectId: null,
+    sortOrder: 2,
     status: "published",
     avatar: "/avatars/elena.jpg",
+    createdAt: new Date("2025-02-01"),
+    updatedAt: new Date("2026-01-01"),
   },
 ];
 
-export const fallbackSocialLinks = [
-  { id: "soc-github", platform: "GitHub", url: "https://github.com", icon: "github", status: "published", sortOrder: 1 },
-  { id: "soc-linkedin", platform: "LinkedIn", url: "https://linkedin.com", icon: "linkedin", status: "published", sortOrder: 2 },
-  { id: "soc-twitter", platform: "Twitter/X", url: "https://x.com", icon: "twitter", status: "published", sortOrder: 3 },
+export const fallbackSocialLinks: SocialLink[] = [
+  { id: "soc-github", platform: "GitHub", url: "https://github.com", icon: "github", label: "GitHub", isActive: true, sortOrder: 1, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
+  { id: "soc-linkedin", platform: "LinkedIn", url: "https://linkedin.com", icon: "linkedin", label: "LinkedIn", isActive: true, sortOrder: 2, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
+  { id: "soc-twitter", platform: "Twitter/X", url: "https://x.com", icon: "twitter", label: "Twitter", isActive: true, sortOrder: 3, createdAt: new Date("2024-01-01"), updatedAt: new Date("2026-01-01") },
 ];
 

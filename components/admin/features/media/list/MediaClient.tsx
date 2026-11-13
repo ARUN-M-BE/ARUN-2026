@@ -11,15 +11,16 @@ import { EmptyState } from "@/components/admin/empty-state";
 import { createMediaAsset, deleteMediaAsset } from "@/lib/actions";
 import { Plus, Trash2, Image, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import type { MediaAsset } from "@/types";
 
-export function MediaClient({ initialData }: { initialData: any[] }) {
+export function MediaClient({ initialData }: { initialData: MediaAsset[] }) {
   const router = useRouter();
-  const [items, setItems] = useState(initialData);
+  const [items, setItems] = useState<MediaAsset[]>(initialData);
   const [isOpen, setIsOpen] = useState(false);
   const [filename, setFilename] = useState("");
   const [url, setUrl] = useState("");
   const [altText, setAltText] = useState("");
-  const [copyright, setCopyright] = useState("© 2026 Developer Portfolio. All Rights Reserved.");
+  const [copyright, setCopyright] = useState("© 2026 arun-m.in. All Rights Reserved.");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -42,7 +43,8 @@ export function MediaClient({ initialData }: { initialData: any[] }) {
 
       if (res.success && res.data) {
         toast.success("Media asset registered");
-        setItems((prev) => [res.data, ...prev]);
+        const newAsset = res.data as MediaAsset;
+        setItems((prev) => [newAsset, ...prev]);
         setFilename("");
         setUrl("");
         setAltText("");
@@ -125,10 +127,10 @@ export function MediaClient({ initialData }: { initialData: any[] }) {
                   <h4 className="font-medium text-xs text-white truncate" title={item.filename}>
                     {item.filename}
                   </h4>
-                  <p className="text-[10px] text-muted-foreground truncate" title={item.altText}>
+                  <p className="text-[10px] text-muted-foreground truncate" title={item.altText ?? undefined}>
                     Alt: {item.altText || "No accessible description"}
                   </p>
-                  <p className="text-[10px] text-muted-foreground font-mono truncate" title={item.copyright}>
+                  <p className="text-[10px] text-muted-foreground font-mono truncate" title={item.copyright ?? undefined}>
                     {item.copyright || "All Rights Reserved"}
                   </p>
                 </div>

@@ -38,7 +38,7 @@ export async function parseJsonBody(req: http.IncomingMessage): Promise<any> {
   });
 }
 
-export function sendJson(res: http.ServerResponse, statusCode: number, data: any) {
+export function sendJson(res: http.ServerResponse, statusCode: number, data: unknown) {
   const json = JSON.stringify(data);
   res.writeHead(statusCode, {
     "Content-Type": "application/json",
@@ -135,9 +135,10 @@ export async function app(req: http.IncomingMessage, res: http.ServerResponse) {
 
     // Not found
     sendJson(res, 404, formatApiError("NOT_FOUND", `Endpoint not found: ${method} ${pathname}`));
-  } catch (error: any) {
+  } catch (error: unknown) {
     Logger.error("Backend request processing error", error, { method, pathname });
-    sendJson(res, 500, formatApiError("INTERNAL_ERROR", error.message || "Internal server error"));
+    const message = error instanceof Error ? error.message : "Internal server error";
+    sendJson(res, 500, formatApiError("INTERNAL_ERROR", message));
   } finally {
     Logger.info(`${method} ${pathname}`, {
       durationMs: Date.now() - startTime,

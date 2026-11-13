@@ -11,8 +11,9 @@ import { EmptyState } from "@/components/admin/empty-state";
 import { deleteTestimonial } from "@/lib/actions";
 import { Edit2, Trash2, MessageSquareQuote, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import type { Testimonial } from "@/types";
 
-export function TestimonialListClient({ initialData }: { initialData: any[] }) {
+export function TestimonialListClient({ initialData }: { initialData: Testimonial[] }) {
   const router = useRouter();
   const [items, setItems] = useState(initialData);
   const [deleteId, setDeleteId] = useState<string | null>(null);

@@ -28,6 +28,7 @@ import {
   legalDocumentSchema,
 } from "../validators";
 import { ActionResult } from "../constants";
+import type { PaginationParams, MediaAssetInsert } from "@/types";
 
 async function requireUser() {
   const session = await requireAdmin();
@@ -52,7 +53,7 @@ export const ProfileController = {
 
 // ─── Project Controller ──────────────────────────────────
 export const ProjectController = {
-  async getProjects(opts?: any) {
+  async getProjects(opts?: PaginationParams) {
     return ProjectService.getProjects(opts);
   },
   async getPublicProjects() {
@@ -94,7 +95,7 @@ export const SkillController = {
     const user = await requireUser();
     return SkillService.deleteCategory(user.id, id);
   },
-  async getSkills(opts?: any) {
+  async getSkills(opts?: PaginationParams) {
     return SkillService.getSkills(opts);
   },
   async getPublicSkills() {
@@ -244,7 +245,7 @@ export const TestimonialController = {
 
 // ─── Message Controller ──────────────────────────────────
 export const MessageController = {
-  async getContactMessages(opts?: any) {
+  async getContactMessages(opts?: PaginationParams) {
     await requireUser();
     return MessageService.getMessages(opts);
   },
@@ -268,7 +269,7 @@ export const SettingsController = {
   async getSiteSettings() {
     return SettingsService.getSettings();
   },
-  async updateSiteSetting(key: string, value: any): Promise<ActionResult> {
+  async updateSiteSetting(key: string, value: unknown): Promise<ActionResult> {
     const user = await requireUser();
     return SettingsService.updateSetting(user.id, key, value);
   },
@@ -296,10 +297,10 @@ export const LegalController = {
 
 // ─── Media Controller ────────────────────────────────────
 export const MediaController = {
-  async getMediaAssets(opts?: any) {
+  async getMediaAssets(opts?: PaginationParams) {
     return MediaService.getMedia(opts);
   },
-  async createMediaAsset(data: any): Promise<ActionResult> {
+  async createMediaAsset(data: MediaAssetInsert): Promise<ActionResult> {
     const user = await requireUser();
     return MediaService.createMedia(user.id, data);
   },
@@ -311,7 +312,7 @@ export const MediaController = {
 
 // ─── Audit Controller ────────────────────────────────────
 export const AuditController = {
-  async getAuditLogs(opts?: any) {
+  async getAuditLogs(opts?: PaginationParams) {
     await requireUser();
     return AuditService.getLogs(opts);
   },

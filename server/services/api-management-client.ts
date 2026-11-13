@@ -56,11 +56,12 @@ export class ApiManagementClient {
         statusCode: res.status,
         latencyMs,
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : null;
       return {
         isOnline: false,
         latencyMs: Date.now() - start,
-        error: err?.name === "AbortError" ? "Request timed out" : err?.message || "Connection failed",
+        error: error?.name === "AbortError" ? "Request timed out" : error?.message || "Connection failed",
       };
     }
   }
@@ -68,7 +69,7 @@ export class ApiManagementClient {
   /**
    * Generic CRUD: GET (Read)
    */
-  async get<T = any>(endpoint: string, params?: Record<string, string | number>): Promise<{ data?: T; error?: string }> {
+  async get<T = unknown>(endpoint: string, params?: Record<string, string | number>): Promise<{ data?: T; error?: string }> {
     try {
       const url = new URL(`${this.baseUrl}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`);
       if (params) {
@@ -87,18 +88,18 @@ export class ApiManagementClient {
         return { error: `HTTP ${res.status}: ${errorText}` };
       }
 
-      const data = await res.json();
+      const data = (await res.json()) as T;
       return { data };
-    } catch (err: any) {
+    } catch (err: unknown) {
       Logger.error(`API-FRRM GET Exception`, err, { endpoint });
-      return { error: err?.message || "Network error" };
+      return { error: err instanceof Error ? err.message : "Network error" };
     }
   }
 
   /**
    * Generic CRUD: POST (Create)
    */
-  async post<T = any>(endpoint: string, body: any): Promise<{ data?: T; error?: string }> {
+  async post<T = unknown>(endpoint: string, body: unknown): Promise<{ data?: T; error?: string }> {
     try {
       const url = `${this.baseUrl}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
       const res = await fetch(url, {
@@ -113,18 +114,18 @@ export class ApiManagementClient {
         return { error: `HTTP ${res.status}: ${errorText}` };
       }
 
-      const data = await res.json();
+      const data = (await res.json()) as T;
       return { data };
-    } catch (err: any) {
+    } catch (err: unknown) {
       Logger.error(`API-FRRM POST Exception`, err, { endpoint });
-      return { error: err?.message || "Network error" };
+      return { error: err instanceof Error ? err.message : "Network error" };
     }
   }
 
   /**
    * Generic CRUD: PUT / PATCH (Update)
    */
-  async update<T = any>(endpoint: string, body: any, partial: boolean = false): Promise<{ data?: T; error?: string }> {
+  async update<T = unknown>(endpoint: string, body: unknown, partial: boolean = false): Promise<{ data?: T; error?: string }> {
     try {
       const url = `${this.baseUrl}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
       const res = await fetch(url, {
@@ -138,11 +139,11 @@ export class ApiManagementClient {
         return { error: `HTTP ${res.status}: ${errorText}` };
       }
 
-      const data = await res.json();
+      const data = (await res.json()) as T;
       return { data };
-    } catch (err: any) {
+    } catch (err: unknown) {
       Logger.error(`API-FRRM UPDATE Exception`, err, { endpoint });
-      return { error: err?.message || "Network error" };
+      return { error: err instanceof Error ? err.message : "Network error" };
     }
   }
 
@@ -163,9 +164,9 @@ export class ApiManagementClient {
       }
 
       return { success: true };
-    } catch (err: any) {
+    } catch (err: unknown) {
       Logger.error(`API-FRRM DELETE Exception`, err, { endpoint });
-      return { success: false, error: err?.message || "Network error" };
+      return { success: false, error: err instanceof Error ? err.message : "Network error" };
     }
   }
 }

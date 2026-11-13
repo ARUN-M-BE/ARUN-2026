@@ -2,36 +2,14 @@
 
 import { Star } from "lucide-react";
 import { LimeUnderlineSwoosh, CarrotThreeLineSpark } from "./voldog-doodles";
+import type { Testimonial } from "@/types";
+import { fallbackTestimonials } from "@/server/repositories/fallback-data";
 
 interface VoldogTestimonialsProps {
-  testimonials?: any[];
+  testimonials?: Testimonial[];
 }
 
 export function VoldogTestimonials({ testimonials }: VoldogTestimonialsProps) {
-  const fallbackTestimonials = [
-    {
-      id: "test-1",
-      name: "Marcus Vance",
-      role: "VP of Engineering, CloudScale Europe",
-      content: "Arun fundamentally re-architected our microservices fleet on Cloudflare Workers and Neon. Our edge response times dropped from 240ms to under 38ms, and we haven't experienced a single second of unexpected downtime since deployment.",
-      avatar: "MV",
-    },
-    {
-      id: "test-2",
-      name: "Elena Rostova",
-      role: "Head of Product, Spatial Labs Berlin",
-      content: "The level of craftsmanship Arun brings to 3D WebGL and Next.js is rare. He combines cutting-edge visual aesthetics with rigorous type safety and DPDP Act compliance. Absolutely top-tier engineering talent.",
-      avatar: "ER",
-    },
-    {
-      id: "test-3",
-      name: "Siddharth Rao",
-      role: "CTO, FinEdge Payments",
-      content: "Arun delivered our high-throughput payment transaction pipeline ahead of schedule. The code was exceptionally well-documented, unit-tested with Vitest, and survived heavy concurrent spike simulations effortlessly.",
-      avatar: "SR",
-    },
-  ];
-
   const tests = testimonials && testimonials.length > 0 ? testimonials : fallbackTestimonials;
 
   return (
@@ -62,8 +40,8 @@ export function VoldogTestimonials({ testimonials }: VoldogTestimonialsProps) {
         5 yellow stars, and Stone Gray #666666 text
       */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-        {tests.map((t: any, idx: number) => {
-          const initials = t.avatar || t.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2);
+        {tests.map((t, idx: number) => {
+          const initials = t.avatar || (t.name || "").split(" ").map((n: string) => n[0]).join("").slice(0, 2);
 
           return (
             <div
@@ -94,7 +72,7 @@ export function VoldogTestimonials({ testimonials }: VoldogTestimonialsProps) {
                     {t.name}
                   </h4>
                   <p className="text-[#204e4a]/60 text-[13px] font-normal">
-                    {t.role || "Technical Lead"}
+                    {t.title || "Technical Lead"}
                   </p>
                 </div>
               </div>

@@ -58,7 +58,7 @@ export default async function AdminDashboardPage() {
       value: stats.unreadMessages,
       desc: "Client inquiries awaiting reply",
       icon: Mail,
-      color: stats.unreadMessages > 0 ? "from-amber-500/20 to-amber-500/5 text-amber-400 border-amber-500/20" : "from-zinc-500/20 to-zinc-500/5 text-zinc-400 border-border",
+      color: (stats.unreadMessages ?? 0) > 0 ? "from-amber-500/20 to-amber-500/5 text-amber-400 border-amber-500/20" : "from-zinc-500/20 to-zinc-500/5 text-zinc-400 border-border",
       href: "/admin/messages",
     },
     {

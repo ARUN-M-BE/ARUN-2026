@@ -16,9 +16,10 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2, ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import type { Project } from "@/types";
 
 interface ProjectFormProps {
-  initialData?: any;
+  initialData?: Partial<Project> | null;
   isEditing?: boolean;
 }
 
@@ -74,7 +75,7 @@ export function ProjectForm({ initialData, isEditing = false }: ProjectFormProps
     data.techStack = techArray;
 
     try {
-      if (isEditing) {
+      if (isEditing && initialData?.id) {
         const res = await updateProject(initialData.id, data);
         if (res.success) {
           toast.success("Project updated successfully");
@@ -197,7 +198,7 @@ export function ProjectForm({ initialData, isEditing = false }: ProjectFormProps
               <Label className="text-xs font-medium text-zinc-300">Status</Label>
               <Select
                 value={watch("status")}
-                onValueChange={(val: any) => setValue("status", val)}
+                onValueChange={(val: "draft" | "published" | "unpublished") => setValue("status", val)}
               >
                 <SelectTrigger className="bg-background/50 border-border">
                   <SelectValue placeholder="Select status" />

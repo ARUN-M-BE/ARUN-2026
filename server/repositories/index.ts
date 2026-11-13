@@ -11,6 +11,26 @@ import {
   fallbackCertifications,
   fallbackTestimonials,
 } from "./fallback-data";
+import type {
+  ProfileInsert,
+  ProjectInsert,
+  SkillCategoryInsert,
+  SkillInsert,
+  ExperienceInsert,
+  EducationInsert,
+  CertificationInsert,
+  ServiceOfferingInsert,
+  TestimonialInsert,
+  ContactMessageInsert,
+  ConsentRecordInsert,
+  NavigationItemInsert,
+  SiteSettingInsert,
+  LegalDocumentInsert,
+  LegalVersionHistoryInsert,
+  MediaAssetInsert,
+  AuditLogEntryInsert,
+  PaginationParams,
+} from "@/types";
 
 // ─── Profile Repository ──────────────────────────────────
 export const ProfileRepository = {
@@ -30,14 +50,14 @@ export const ProfileRepository = {
       return fallbackProfile;
     }
   },
-  async upsert(data: any) {
+  async upsert(data: Partial<ProfileInsert>) {
     try {
-      const { id: _ignored, ...cleanData } = data;
+      const { id: _ignored, ...cleanData } = data as { id?: string } & Partial<ProfileInsert>;
       const existing = await this.getFirst();
       if (existing && existing.id && isUUID(existing.id) && existing.id !== fallbackProfile.id) {
         return await db.update(schema.profile).set({ ...cleanData, updatedAt: new Date() }).where(eq(schema.profile.id, existing.id));
       }
-      return await db.insert(schema.profile).values(cleanData);
+      return await db.insert(schema.profile).values(cleanData as ProfileInsert);
     } catch (err) {
       console.warn("[ProfileRepository.upsert] DB update bypassed or failed:", err);
       return null;
@@ -47,13 +67,13 @@ export const ProfileRepository = {
 
 // ─── Project Repository ──────────────────────────────────
 export const ProjectRepository = {
-  async findMany(opts?: { search?: string; status?: string; page?: number; limit?: number }) {
+  async findMany(opts?: PaginationParams & { search?: string; status?: string }) {
     try {
       const page = opts?.page || 1;
       const limit = opts?.limit || 20;
       const offset = (page - 1) * limit;
       const conditions = [];
-      if (opts?.status) conditions.push(eq(schema.projects.status, opts.status as any));
+      if (opts?.status) conditions.push(eq(schema.projects.status, opts.status as "draft" | "published" | "unpublished"));
       if (opts?.search) conditions.push(ilike(schema.projects.title, `%${opts.search}%`));
       const where = conditions.length > 0 ? and(...conditions) : undefined;
       const [items, [{ total }]] = await Promise.all([
@@ -91,17 +111,17 @@ export const ProjectRepository = {
       return fallbackProjects.find((p) => p.id === id || p.slug === id || p.slug === cleanSlug) || null;
     }
   },
-  async create(data: any) {
+  async create(data: ProjectInsert) {
     try {
-      const { id: _ignored, ...cleanData } = data;
-      const [item] = await db.insert(schema.projects).values(cleanData).returning();
+      const { id: _ignored, ...cleanData } = data as { id?: string } & ProjectInsert;
+      const [item] = await db.insert(schema.projects).values(cleanData as ProjectInsert).returning();
       return item;
     } catch (err) {
       console.warn("[ProjectRepository.create] DB insert failed:", err);
-      return { ...data, id: data.id || "proj-" + Date.now() };
+      return { ...data, id: (data as { id?: string }).id || "proj-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Partial<ProjectInsert>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -127,9 +147,9 @@ export const ProjectRepository = {
       }
 
       // 3. Fallback item promotion to database
-      const insertData = { ...updateData, slug: targetSlug };
+      const insertData = { ...updateData, slug: targetSlug } as { id?: string } & ProjectInsert;
       if (isUUID(id)) insertData.id = id;
-      const [created] = await db.insert(schema.projects).values(insertData).returning();
+      const [created] = await db.insert(schema.projects).values(insertData as ProjectInsert).returning();
       return created;
     } catch (err) {
       console.warn("[ProjectRepository.update] DB update/upsert error:", err);
@@ -162,14 +182,14 @@ export const SkillRepository = {
       return fallbackSkillCategories;
     }
   },
-  async createCategory(data: any) {
+  async createCategory(data: SkillCategoryInsert) {
     try {
-      const { id: _ignored, ...cleanData } = data;
-      const [cat] = await db.insert(schema.skillCategories).values(cleanData).returning();
+      const { id: _ignored, ...cleanData } = data as { id?: string } & SkillCategoryInsert;
+      const [cat] = await db.insert(schema.skillCategories).values(cleanData as SkillCategoryInsert).returning();
       return cat;
     } catch (err) {
       console.warn("[SkillRepository.createCategory] Error:", err);
-      return { ...data, id: "cat-" + Date.now() };
+      return { ...data, id: (data as { id?: string }).id || "cat-" + Date.now() };
     }
   },
   async deleteCategory(id: string) {
@@ -211,18 +231,18 @@ export const SkillRepository = {
       return fallbackSkillCategories;
     }
   },
-  async createSkill(data: any) {
+  async createSkill(data: SkillInsert) {
     try {
-      const { id: _ignored, ...cleanData } = data;
+      const { id: _ignored, ...cleanData } = data as { id?: string } & SkillInsert;
       const safeData = {
         ...cleanData,
         categoryId: isUUID(data?.categoryId) ? data.categoryId : null,
       };
-      const [skill] = await db.insert(schema.skills).values(safeData).returning();
+      const [skill] = await db.insert(schema.skills).values(safeData as SkillInsert).returning();
       return skill;
     } catch (err) {
       console.warn("[SkillRepository.createSkill] Error:", err);
-      return { ...data, id: "sk-" + Date.now() };
+      return { ...data, id: (data as { id?: string }).id || "sk-" + Date.now() };
     }
   },
   async deleteSkill(id: string) {
@@ -259,17 +279,17 @@ export const ExperienceRepository = {
       return fallbackExperiences;
     }
   },
-  async create(data: any) {
+  async create(data: ExperienceInsert) {
     try {
-      const { id: _ignored, ...cleanData } = data;
-      const [exp] = await db.insert(schema.experience).values(cleanData).returning();
+      const { id: _ignored, ...cleanData } = data as { id?: string } & ExperienceInsert;
+      const [exp] = await db.insert(schema.experience).values(cleanData as ExperienceInsert).returning();
       return exp;
     } catch (err) {
       console.warn("[ExperienceRepository.create] Error:", err);
-      return { ...data, id: "exp-" + Date.now() };
+      return { ...data, id: (data as { id?: string }).id || "exp-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Partial<ExperienceInsert>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -287,9 +307,9 @@ export const ExperienceRepository = {
           return updated;
         }
       }
-      const insertData = { ...updateData };
+      const insertData = { ...updateData } as { id?: string } & ExperienceInsert;
       if (isUUID(id)) insertData.id = id;
-      const [created] = await db.insert(schema.experience).values(insertData).returning();
+      const [created] = await db.insert(schema.experience).values(insertData as ExperienceInsert).returning();
       return created;
     } catch (err) {
       console.warn("[ExperienceRepository.update] Error:", err);
@@ -327,17 +347,17 @@ export const EducationRepository = {
       return fallbackEducation;
     }
   },
-  async create(data: any) {
+  async create(data: EducationInsert) {
     try {
-      const { id: _ignored, ...cleanData } = data;
-      const [edu] = await db.insert(schema.education).values(cleanData).returning();
+      const { id: _ignored, ...cleanData } = data as { id?: string } & EducationInsert;
+      const [edu] = await db.insert(schema.education).values(cleanData as EducationInsert).returning();
       return edu;
     } catch (err) {
       console.warn("[EducationRepository.create] Error:", err);
-      return { ...data, id: "edu-" + Date.now() };
+      return { ...data, id: (data as { id?: string }).id || "edu-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Partial<EducationInsert>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -355,9 +375,9 @@ export const EducationRepository = {
           return updated;
         }
       }
-      const insertData = { ...updateData };
+      const insertData = { ...updateData } as { id?: string } & EducationInsert;
       if (isUUID(id)) insertData.id = id;
-      const [created] = await db.insert(schema.education).values(insertData).returning();
+      const [created] = await db.insert(schema.education).values(insertData as EducationInsert).returning();
       return created;
     } catch (err) {
       console.warn("[EducationRepository.update] Error:", err);
@@ -395,17 +415,17 @@ export const CertificationRepository = {
       return fallbackCertifications;
     }
   },
-  async create(data: any) {
+  async create(data: CertificationInsert) {
     try {
-      const { id: _ignored, ...cleanData } = data;
-      const [cert] = await db.insert(schema.certifications).values(cleanData).returning();
+      const { id: _ignored, ...cleanData } = data as { id?: string } & CertificationInsert;
+      const [cert] = await db.insert(schema.certifications).values(cleanData as CertificationInsert).returning();
       return cert;
     } catch (err) {
       console.warn("[CertificationRepository.create] Error:", err);
-      return { ...data, id: "cert-" + Date.now() };
+      return { ...data, id: (data as { id?: string }).id || "cert-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Partial<CertificationInsert>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -423,9 +443,9 @@ export const CertificationRepository = {
           return updated;
         }
       }
-      const insertData = { ...updateData };
+      const insertData = { ...updateData } as { id?: string } & CertificationInsert;
       if (isUUID(id)) insertData.id = id;
-      const [created] = await db.insert(schema.certifications).values(insertData).returning();
+      const [created] = await db.insert(schema.certifications).values(insertData as CertificationInsert).returning();
       return created;
     } catch (err) {
       console.warn("[CertificationRepository.update] Error:", err);
@@ -461,17 +481,17 @@ export const ServiceRepository = {
       return [];
     }
   },
-  async create(data: any) {
+  async create(data: ServiceOfferingInsert) {
     try {
-      const { id: _ignored, ...cleanData } = data;
-      const [svc] = await db.insert(schema.services).values(cleanData).returning();
+      const { id: _ignored, ...cleanData } = data as { id?: string } & ServiceOfferingInsert;
+      const [svc] = await db.insert(schema.services).values(cleanData as ServiceOfferingInsert).returning();
       return svc;
     } catch (err) {
       console.warn("[ServiceRepository.create] Error:", err);
-      return { ...data, id: "svc-" + Date.now() };
+      return { ...data, id: (data as { id?: string }).id || "svc-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Partial<ServiceOfferingInsert>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -489,9 +509,9 @@ export const ServiceRepository = {
           return updated;
         }
       }
-      const insertData = { ...updateData };
+      const insertData = { ...updateData } as { id?: string } & ServiceOfferingInsert;
       if (isUUID(id)) insertData.id = id;
-      const [created] = await db.insert(schema.services).values(insertData).returning();
+      const [created] = await db.insert(schema.services).values(insertData as ServiceOfferingInsert).returning();
       return created;
     } catch (err) {
       console.warn("[ServiceRepository.update] Error:", err);
@@ -529,17 +549,17 @@ export const TestimonialRepository = {
       return fallbackTestimonials;
     }
   },
-  async create(data: any) {
+  async create(data: TestimonialInsert) {
     try {
-      const { id: _ignored, ...cleanData } = data;
-      const [t] = await db.insert(schema.testimonials).values(cleanData).returning();
+      const { id: _ignored, ...cleanData } = data as { id?: string } & TestimonialInsert;
+      const [t] = await db.insert(schema.testimonials).values(cleanData as TestimonialInsert).returning();
       return t;
     } catch (err) {
       console.warn("[TestimonialRepository.create] Error:", err);
-      return { ...data, id: "test-" + Date.now() };
+      return { ...data, id: (data as { id?: string }).id || "test-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Partial<TestimonialInsert>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -557,9 +577,9 @@ export const TestimonialRepository = {
           return updated;
         }
       }
-      const insertData = { ...updateData };
+      const insertData = { ...updateData } as { id?: string } & TestimonialInsert;
       if (isUUID(id)) insertData.id = id;
-      const [created] = await db.insert(schema.testimonials).values(insertData).returning();
+      const [created] = await db.insert(schema.testimonials).values(insertData as TestimonialInsert).returning();
       return created;
     } catch (err) {
       console.warn("[TestimonialRepository.update] Error:", err);
@@ -598,16 +618,16 @@ export const MessageRepository = {
       return { items: [], total: 0, page: 1, limit: 20, pages: 1 };
     }
   },
-  async create(data: any) {
+  async create(data: ContactMessageInsert) {
     try {
-      const { id: _ignored, ...cleanData } = data;
-      return await db.insert(schema.contactMessages).values(cleanData);
+      const { id: _ignored, ...cleanData } = data as { id?: string } & ContactMessageInsert;
+      return await db.insert(schema.contactMessages).values(cleanData as ContactMessageInsert);
     } catch (err) {
       console.warn("[MessageRepository.create] Stored in local fallback log:", err);
       return null;
     }
   },
-  async recordConsent(data: any) {
+  async recordConsent(data: ConsentRecordInsert) {
     try {
       return await db.insert(schema.consentRecords).values(data);
     } catch (err) {
@@ -615,10 +635,10 @@ export const MessageRepository = {
       return null;
     }
   },
-  async updateStatus(id: string, status: any) {
+  async updateStatus(id: string, status: string) {
     try {
       if (isUUID(id)) {
-        return await db.update(schema.contactMessages).set({ messageStatus: status }).where(eq(schema.contactMessages.id, id));
+        return await db.update(schema.contactMessages).set({ messageStatus: status as "unread" | "read" | "replied" | "archived" | "spam" }).where(eq(schema.contactMessages.id, id));
       }
       return null;
     } catch (err) {
@@ -655,14 +675,14 @@ export const NavigationRepository = {
       return [];
     }
   },
-  async create(data: any) {
+  async create(data: NavigationItemInsert) {
     try {
-      const { id: _ignored, ...cleanData } = data;
-      const [nav] = await db.insert(schema.navigation).values(cleanData).returning();
+      const { id: _ignored, ...cleanData } = data as { id?: string } & NavigationItemInsert;
+      const [nav] = await db.insert(schema.navigation).values(cleanData as NavigationItemInsert).returning();
       return nav;
     } catch (err) {
       console.warn("[NavigationRepository.create] Error:", err);
-      return { ...data, id: "nav-" + Date.now() };
+      return { ...data, id: (data as { id?: string }).id || "nav-" + Date.now() };
     }
   },
   async delete(id: string) {
@@ -687,13 +707,13 @@ export const SettingsRepository = {
       return [];
     }
   },
-  async upsert(key: string, value: any) {
+  async upsert(key: string, value: unknown) {
     try {
       const [existing] = await db.select().from(schema.siteSettings).where(eq(schema.siteSettings.key, key)).limit(1);
       if (existing) {
-        return await db.update(schema.siteSettings).set({ value, updatedAt: new Date() }).where(eq(schema.siteSettings.id, existing.id));
+        return await db.update(schema.siteSettings).set({ value: typeof value === "object" ? JSON.stringify(value) : String(value), updatedAt: new Date() }).where(eq(schema.siteSettings.id, existing.id));
       }
-      return await db.insert(schema.siteSettings).values({ key, value, group: "general" });
+      return await db.insert(schema.siteSettings).values({ key, value: typeof value === "object" ? JSON.stringify(value) : String(value), group: "general" });
     } catch (err) {
       console.warn("[SettingsRepository.upsert] Error:", err);
       return null;
@@ -718,9 +738,9 @@ export const LegalRepository = {
       return null;
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Partial<LegalDocumentInsert>) {
     try {
-      const { id: _ignored, ...cleanData } = data;
+      const { id: _ignored, ...cleanData } = data as { id?: string } & Partial<LegalDocumentInsert>;
       const updateData = { ...cleanData, updatedAt: new Date() };
       if (isUUID(id)) {
         return await db.update(schema.legalDocuments).set(updateData).where(eq(schema.legalDocuments.id, id));
@@ -734,14 +754,14 @@ export const LegalRepository = {
       return null;
     }
   },
-  async addVersionHistory(data: any) {
+  async addVersionHistory(data: LegalVersionHistoryInsert) {
     try {
       const safeData = {
         ...data,
         documentId: isUUID(data?.documentId) ? data.documentId : null,
         changedBy: isUUID(data?.changedBy) ? data.changedBy : null,
       };
-      return await db.insert(schema.legalVersionHistory).values(safeData);
+      return await db.insert(schema.legalVersionHistory).values(safeData as LegalVersionHistoryInsert);
     } catch (err) {
       console.warn("[LegalRepository.addVersionHistory] Error:", err);
       return null;
@@ -762,7 +782,7 @@ export const LegalRepository = {
 
 // ─── Media Repository ────────────────────────────────────
 export const MediaRepository = {
-  async findMany(opts?: { page?: number; limit?: number }) {
+  async findMany(opts?: PaginationParams) {
     try {
       const page = opts?.page || 1;
       const limit = opts?.limit || 24;
@@ -776,14 +796,14 @@ export const MediaRepository = {
       return { items: [], total: 0, page: 1, limit: 24, pages: 1 };
     }
   },
-  async create(data: any) {
+  async create(data: MediaAssetInsert) {
     try {
-      const { id: _ignored, ...cleanData } = data;
-      const [asset] = await db.insert(schema.mediaAssets).values(cleanData).returning();
+      const { id: _ignored, ...cleanData } = data as { id?: string } & MediaAssetInsert;
+      const [asset] = await db.insert(schema.mediaAssets).values(cleanData as MediaAssetInsert).returning();
       return asset;
     } catch (err) {
       console.warn("[MediaRepository.create] Error:", err);
-      return { ...data, id: "media-" + Date.now() };
+      return { ...data, id: (data as { id?: string }).id || "media-" + Date.now() };
     }
   },
   async delete(id: string) {
@@ -801,18 +821,18 @@ export const MediaRepository = {
 
 // ─── Audit Repository ────────────────────────────────────
 export const AuditRepository = {
-  async log(data: any) {
+  async log(data: AuditLogEntryInsert) {
     try {
       const safeData = {
         ...data,
         userId: isUUID(data?.userId) ? data.userId : null,
       };
-      await db.insert(schema.auditLog).values(safeData);
+      await db.insert(schema.auditLog).values(safeData as AuditLogEntryInsert);
     } catch {
       // Don't fail primary operation
     }
   },
-  async findMany(opts?: { page?: number; limit?: number }) {
+  async findMany(opts?: PaginationParams) {
     try {
       const page = opts?.page || 1;
       const limit = opts?.limit || 50;

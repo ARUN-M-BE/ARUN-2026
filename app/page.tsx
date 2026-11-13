@@ -43,7 +43,7 @@ export default async function HomePage({
   ]);
 
   // Determine active theme from backend site_settings
-  const themeSetting = settings?.find((s: any) => s.key === "portfolio_theme");
+  const themeSetting = settings?.find((s) => s.key === "portfolio_theme");
   let backendTheme: "cyberpunk" | "voldog" = "voldog";
   if (themeSetting?.value) {
     try {

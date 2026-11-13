@@ -20,10 +20,11 @@ import {
 import { toast } from "sonner";
 import Link from "next/link";
 import { useLanguage } from "@/context/languageContext";
+import type { Profile, SocialLink } from "@/types";
 
 interface ContactSectionProps {
-  profile: any;
-  socialLinks: any[];
+  profile?: Profile | null;
+  socialLinks?: SocialLink[];
 }
 
 export function ContactSection({ profile, socialLinks = [] }: ContactSectionProps) {

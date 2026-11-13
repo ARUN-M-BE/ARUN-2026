@@ -12,8 +12,9 @@ import { EmptyState } from "@/components/admin/empty-state";
 import { createNavigation, deleteNavigation } from "@/lib/actions";
 import { Plus, Trash2, Navigation, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import type { NavigationItem } from "@/types";
 
-export function NavigationClient({ initialData }: { initialData: any[] }) {
+export function NavigationClient({ initialData }: { initialData: NavigationItem[] }) {
   const router = useRouter();
   const [items, setItems] = useState(initialData);
   const [isOpen, setIsOpen] = useState(false);
@@ -39,7 +40,8 @@ export function NavigationClient({ initialData }: { initialData: any[] }) {
 
       if (res.success && res.data) {
         toast.success("Navigation item added");
-        setItems((prev) => [...prev, res.data]);
+        const newItem = res.data as NavigationItem;
+        setItems((prev) => [...prev, newItem]);
         setLabel("");
         setHref("");
         setIsOpen(false);

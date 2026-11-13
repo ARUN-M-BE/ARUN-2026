@@ -13,16 +13,26 @@ import { TestimonialsSection } from "@/components/portfolio/testimonials-section
 import { ContactSection } from "@/components/portfolio/contact-section";
 import { PortfolioFooter } from "@/components/portfolio/footer";
 import { CookieConsent } from "@/components/portfolio/cookie-consent";
+import type {
+  Profile,
+  Project,
+  SkillCategoryWithSkills,
+  Experience,
+  Education,
+  Certification,
+  Testimonial,
+  SocialLink,
+} from "@/types";
 
 interface CyberpunkLayoutProps {
-  profile?: any;
-  projects?: any[];
-  categoriesWithSkills?: any[];
-  experiences?: any[];
-  education?: any[];
-  certifications?: any[];
-  testimonials?: any[];
-  socialLinks?: any[];
+  profile?: Profile | null;
+  projects?: Project[];
+  categoriesWithSkills?: SkillCategoryWithSkills[];
+  experiences?: Experience[];
+  education?: Education[];
+  certifications?: Certification[];
+  testimonials?: Testimonial[];
+  socialLinks?: SocialLink[];
   onSwitchTheme?: () => void;
 }
 
@@ -47,8 +57,8 @@ export function CyberpunkLayout({
 
       {/* Main Sections */}
       <main className="relative z-10 space-y-8">
-        <HeroSection profile={profile} />
-        <AboutSection profile={profile} />
+        <HeroSection profile={profile ?? null} />
+        <AboutSection profile={profile ?? null} />
         <ProjectsSection projects={projects} />
         <SkillsSection categoriesWithSkills={categoriesWithSkills} />
         <RealtimeTelemetry />

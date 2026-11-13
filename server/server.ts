@@ -19,15 +19,16 @@ async function startServer() {
     try {
       await db.execute(sql`SELECT 1`);
       Logger.info("Database connectivity confirmed");
-    } catch (dbErr: any) {
-      Logger.warn("Database connection notice (running in standby or check credentials): " + dbErr.message);
+    } catch (dbErr: unknown) {
+      const msg = dbErr instanceof Error ? dbErr.message : String(dbErr);
+      Logger.warn("Database connection notice (running in standby or check credentials): " + msg);
     }
 
     server.listen(PORT, HOST, () => {
       Logger.info(`Backend Server listening at http://${HOST}:${PORT}`);
       Logger.info(`Health check available at http://${HOST}:${PORT}/api/health`);
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     Logger.error("Failed to start backend server", err);
     process.exit(1);
   }

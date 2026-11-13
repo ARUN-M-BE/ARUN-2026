@@ -2,9 +2,10 @@
 
 import { Terminal, ShieldCheck, Zap, Layers, Sparkles, Database, Globe2 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+import type { Profile } from "@/types";
 
 interface AboutSectionProps {
-  profile: any;
+  profile: Profile | null;
 }
 
 export function AboutSection({ profile }: AboutSectionProps) {

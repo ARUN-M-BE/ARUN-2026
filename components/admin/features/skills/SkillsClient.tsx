@@ -13,13 +13,14 @@ import { EmptyState } from "@/components/admin/empty-state";
 import { createSkill, deleteSkill, createSkillCategory, deleteSkillCategory } from "@/lib/actions";
 import { Plus, Trash2, Cpu, Sparkles, FolderPlus, Loader2, Star } from "lucide-react";
 import { toast } from "sonner";
+import type { SkillCategory, Skill } from "@/types";
 
 export function SkillsClient({
   initialCategories,
   initialSkills,
 }: {
-  initialCategories: any[];
-  initialSkills: any[];
+  initialCategories: SkillCategory[];
+  initialSkills: Skill[];
 }) {
   const router = useRouter();
   const [categories, setCategories] = useState(initialCategories);
@@ -51,7 +52,8 @@ export function SkillsClient({
       const res = await createSkillCategory({ name: catName, slug, status: "published" });
       if (res.success && res.data) {
         toast.success("Category created");
-        setCategories((prev) => [...prev, res.data]);
+        const newCat = res.data as SkillCategory;
+        setCategories((prev) => [...prev, newCat]);
         setCatName("");
         setIsCatOpen(false);
         router.refresh();
@@ -80,7 +82,8 @@ export function SkillsClient({
 
       if (res.success && res.data) {
         toast.success("Skill added to constellation");
-        setSkills((prev) => [...prev, res.data]);
+        const newSkill = res.data as Skill;
+        setSkills((prev) => [...prev, newSkill]);
         setSkillName("");
         setIsSkillOpen(false);
         router.refresh();

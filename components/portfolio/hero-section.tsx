@@ -18,6 +18,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/context/languageContext";
+import type { Profile } from "@/types";
 
 // Instant zero-latency geometric sculpture placeholder
 function HeroFallbackSculpture() {
@@ -49,7 +50,7 @@ const HeroCanvas = dynamic(() => import("@/components/3d/hero-canvas"), {
 });
 
 interface HeroSectionProps {
-  profile: any;
+  profile: Profile | null;
 }
 
 export function HeroSection({ profile }: HeroSectionProps) {

@@ -16,8 +16,9 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2, ArrowLeft, Save, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import type { LegalDocument } from "@/types";
 
-export function LegalForm({ initialData }: { initialData: any }) {
+export function LegalForm({ initialData }: { initialData?: Partial<LegalDocument> | null }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -46,13 +47,15 @@ export function LegalForm({ initialData }: { initialData: any }) {
   const onSubmit = async (data: LegalDocumentFormData) => {
     setIsSubmitting(true);
     try {
-      const res = await updateLegalDocument(initialData.id, data);
-      if (res.success) {
-        toast.success("Legal document updated & version recorded in audit trail");
-        router.push("/admin/legal");
-        router.refresh();
-      } else {
-        toast.error("Failed to update", { description: res.error });
+      if (initialData?.id) {
+        const res = await updateLegalDocument(initialData.id, data);
+        if (res.success) {
+          toast.success("Legal document updated & version recorded in audit trail");
+          router.push("/admin/legal");
+          router.refresh();
+        } else {
+          toast.error("Failed to update", { description: res.error });
+        }
       }
     } finally {
       setIsSubmitting(false);
@@ -119,7 +122,7 @@ export function LegalForm({ initialData }: { initialData: any }) {
               <Label className="text-xs font-medium text-zinc-300">Status</Label>
               <Select
                 value={watch("status")}
-                onValueChange={(val: any) => setValue("status", val)}
+                onValueChange={(val: "draft" | "published" | "unpublished") => setValue("status", val)}
               >
                 <SelectTrigger className="bg-background/50 border-border">
                   <SelectValue placeholder="Select status" />

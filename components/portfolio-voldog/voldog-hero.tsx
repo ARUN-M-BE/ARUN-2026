@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { ArrowRight, Server, Box } from "lucide-react";
 import { WhiteHeroScribble, LimeUnderlineSwoosh, CarrotThreeLineSpark } from "./voldog-doodles";
+import type { Profile } from "@/types";
 
 interface VoldogHeroProps {
-  profile?: any;
+  profile?: Profile | null;
 }
 
 export function VoldogHero({ profile: _profile }: VoldogHeroProps) {

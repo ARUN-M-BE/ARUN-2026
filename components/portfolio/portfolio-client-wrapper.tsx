@@ -4,17 +4,28 @@ import { useState, useEffect } from "react";
 import { VoldogLayout } from "@/components/portfolio-voldog/voldog-layout";
 import { CyberpunkLayout } from "@/components/portfolio/cyberpunk-layout";
 import { ThemeSwitchPill } from "@/components/portfolio-voldog/theme-switch-pill";
+import type {
+  PortfolioTheme,
+  Profile,
+  Project,
+  SkillCategoryWithSkills,
+  Experience,
+  Education,
+  Certification,
+  Testimonial,
+  SocialLink,
+} from "@/types";
 
 interface PortfolioClientWrapperProps {
-  initialTheme?: "cyberpunk" | "voldog";
-  profile?: any;
-  projects?: any[];
-  categoriesWithSkills?: any[];
-  experiences?: any[];
-  education?: any[];
-  certifications?: any[];
-  testimonials?: any[];
-  socialLinks?: any[];
+  initialTheme?: PortfolioTheme;
+  profile?: Profile | null;
+  projects?: Project[];
+  categoriesWithSkills?: SkillCategoryWithSkills[];
+  experiences?: Experience[];
+  education?: Education[];
+  certifications?: Certification[];
+  testimonials?: Testimonial[];
+  socialLinks?: SocialLink[];
 }
 
 export function PortfolioClientWrapper({

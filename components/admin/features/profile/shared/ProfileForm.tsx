@@ -13,8 +13,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
+import type { Profile } from "@/types";
 
-export function ProfileForm({ initialData }: { initialData: any }) {
+export function ProfileForm({ initialData }: { initialData?: Partial<Profile> | null }) {
   const [isSaving, setIsSaving] = useState(false);
 
   const {
@@ -57,8 +58,8 @@ export function ProfileForm({ initialData }: { initialData: any }) {
       } else {
         toast.error("Failed to update profile", { description: res.error });
       }
-    } catch (e: any) {
-      toast.error("Error", { description: e.message || "An error occurred" });
+    } catch (e: unknown) {
+      toast.error("Error", { description: e instanceof Error ? e.message : "An error occurred" });
     } finally {
       setIsSaving(false);
     }
@@ -142,7 +143,7 @@ export function ProfileForm({ initialData }: { initialData: any }) {
               <Label className="text-xs font-medium text-zinc-300">Publication Status</Label>
               <Select
                 value={watch("status")}
-                onValueChange={(val: any) => setValue("status", val)}
+                onValueChange={(val: "draft" | "published" | "unpublished") => setValue("status", val)}
               >
                 <SelectTrigger className="bg-background/50 border-border">
                   <SelectValue placeholder="Select status" />

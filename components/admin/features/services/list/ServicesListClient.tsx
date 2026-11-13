@@ -11,8 +11,9 @@ import { EmptyState } from "@/components/admin/empty-state";
 import { deleteService } from "@/lib/actions";
 import { Edit2, Trash2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import type { ServiceOffering } from "@/types";
 
-export function ServiceListClient({ initialData }: { initialData: any[] }) {
+export function ServiceListClient({ initialData }: { initialData: ServiceOffering[] }) {
   const router = useRouter();
   const [items, setItems] = useState(initialData);
   const [deleteId, setDeleteId] = useState<string | null>(null);

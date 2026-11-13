@@ -4,9 +4,10 @@ import { useState } from "react";
 import { Cpu, Star, SlidersHorizontal, Sparkles, Server, ShieldCheck, Layers } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 import { Button } from "@/components/ui/button";
+import type { SkillCategoryWithSkills } from "@/types";
 
 interface SkillsSectionProps {
-  categoriesWithSkills: any[];
+  categoriesWithSkills?: SkillCategoryWithSkills[];
 }
 
 export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps) {
@@ -25,7 +26,7 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
     .filter((c) => activeCluster === "All" || c.name === activeCluster)
     .map((c) => ({
       ...c,
-      skills: (c.skills || []).filter((s: any) => s.level >= minProficiency),
+      skills: (c.skills || []).filter((s) => s.level >= minProficiency),
     }))
     .filter((c) => c.skills.length > 0);
 
@@ -122,7 +123,7 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
                 </div>
 
                 <div className="space-y-4">
-                  {cluster.skills.map((skill: any) => (
+                  {cluster.skills.map((skill) => (
                     <div key={skill.id} className="space-y-1.5 group">
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-1.5 font-medium text-foreground group-hover:text-sky-500 transition-colors">

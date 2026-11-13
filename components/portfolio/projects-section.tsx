@@ -19,23 +19,24 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+import type { Project } from "@/types";
 
 interface ProjectsSectionProps {
-  projects: any[];
+  projects?: Project[];
 }
 
 export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
   const { t, language } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [search, setSearch] = useState("");
-  const [activeProject, setActiveProject] = useState<any | null>(null);
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
 
   // Comparison mode
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
 
   // Extract unique categories safely
-  const categories = ["All", ...Array.from(new Set((projects || []).map((p) => p.category).filter(Boolean)))];
+  const categories = ["All", ...Array.from(new Set((projects || []).map((p) => p.category).filter((c): c is string => Boolean(c))))];
 
   const filtered = (projects || []).filter((p) => {
     const matchesCat = selectedCategory === "All" || p.category === selectedCategory;
@@ -150,9 +151,9 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                 >
                   {/* Visual Thumbnail */}
                   <div className="aspect-[16/10] bg-muted relative overflow-hidden flex items-center justify-center">
-                    {project.thumbnailUrl ? (
+                    {project.thumbnail ? (
                       <img
-                        src={project.thumbnailUrl}
+                        src={project.thumbnail}
                         alt={project.title}
                         className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                       />
@@ -289,9 +290,9 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                 </DialogDescription>
               </DialogHeader>
 
-              {activeProject.thumbnailUrl && (
+              {activeProject.thumbnail && (
                 <div className="aspect-video rounded-2xl overflow-hidden border border-border">
-                  <img src={activeProject.thumbnailUrl} alt={activeProject.title} className="w-full h-full object-cover" />
+                  <img src={activeProject.thumbnail} alt={activeProject.title} className="w-full h-full object-cover" />
                 </div>
               )}
 

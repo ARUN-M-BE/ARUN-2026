@@ -10,18 +10,19 @@ import { Switch } from "@/components/ui/switch";
 import { updateSiteSetting } from "@/lib/actions";
 import { Loader2, Save, Palette, Shield, Globe, Bell, Check } from "lucide-react";
 import { toast } from "sonner";
+import type { SiteSetting } from "@/types";
 
-export function SettingsClient({ initialSettings }: { initialSettings: any[] }) {
+export function SettingsClient({ initialSettings }: { initialSettings: SiteSetting[] }) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
 
-  const getVal = (key: string, fallback: any) => {
+  const getVal = <T,>(key: string, fallback: T): T => {
     const s = initialSettings.find((item) => item.key === key);
-    if (!s || s.value === undefined) return fallback;
+    if (!s || s.value === undefined || s.value === null) return fallback;
     try {
-      return typeof s.value === "string" ? JSON.parse(s.value) : s.value;
+      return (typeof s.value === "string" ? JSON.parse(s.value) : s.value) as T;
     } catch {
-      return s.value;
+      return s.value as T;
     }
   };
 
@@ -251,7 +252,7 @@ export function SettingsClient({ initialSettings }: { initialSettings: any[] }) 
             <Input
               type="number"
               value={dataRetention}
-              onChange={(e) => setDataRetention(e.target.value)}
+              onChange={(e) => setDataRetention(Number(e.target.value))}
               className="w-48 font-mono text-xs"
             />
             <p className="text-[11px] text-muted-foreground">

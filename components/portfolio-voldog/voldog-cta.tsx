@@ -4,10 +4,11 @@ import { useState } from "react";
 import { ArrowRight, Send, CheckCircle2, ShieldCheck, Mail } from "lucide-react";
 import { LimeUnderlineSwoosh } from "./voldog-doodles";
 import { toast } from "sonner";
+import type { Profile, SocialLink } from "@/types";
 
 interface VoldogCtaProps {
-  profile?: any;
-  socialLinks?: any[];
+  profile?: Profile | null;
+  socialLinks?: SocialLink[];
 }
 
 export function VoldogCta({ profile: _profile, socialLinks: _socialLinks }: VoldogCtaProps) {

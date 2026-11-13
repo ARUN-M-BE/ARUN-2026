@@ -2,52 +2,14 @@
 
 import { ArrowUpRight, ArrowRight, Layers, Zap, Shield, Database } from "lucide-react";
 import { LimeUnderlineSwoosh, CarrotThreeLineSpark, GithubIcon } from "./voldog-doodles";
+import type { Project } from "@/types";
+import { fallbackProjects } from "@/server/repositories/fallback-data";
 
 interface VoldogProjectsProps {
-  projects: any[];
+  projects?: Project[];
 }
 
 export function VoldogProjects({ projects }: VoldogProjectsProps) {
-
-  const fallbackProjects = [
-    {
-      id: "proj-1",
-      title: "Nexus Neural Cloud Engine",
-      slug: "nexus-neural-cloud",
-      description: "Distributed microservices cloud cluster with Neon PostgreSQL HTTP pooling, auto-scaling worker nodes, and sub-35ms edge latency.",
-      technologies: ["Next.js 16", "Cloudflare Workers", "Neon PostgreSQL", "Drizzle ORM"],
-      metric: "12M+ Req/Day · 32ms p99 SLA",
-      status: "published",
-      githubUrl: "https://github.com/arun-m",
-      liveUrl: "https://arun-m.in",
-      category: "cloud",
-    },
-    {
-      id: "proj-2",
-      title: "Aura 3D Spatial Universe",
-      slug: "aura-3d-universe",
-      description: "Immersive WebGL canvas universe with React Three Fiber, GLSL shaders, 60fps post-processing pipeline, and interactive physics.",
-      technologies: ["Three.js", "React Three Fiber", "GLSL Shaders", "TailwindCSS"],
-      metric: "60 FPS Fixed · Zero Layout Shift",
-      status: "published",
-      githubUrl: "https://github.com/arun-m",
-      liveUrl: "https://arun-m.in",
-      category: "3d",
-    },
-    {
-      id: "proj-3",
-      title: "HyperScale E-Commerce Nexus",
-      slug: "hyperscale-ecommerce",
-      description: "Enterprise e-commerce store with DPDP Act 2023 compliance, audit logging, zero-downtime database migrations, and PCI-ready token guards.",
-      technologies: ["PostgreSQL", "NextAuth v5", "Zod Validation", "Stripe API"],
-      metric: "DPDP 2023 Compliant · 99.99% Up",
-      status: "published",
-      githubUrl: "https://github.com/arun-m",
-      liveUrl: "https://arun-m.in",
-      category: "enterprise",
-    },
-  ];
-
   const displayProjects = projects && projects.length > 0 ? projects : fallbackProjects;
 
   return (
@@ -94,13 +56,11 @@ export function VoldogProjects({ projects }: VoldogProjectsProps) {
       */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {displayProjects.map((project, idx) => {
-          const techList = Array.isArray(project.technologies)
-            ? project.technologies
-            : typeof project.technologies === "string"
-            ? project.technologies.split(",").map((s: string) => s.trim())
+          const techList = Array.isArray(project.techStack)
+            ? project.techStack
             : ["Distributed Engine", "TypeScript", "PostgreSQL"];
 
-          const metric = project.metric || project.client || "10M+ Req/Day · Sub-35ms Edge";
+          const metric = project.category || project.client || "10M+ Req/Day · Sub-35ms Edge";
 
           return (
             <div
