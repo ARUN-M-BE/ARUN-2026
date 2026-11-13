@@ -10,7 +10,6 @@ import {
   fallbackEducation,
   fallbackCertifications,
   fallbackTestimonials,
-  fallbackSocialLinks,
 } from "./fallback-data";
 
 // ─── Profile Repository ──────────────────────────────────

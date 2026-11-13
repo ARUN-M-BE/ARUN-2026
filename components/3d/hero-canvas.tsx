@@ -141,7 +141,7 @@ function CosmicParticles({ count = 120 }: { count?: number }) {
   const skyRef = useRef<THREE.Points>(null!);
   const indigoRef = useRef<THREE.Points>(null!);
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (skyRef.current) {
       skyRef.current.rotation.y += delta * 0.025;
       skyRef.current.rotation.x -= delta * 0.01;
@@ -173,13 +173,21 @@ function CosmicParticles({ count = 120 }: { count?: number }) {
 
 // ─── Main Hero Canvas Component ───────────────────────────
 export default function HeroCanvas() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+    return false;
+  });
   const [isPulsing, setIsPulsing] = useState(false);
   const mouse = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
+    const handleMotionChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+    mediaQuery.addEventListener("change", handleMotionChange);
 
     const handleMouseMove = (e: MouseEvent) => {
       mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -187,7 +195,10 @@ export default function HeroCanvas() {
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    return () => {
+      mediaQuery.removeEventListener("change", handleMotionChange);
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
   }, []);
 
   const handleClick = () => {

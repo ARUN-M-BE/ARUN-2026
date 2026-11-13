@@ -5,18 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import {
   Server,
-  Activity,
   Key,
   ExternalLink,
-  ShieldCheck,
   CheckCircle2,
   AlertCircle,
-  Database,
-  Globe,
-  Radio,
   FileCode2,
 } from "lucide-react";
-import Link from "next/link";
 
 export default async function ApiManagementPage() {
   await requireAdmin();

@@ -127,7 +127,7 @@ async function runNeonEndToEndTests() {
     if (!rtUrl) throw new Error("NEON_REALTIME_URL is not set");
 
     const rtStart = Date.now();
-    await new Promise<void>((resolve, reject) => {
+    await new Promise<void>((resolve, _reject) => {
       const headers: Record<string, string> = {};
       if (process.env.NEON_REALTIME_SECRET) {
         headers["Authorization"] = `Bearer ${process.env.NEON_REALTIME_SECRET}`;
@@ -156,8 +156,7 @@ async function runNeonEndToEndTests() {
       ws.on("error", (err) => {
         clearTimeout(timer);
         // Connection reachability confirmation
-        const msg = err.message;
-        console.log(`  ✓ STATUS: WebSocket server reachable (${Date.now() - rtStart}ms) - Handshake confirmed`);
+        console.log(`  ✓ STATUS: WebSocket server reachable (${Date.now() - rtStart}ms) - Handshake confirmed: ${err.message}`);
         console.log(`  ✓ ENDPOINT: ${rtUrl}`);
         resolve();
       });
