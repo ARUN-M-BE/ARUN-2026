@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle";
+import { Toggle, ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { DeleteDialog } from "@/components/admin/delete-dialog";
@@ -25,6 +24,7 @@ import {
   Copy,
   Edit3,
   Eye,
+  EyeOff,
   ArrowUp,
   ArrowDown,
   Layers,
@@ -439,13 +439,19 @@ export function SectionsClient({ initialData }: { initialData: WebsiteSection[] 
                     {sec.status === "published" ? "● Published" : sec.status === "draft" ? "▲ Draft" : "■ Unpublished"}
                   </button>
 
-                  {/* Quick Live Switch */}
-                  <Switch
-                    checked={isPub}
-                    onCheckedChange={(checked) => handleTogglePublished(sec, checked)}
+                  {/* Quick Live Toggle */}
+                  <Toggle
+                    size="sm"
+                    variant={isPub ? "emerald" : "outline"}
+                    pressed={isPub}
+                    onPressedChange={(pressed) => handleTogglePublished(sec, pressed)}
                     title={isPub ? "Published live. Click to hide." : "Hidden. Click to publish live."}
-                    className="scale-85"
-                  />
+                    aria-label="Toggle section publication"
+                    className="h-8 text-xs gap-1.5 font-mono"
+                  >
+                    {isPub ? <Eye className="w-3.5 h-3.5 text-emerald-400" /> : <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />}
+                    <span className="hidden sm:inline">{isPub ? "Live" : "Hidden"}</span>
+                  </Toggle>
 
                   {/* Preview Button */}
                   <Button

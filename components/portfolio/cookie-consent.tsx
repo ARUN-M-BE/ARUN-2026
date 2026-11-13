@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { Toggle } from "@/components/ui/toggle";
 import { Cookie, Settings2, X } from "lucide-react";
 import Link from "next/link";
 import { recordConsent } from "@/lib/actions";
@@ -114,7 +114,15 @@ export function CookieConsent() {
                   {language === "ar" ? "قياس الاستخدام دون بيانات شخصية" : "Anonymous usage measurement"}
                 </span>
               </div>
-              <Switch checked={analyticsConsent} onCheckedChange={setAnalyticsConsent} />
+              <Toggle
+                size="sm"
+                variant={analyticsConsent ? "sky" : "outline"}
+                pressed={analyticsConsent}
+                onPressedChange={setAnalyticsConsent}
+                className="h-7 px-2.5 text-xs font-mono"
+              >
+                {analyticsConsent ? "Allowed" : "Blocked"}
+              </Toggle>
             </div>
           </div>
         )}

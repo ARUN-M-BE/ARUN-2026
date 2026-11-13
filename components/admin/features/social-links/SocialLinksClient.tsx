@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Toggle } from "@/components/ui/toggle";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -395,14 +394,19 @@ export function SocialLinksClient({ initialData }: { initialData: SocialLink[] }
                         </div>
                       </div>
 
-                      {/* Right: Switch & Actions */}
+                      {/* Right: Toggle & Actions */}
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <Switch
-                          checked={link.isActive}
-                          onCheckedChange={() => handleQuickToggleActive(link)}
-                          className="scale-75"
+                        <Toggle
+                          size="xs"
+                          variant={link.isActive ? "emerald" : "outline"}
+                          pressed={link.isActive}
+                          onPressedChange={() => handleQuickToggleActive(link)}
                           title="Toggle account active"
-                        />
+                          aria-label="Toggle account active"
+                          className="h-6 px-2 text-[10px] font-mono"
+                        >
+                          {link.isActive ? "Active" : "Paused"}
+                        </Toggle>
 
                         <a
                           href={link.url}
