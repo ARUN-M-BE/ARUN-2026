@@ -146,10 +146,30 @@ export const testimonialSchema = z.object({
 export const socialLinkSchema = z.object({
   platform: z.string().min(1, "Platform is required"),
   url: z.string().min(1, "URL is required"),
-  icon: z.string().optional(),
-  label: z.string().optional(),
+  icon: z.string().optional().nullable(),
+  label: z.string().optional().nullable(),
+  color: z.string().optional().nullable(),
+  size: z.string().optional().default("md"),
+  style: z.string().optional().default("default"),
+  placements: z.array(z.string()).default(["footer", "contact"]),
   sortOrder: z.coerce.number().int().default(0),
   isActive: z.boolean().default(true),
+  status: z.enum(["draft", "published", "unpublished"]).default("published"),
+});
+
+// ─── Website Section ──────────────────────────────────────
+export const sectionSchema = z.object({
+  sectionKey: z.string().min(1, "Section key is required"),
+  title: z.string().min(1, "Title is required"),
+  subtitle: z.string().optional().nullable(),
+  badge: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
+  content: z.string().optional().nullable(),
+  componentType: z.string().default("custom"),
+  sortOrder: z.coerce.number().int().default(0),
+  status: z.enum(["draft", "published", "unpublished"]).default("published"),
+  styles: z.record(z.string(), z.unknown()).optional().nullable(),
+  metadata: z.record(z.string(), z.unknown()).optional().nullable(),
 });
 
 // ─── Contact Form ─────────────────────────────────────────
@@ -167,10 +187,14 @@ export const contactFormSchema = z.object({
 export const navigationSchema = z.object({
   label: z.string().min(1, "Label is required"),
   href: z.string().min(1, "Link is required"),
-  icon: z.string().optional(),
+  icon: z.string().optional().nullable(),
+  color: z.string().optional().nullable(),
+  badge: z.string().optional().nullable(),
+  style: z.string().optional().nullable(),
   isExternal: z.boolean().default(false),
   sortOrder: z.coerce.number().int().default(0),
   isActive: z.boolean().default(true),
+  status: z.enum(["published", "draft", "unpublished"]).default("published"),
   group: z.string().default("main"),
   parentId: z.string().optional().nullable(),
 });
@@ -178,7 +202,7 @@ export const navigationSchema = z.object({
 // ─── Site Settings ────────────────────────────────────────
 export const siteSettingSchema = z.object({
   key: z.string().min(1, "Key is required"),
-  value: z.any(),
+  value: z.unknown(),
   group: z.string().default("general"),
   label: z.string().optional(),
   description: z.string().optional(),
@@ -193,7 +217,7 @@ export const seoMetadataSchema = z.object({
   ogImage: z.string().optional(),
   ogTitle: z.string().optional(),
   ogDescription: z.string().optional(),
-  structuredData: z.any().optional(),
+  structuredData: z.record(z.string(), z.unknown()).optional(),
   canonicalUrl: z.string().optional().or(z.literal("")),
   noIndex: z.boolean().default(false),
 });
@@ -227,6 +251,7 @@ export type CertificationFormData = z.infer<typeof certificationSchema>;
 export type ServiceFormData = z.infer<typeof serviceSchema>;
 export type TestimonialFormData = z.infer<typeof testimonialSchema>;
 export type SocialLinkFormData = z.infer<typeof socialLinkSchema>;
+export type SectionFormData = z.infer<typeof sectionSchema>;
 export type ContactFormData = z.infer<typeof contactFormSchema>;
 export type NavigationFormData = z.infer<typeof navigationSchema>;
 export type SiteSettingFormData = z.infer<typeof siteSettingSchema>;

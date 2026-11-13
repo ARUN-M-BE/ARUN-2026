@@ -10,8 +10,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { DeleteDialog } from "@/components/admin/delete-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
-import { createSkill, deleteSkill, createSkillCategory, deleteSkillCategory } from "@/lib/actions";
-import { Plus, Trash2, Cpu, Sparkles, FolderPlus, Loader2, Star } from "lucide-react";
+import { Toggle } from "@/components/ui/toggle";
+import {
+  createSkill,
+  updateSkill,
+  deleteSkill,
+  createSkillCategory,
+  updateSkillCategory,
+  deleteSkillCategory,
+} from "@/lib/actions";
+import { Plus, Trash2, Cpu, Sparkles, FolderPlus, Loader2, Star, Edit2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function SkillsClient({
@@ -25,16 +33,18 @@ export function SkillsClient({
   const [categories, setCategories] = useState(initialCategories);
   const [skills, setSkills] = useState(initialSkills);
 
-  // Skill dialog
+  // Skill dialog (create & edit)
   const [isSkillOpen, setIsSkillOpen] = useState(false);
+  const [editingSkill, setEditingSkill] = useState<any | null>(null);
   const [skillName, setSkillName] = useState("");
   const [skillCategory, setSkillCategory] = useState(categories[0]?.id || "");
   const [skillLevel, setSkillLevel] = useState(85);
   const [skillFeatured, setSkillFeatured] = useState(true);
   const [isSavingSkill, setIsSavingSkill] = useState(false);
 
-  // Category dialog
+  // Category dialog (create & edit)
   const [isCatOpen, setIsCatOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<any | null>(null);
   const [catName, setCatName] = useState("");
   const [isSavingCat, setIsSavingCat] = useState(false);
 
@@ -42,50 +52,113 @@ export function SkillsClient({
   const [deleteTarget, setDeleteTarget] = useState<{ type: "skill" | "category"; id: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleCreateCategory = async (e: React.FormEvent) => {
+  const openCreateCategory = () => {
+    setEditingCategory(null);
+    setCatName("");
+    setIsCatOpen(true);
+  };
+
+  const openEditCategory = (cat: any) => {
+    setEditingCategory(cat);
+    setCatName(cat.name);
+    setIsCatOpen(true);
+  };
+
+  const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!catName.trim()) return;
     setIsSavingCat(true);
     try {
       const slug = catName.toLowerCase().replace(/\s+/g, "-");
-      const res = await createSkillCategory({ name: catName, slug, status: "published" });
-      if (res.success && res.data) {
-        toast.success("Category created");
-        setCategories((prev) => [...prev, res.data]);
-        setCatName("");
-        setIsCatOpen(false);
-        router.refresh();
+      if (editingCategory) {
+        const res = await updateSkillCategory(editingCategory.id, { name: catName, slug });
+        if (res.success) {
+          toast.success("Category updated");
+          setCategories((prev) =>
+            prev.map((c) => (c.id === editingCategory.id ? { ...c, name: catName, slug } : c))
+          );
+          setIsCatOpen(false);
+          setEditingCategory(null);
+          setCatName("");
+          router.refresh();
+        } else {
+          toast.error("Failed to update category", { description: res.error });
+        }
       } else {
-        toast.error("Failed", { description: res.error });
+        const res = await createSkillCategory({ name: catName, slug, status: "published" });
+        if (res.success && res.data) {
+          toast.success("Category created");
+          setCategories((prev) => [...prev, res.data]);
+          setCatName("");
+          setIsCatOpen(false);
+          router.refresh();
+        } else {
+          toast.error("Failed", { description: res.error });
+        }
       }
     } finally {
       setIsSavingCat(false);
     }
   };
 
-  const handleCreateSkill = async (e: React.FormEvent) => {
+  const openCreateSkill = (targetCatId?: string) => {
+    setEditingSkill(null);
+    setSkillName("");
+    setSkillCategory(targetCatId || categories[0]?.id || "");
+    setSkillLevel(85);
+    setSkillFeatured(true);
+    setIsSkillOpen(true);
+  };
+
+  const openEditSkill = (skill: any) => {
+    setEditingSkill(skill);
+    setSkillName(skill.name);
+    setSkillCategory(skill.categoryId || categories[0]?.id || "");
+    setSkillLevel(skill.level || 85);
+    setSkillFeatured(Boolean(skill.isFeatured));
+    setIsSkillOpen(true);
+  };
+
+  const handleSaveSkill = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!skillName.trim()) return;
     setIsSavingSkill(true);
     try {
       const slug = skillName.toLowerCase().replace(/\s+/g, "-");
-      const res = await createSkill({
+      const payload = {
         name: skillName,
         slug,
         categoryId: skillCategory || null,
         level: Number(skillLevel),
         isFeatured: skillFeatured,
-        status: "published",
-      });
+        status: "published" as const,
+      };
 
-      if (res.success && res.data) {
-        toast.success("Skill added to constellation");
-        setSkills((prev) => [...prev, res.data]);
-        setSkillName("");
-        setIsSkillOpen(false);
-        router.refresh();
+      if (editingSkill) {
+        const res = await updateSkill(editingSkill.id, payload);
+        if (res.success) {
+          toast.success("Skill updated");
+          setSkills((prev) =>
+            prev.map((s) => (s.id === editingSkill.id ? { ...s, ...payload } : s))
+          );
+          setIsSkillOpen(false);
+          setEditingSkill(null);
+          setSkillName("");
+          router.refresh();
+        } else {
+          toast.error("Failed to update skill", { description: res.error });
+        }
       } else {
-        toast.error("Failed to add skill", { description: res.error });
+        const res = await createSkill(payload);
+        if (res.success && res.data) {
+          toast.success("Skill added to constellation");
+          setSkills((prev) => [...prev, res.data]);
+          setSkillName("");
+          setIsSkillOpen(false);
+          router.refresh();
+        } else {
+          toast.error("Failed to add skill", { description: res.error });
+        }
       }
     } finally {
       setIsSavingSkill(false);
@@ -116,7 +189,7 @@ export function SkillsClient({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="text-xs text-muted-foreground font-mono">
           {skills.length} skills organized in {categories.length} constellation clusters
         </div>
@@ -124,16 +197,16 @@ export function SkillsClient({
           <Button
             size="sm"
             variant="outline"
-            onClick={() => setIsCatOpen(true)}
-            className="text-xs border-border"
+            onClick={openCreateCategory}
+            className="text-xs border-border rounded-xl"
           >
             <FolderPlus className="w-3.5 h-3.5 mr-1" />
             Add Category
           </Button>
           <Button
             size="sm"
-            onClick={() => setIsSkillOpen(true)}
-            className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs"
+            onClick={() => openCreateSkill()}
+            className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs rounded-xl"
           >
             <Plus className="w-3.5 h-3.5 mr-1" />
             Add Skill
@@ -147,7 +220,7 @@ export function SkillsClient({
           description="Create your first category (e.g. Frontend, Backend, Architecture) to group your skills."
           icon={<Cpu className="w-6 h-6" />}
         >
-          <Button size="sm" onClick={() => setIsCatOpen(true)} className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs">
+          <Button size="sm" onClick={openCreateCategory} className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs rounded-xl">
             Add Category
           </Button>
         </EmptyState>
@@ -156,7 +229,7 @@ export function SkillsClient({
           {categories.map((cat) => {
             const catSkills = skills.filter((s) => s.categoryId === cat.id);
             return (
-              <Card key={cat.id} className="bg-card border-border">
+              <Card key={cat.id} className="bg-card border-border rounded-2xl">
                 <CardHeader className="flex flex-row items-center justify-between pb-3">
                   <div>
                     <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
@@ -167,45 +240,78 @@ export function SkillsClient({
                       {catSkills.length} skills in cluster
                     </CardDescription>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setDeleteTarget({ type: "category", id: cat.id })}
-                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openEditCategory(cat)}
+                      className="h-7 w-7 text-muted-foreground hover:text-cyan-400 rounded-lg"
+                      title="Edit Category"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setDeleteTarget({ type: "category", id: cat.id })}
+                      className="h-7 w-7 text-muted-foreground hover:text-destructive rounded-lg"
+                      title="Delete Category"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
                 </CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent className="space-y-3">
                   {catSkills.length === 0 ? (
-                    <p className="text-xs text-muted-foreground italic py-2">No skills in this category yet.</p>
+                    <div className="py-5 text-center rounded-xl border border-dashed border-border/70 bg-muted/20 space-y-2.5 p-4">
+                      <p className="text-xs text-muted-foreground italic">No skills in this category yet.</p>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openCreateSkill(cat.id)}
+                        className="text-xs h-8 rounded-xl border-border hover:bg-muted"
+                      >
+                        <Plus className="w-3.5 h-3.5 mr-1 text-cyan-400" />
+                        Add Skill to this Category
+                      </Button>
+                    </div>
                   ) : (
                     <div className="divide-y divide-border/40">
                       {catSkills.map((skill) => (
-                        <div key={skill.id} className="py-2 flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-medium text-zinc-200">{skill.name}</span>
+                        <div key={skill.id} className="py-2.5 flex items-center justify-between gap-3 group">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-xs font-medium text-zinc-200 truncate">{skill.name}</span>
                             {skill.isFeatured && (
                               <span title="Featured in 3D Constellation">
-                                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                <Star className="w-3 h-3 fill-amber-400 text-amber-400 shrink-0" />
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-3">
-                            <div className="w-24 bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+                          <div className="flex items-center gap-2 shrink-0">
+                            <div className="w-20 sm:w-24 bg-zinc-800 rounded-full h-1.5 overflow-hidden">
                               <div
                                 className="bg-gradient-to-r from-cyan-500 to-violet-500 h-full rounded-full"
                                 style={{ width: `${skill.level}%` }}
                               />
                             </div>
-                            <span className="text-[11px] font-mono text-muted-foreground w-8 text-right">
+                            <span className="text-[11px] font-mono text-muted-foreground w-7 text-right">
                               {skill.level}%
                             </span>
                             <Button
                               variant="ghost"
                               size="icon"
+                              onClick={() => openEditSkill(skill)}
+                              className="h-6 w-6 text-muted-foreground hover:text-cyan-400 rounded-md"
+                              title="Edit Skill"
+                            >
+                              <Edit2 className="w-3 h-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               onClick={() => setDeleteTarget({ type: "skill", id: skill.id })}
-                              className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                              className="h-6 w-6 text-muted-foreground hover:text-destructive rounded-md"
+                              title="Delete Skill"
                             >
                               <Trash2 className="w-3 h-3" />
                             </Button>
@@ -221,13 +327,15 @@ export function SkillsClient({
         </div>
       )}
 
-      {/* Add Category Dialog */}
+      {/* Add / Edit Category Dialog */}
       <Dialog open={isCatOpen} onOpenChange={setIsCatOpen}>
-        <DialogContent className="bg-card border-border">
+        <DialogContent className="bg-card border-border rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-white">Add Skill Category</DialogTitle>
+            <DialogTitle className="text-white">
+              {editingCategory ? "Edit Skill Category" : "Add Skill Category"}
+            </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleCreateCategory} className="space-y-4">
+          <form onSubmit={handleSaveCategory} className="space-y-4">
             <div className="space-y-2">
               <Label className="text-xs text-zinc-300">Category Name</Label>
               <Input
@@ -237,25 +345,27 @@ export function SkillsClient({
               />
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCatOpen(false)} className="text-xs border-border">
+              <Button type="button" variant="outline" onClick={() => setIsCatOpen(false)} className="text-xs border-border rounded-xl">
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSavingCat} className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs">
+              <Button type="submit" disabled={isSavingCat} className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs rounded-xl">
                 {isSavingCat && <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />}
-                Create Category
+                {editingCategory ? "Update Category" : "Create Category"}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Add Skill Dialog */}
+      {/* Add / Edit Skill Dialog */}
       <Dialog open={isSkillOpen} onOpenChange={setIsSkillOpen}>
-        <DialogContent className="bg-card border-border">
+        <DialogContent className="bg-card border-border rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-white">Add Skill to Universe</DialogTitle>
+            <DialogTitle className="text-white">
+              {editingSkill ? "Edit Skill" : "Add Skill to Universe"}
+            </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleCreateSkill} className="space-y-4">
+          <form onSubmit={handleSaveSkill} className="space-y-4">
             <div className="space-y-2">
               <Label className="text-xs text-zinc-300">Skill Name</Label>
               <Input
@@ -268,10 +378,10 @@ export function SkillsClient({
             <div className="space-y-2">
               <Label className="text-xs text-zinc-300">Category Cluster</Label>
               <Select value={skillCategory} onValueChange={setSkillCategory}>
-                <SelectTrigger className="bg-background/50 border-border">
+                <SelectTrigger className="bg-background/50 border-border rounded-xl">
                   <SelectValue placeholder="Select cluster" />
                 </SelectTrigger>
-                <SelectContent className="bg-card border-border">
+                <SelectContent className="bg-card border-border rounded-xl">
                   {categories.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
                       {c.name}
@@ -295,26 +405,27 @@ export function SkillsClient({
               />
             </div>
 
-            <div className="flex items-center gap-2 pt-2">
-              <input
-                type="checkbox"
-                id="featured"
-                checked={skillFeatured}
-                onChange={(e) => setSkillFeatured(e.target.checked)}
-                className="rounded border-border accent-cyan-400"
-              />
-              <Label htmlFor="featured" className="text-xs text-zinc-300 cursor-pointer">
-                Feature prominently in 3D Constellation
-              </Label>
+            <div className="pt-2">
+              <Label className="text-xs text-zinc-300 block mb-2">Display Prominence</Label>
+              <Toggle
+                pressed={skillFeatured}
+                onPressedChange={setSkillFeatured}
+                variant="sky"
+                size="sm"
+                className="font-mono text-xs w-full justify-center"
+              >
+                <Star className="w-3.5 h-3.5 mr-1.5" />
+                {skillFeatured ? "Featured in 3D Constellation" : "Standard Skill"}
+              </Toggle>
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsSkillOpen(false)} className="text-xs border-border">
+              <Button type="button" variant="outline" onClick={() => setIsSkillOpen(false)} className="text-xs border-border rounded-xl">
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSavingSkill} className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs">
+              <Button type="submit" disabled={isSavingSkill} className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs rounded-xl">
                 {isSavingSkill && <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />}
-                Add Skill
+                {editingSkill ? "Save Changes" : "Add Skill"}
               </Button>
             </DialogFooter>
           </form>

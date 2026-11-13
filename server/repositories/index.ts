@@ -36,11 +36,17 @@ export const ProfileRepository = {
   async upsert(data: any) {
     try {
       const { id: _ignored, ...cleanData } = data;
-      const existing = await this.getFirst();
-      if (existing && existing.id && isUUID(existing.id) && existing.id !== fallbackProfile.id) {
-        return await db.update(schema.profile).set({ ...cleanData, updatedAt: new Date() }).where(eq(schema.profile.id, existing.id));
+      const [existingRow] = await db.select().from(schema.profile).limit(1);
+      if (existingRow) {
+        const [updated] = await db
+          .update(schema.profile)
+          .set({ ...cleanData, updatedAt: new Date() })
+          .where(eq(schema.profile.id, existingRow.id))
+          .returning();
+        return updated;
       }
-      return await db.insert(schema.profile).values(cleanData);
+      const [inserted] = await db.insert(schema.profile).values(cleanData).returning();
+      return inserted;
     } catch (err) {
       console.warn("[ProfileRepository.upsert] DB update bypassed or failed:", err);
       return null;
@@ -175,6 +181,40 @@ export const SkillRepository = {
       return { ...data, id: "cat-" + Date.now() };
     }
   },
+  async updateCategory(id: string, data: any) {
+    try {
+      const { id: _ignored, ...cleanData } = data;
+      const updateData = { ...cleanData, updatedAt: new Date() };
+      if (isUUID(id)) {
+        const [existing] = await db.select().from(schema.skillCategories).where(eq(schema.skillCategories.id, id)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.skillCategories).set(updateData).where(eq(schema.skillCategories.id, id)).returning();
+          return updated;
+        }
+      }
+      const cleanSlug = id.replace(/^cat-/, "");
+      const [existingSlug] = await db
+        .select()
+        .from(schema.skillCategories)
+        .where(or(eq(schema.skillCategories.slug, id), eq(schema.skillCategories.slug, cleanSlug)))
+        .limit(1);
+      if (existingSlug) {
+        const [updated] = await db.update(schema.skillCategories).set(updateData).where(eq(schema.skillCategories.id, existingSlug.id)).returning();
+        return updated;
+      }
+      const [created] = await db.insert(schema.skillCategories).values({
+        name: cleanData.name || "Category",
+        slug: cleanData.slug || cleanSlug,
+        status: cleanData.status || "published",
+        sortOrder: typeof cleanData.sortOrder === "number" ? cleanData.sortOrder : 0,
+        updatedAt: new Date(),
+      }).returning();
+      return created;
+    } catch (err) {
+      console.warn("[SkillRepository.updateCategory] Error:", err);
+      return { ...data, id };
+    }
+  },
   async deleteCategory(id: string) {
     try {
       if (isUUID(id)) {
@@ -226,6 +266,47 @@ export const SkillRepository = {
     } catch (err) {
       console.warn("[SkillRepository.createSkill] Error:", err);
       return { ...data, id: "sk-" + Date.now() };
+    }
+  },
+  async updateSkill(id: string, data: any) {
+    try {
+      const { id: _ignored, ...cleanData } = data;
+      const safeData = {
+        ...cleanData,
+        categoryId: isUUID(data?.categoryId) ? data.categoryId : null,
+        updatedAt: new Date(),
+      };
+      if (isUUID(id)) {
+        const [existing] = await db.select().from(schema.skills).where(eq(schema.skills.id, id)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.skills).set(safeData).where(eq(schema.skills.id, id)).returning();
+          return updated;
+        }
+      }
+      const cleanSlug = id.replace(/^sk-/, "");
+      const [existingSlug] = await db
+        .select()
+        .from(schema.skills)
+        .where(or(eq(schema.skills.slug, id), eq(schema.skills.slug, cleanSlug)))
+        .limit(1);
+      if (existingSlug) {
+        const [updated] = await db.update(schema.skills).set(safeData).where(eq(schema.skills.id, existingSlug.id)).returning();
+        return updated;
+      }
+      const [created] = await db.insert(schema.skills).values({
+        name: cleanData.name || "New Skill",
+        slug: cleanData.slug || cleanSlug,
+        level: typeof cleanData.level === "number" ? cleanData.level : 85,
+        categoryId: safeData.categoryId,
+        isFeatured: typeof cleanData.isFeatured === "boolean" ? cleanData.isFeatured : true,
+        status: cleanData.status || "published",
+        sortOrder: typeof cleanData.sortOrder === "number" ? cleanData.sortOrder : 0,
+        updatedAt: new Date(),
+      }).returning();
+      return created;
+    } catch (err) {
+      console.warn("[SkillRepository.updateSkill] Error:", err);
+      return { ...data, id };
     }
   },
   async deleteSkill(id: string) {
@@ -700,11 +781,46 @@ export const NavigationRepository = {
   },
   async update(id: string, data: any) {
     try {
+      const { id: _ignored, ...cleanData } = data;
+      const updateData = { ...cleanData, updatedAt: new Date() };
       if (isUUID(id)) {
-        const [updated] = await db.update(schema.navigation).set({ ...data, updatedAt: new Date() }).where(eq(schema.navigation.id, id)).returning();
-        return updated;
+        const [existing] = await db.select().from(schema.navigation).where(eq(schema.navigation.id, id)).limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.navigation).set(updateData).where(eq(schema.navigation.id, id)).returning();
+          return updated;
+        }
       }
-      return null;
+      if (data.href || data.label) {
+        const [existing] = await db
+          .select()
+          .from(schema.navigation)
+          .where(
+            or(
+              data.href ? eq(schema.navigation.href, data.href) : undefined,
+              data.label ? eq(schema.navigation.label, data.label) : undefined
+            )
+          )
+          .limit(1);
+        if (existing) {
+          const [updated] = await db.update(schema.navigation).set(updateData).where(eq(schema.navigation.id, existing.id)).returning();
+          return updated;
+        }
+      }
+      const [created] = await db.insert(schema.navigation).values({
+        label: cleanData.label || "Link",
+        href: cleanData.href || "#",
+        icon: cleanData.icon || null,
+        color: cleanData.color || null,
+        badge: cleanData.badge || null,
+        style: cleanData.style || "default",
+        isExternal: Boolean(cleanData.isExternal || cleanData.target === "_blank"),
+        sortOrder: typeof cleanData.sortOrder === "number" ? cleanData.sortOrder : 0,
+        isActive: typeof cleanData.isActive === "boolean" ? cleanData.isActive : true,
+        status: cleanData.status || "published",
+        group: cleanData.group || "main",
+        updatedAt: new Date(),
+      }).returning();
+      return created;
     } catch (err) {
       console.warn("[NavigationRepository.update] Error:", err);
       return { ...data, id };
@@ -715,7 +831,14 @@ export const NavigationRepository = {
       if (isUUID(id)) {
         return await db.delete(schema.navigation).where(eq(schema.navigation.id, id));
       }
-      return null;
+      const cleanLabel = id.replace(/^nav-/, "");
+      return await db.delete(schema.navigation).where(
+        or(
+          eq(schema.navigation.label, cleanLabel),
+          eq(schema.navigation.href, `#${cleanLabel}`),
+          eq(schema.navigation.href, `/${cleanLabel}`)
+        )
+      );
     } catch (err) {
       console.warn("[NavigationRepository.delete] Error:", err);
       return null;
@@ -791,15 +914,53 @@ export const SectionRepository = {
   },
   async update(id: string, data: any) {
     try {
+      const { id: _ignored, ...cleanData } = data;
+      const updateData = { ...cleanData, updatedAt: new Date() };
       if (isUUID(id)) {
-        const [updated] = await db
-          .update(schema.websiteSections)
-          .set({ ...data, updatedAt: new Date() })
-          .where(eq(schema.websiteSections.id, id))
-          .returning();
-        return updated;
+        const [existing] = await db.select().from(schema.websiteSections).where(eq(schema.websiteSections.id, id)).limit(1);
+        if (existing) {
+          const [updated] = await db
+            .update(schema.websiteSections)
+            .set(updateData)
+            .where(eq(schema.websiteSections.id, id))
+            .returning();
+          return updated;
+        }
       }
-      return null;
+      const keyToMatch = data.sectionKey || (id.startsWith("sec-") ? id.replace(/^sec-/, "") : id);
+      if (keyToMatch) {
+        const [existing] = await db
+          .select()
+          .from(schema.websiteSections)
+          .where(eq(schema.websiteSections.sectionKey, keyToMatch))
+          .limit(1);
+        if (existing) {
+          const [updated] = await db
+            .update(schema.websiteSections)
+            .set(updateData)
+            .where(eq(schema.websiteSections.id, existing.id))
+            .returning();
+          return updated;
+        }
+      }
+      const [created] = await db
+        .insert(schema.websiteSections)
+        .values({
+          sectionKey: keyToMatch || "section",
+          title: cleanData.title || "Section",
+          subtitle: cleanData.subtitle || null,
+          badge: cleanData.badge || null,
+          description: cleanData.description || null,
+          content: cleanData.content || null,
+          componentType: cleanData.componentType || keyToMatch || "custom",
+          sortOrder: typeof cleanData.sortOrder === "number" ? cleanData.sortOrder : 0,
+          status: cleanData.status || "published",
+          styles: cleanData.styles || null,
+          metadata: cleanData.metadata || null,
+          updatedAt: new Date(),
+        })
+        .returning();
+      return created;
     } catch (err) {
       console.warn("[SectionRepository.update] Error:", err);
       return { ...data, id };
@@ -834,7 +995,10 @@ export const SectionRepository = {
       if (isUUID(id)) {
         return await db.delete(schema.websiteSections).where(eq(schema.websiteSections.id, id));
       }
-      return null;
+      const cleanKey = id.replace(/^sec-/, "");
+      return await db.delete(schema.websiteSections).where(
+        or(eq(schema.websiteSections.sectionKey, id), eq(schema.websiteSections.sectionKey, cleanKey))
+      );
     } catch (err) {
       console.warn("[SectionRepository.delete] Error:", err);
       return null;

@@ -7,9 +7,6 @@ import { createRemoteJWKSet } from "jose";
 import WebSocket from "ws";
 
 async function runNeonEndToEndTests() {
-  console.log("=================================================");
-  console.log("   NEON CLOUD SUITE END-TO-END VERIFICATION      ");
-  console.log("=================================================\n");
 
   let allPassed = true;
 
@@ -32,9 +29,9 @@ async function runNeonEndToEndTests() {
     console.log(`  ✓ DATABASE: ${res.rows[0].db_name}`);
     console.log(`  ✓ SEEDED PROJECTS: ${countRes.rows[0].project_count}`);
     console.log("  [PASS] Neon Postgres is 100% operational.\n");
-  } catch (err: any) {
+  } catch (err: unknown) {
     allPassed = false;
-    console.error("  ✗ [FAIL] Neon Postgres Error:", err.message, "\n");
+    console.error("  ✗ [FAIL] Neon Postgres Error:", err instanceof Error ? err.message : String(err), "\n");
   }
 
   // 2. TEST NEON AUTH
@@ -58,9 +55,9 @@ async function runNeonEndToEndTests() {
     console.log(`  ✓ ALGORITHM: ${jwks.keys?.[0]?.alg || "EdDSA"} (${jwks.keys?.[0]?.crv || "Ed25519"})`);
     console.log(`  ✓ KEY ID: ${jwks.keys?.[0]?.kid}`);
     console.log("  [PASS] Neon Auth is 100% operational.\n");
-  } catch (err: any) {
+  } catch (err: unknown) {
     allPassed = false;
-    console.error("  ✗ [FAIL] Neon Auth Error:", err.message, "\n");
+    console.error("  ✗ [FAIL] Neon Auth Error:", err instanceof Error ? err.message : String(err), "\n");
   }
 
   // 3. TEST NEON OBJECT STORAGE
@@ -115,9 +112,9 @@ async function runNeonEndToEndTests() {
     );
     console.log(`  ✓ CLEANUP: Deleted test object '${testKey}'`);
     console.log("  [PASS] Neon Object Storage is 100% operational.\n");
-  } catch (err: any) {
+  } catch (err: unknown) {
     allPassed = false;
-    console.error("  ✗ [FAIL] Neon Object Storage Error:", err.message, "\n");
+    console.error("  ✗ [FAIL] Neon Object Storage Error:", err instanceof Error ? err.message : String(err), "\n");
   }
 
   // 4. TEST NEON REALTIME
@@ -127,7 +124,7 @@ async function runNeonEndToEndTests() {
     if (!rtUrl) throw new Error("NEON_REALTIME_URL is not set");
 
     const rtStart = Date.now();
-    await new Promise<void>((resolve, _reject) => {
+    await new Promise<void>((resolve) => {
       const headers: Record<string, string> = {};
       if (process.env.NEON_REALTIME_SECRET) {
         headers["Authorization"] = `Bearer ${process.env.NEON_REALTIME_SECRET}`;
@@ -138,15 +135,13 @@ async function runNeonEndToEndTests() {
         try {
           ws.terminate();
         } catch {}
-        console.log(`  ✓ STATUS: WebSocket protocol reached (${Date.now() - rtStart}ms)`);
-        console.log(`  ✓ ENDPOINT: ${rtUrl}`);
+        console.log(`  ✓ STATUS: WebSocket protocol reached (${Date.now() - rtStart}ms), ✓ ENDPOINT: ${rtUrl}`);
         resolve();
       }, 3000);
 
       ws.on("open", () => {
         clearTimeout(timer);
-        console.log(`  ✓ STATUS: WebSocket connection opened (${Date.now() - rtStart}ms)`);
-        console.log(`  ✓ ENDPOINT: ${rtUrl}`);
+        console.log(`  ✓ STATUS: WebSocket connection opened (${Date.now() - rtStart}ms), ✓ ENDPOINT: ${rtUrl}`);
         try {
           ws.close();
         } catch {}
@@ -156,26 +151,22 @@ async function runNeonEndToEndTests() {
       ws.on("error", (err) => {
         clearTimeout(timer);
         // Connection reachability confirmation
-        console.log(`  ✓ STATUS: WebSocket server reachable (${Date.now() - rtStart}ms) - Handshake confirmed: ${err.message}`);
-        console.log(`  ✓ ENDPOINT: ${rtUrl}`);
+        console.log(`  ✓ STATUS: WebSocket server reachable (${Date.now() - rtStart}ms) - Handshake confirmed: ${err.message}, ✓ ENDPOINT: ${rtUrl}`);
         resolve();
       });
     });
 
     console.log("  [PASS] Neon Realtime is 100% operational.\n");
-  } catch (err: any) {
+  } catch (err: unknown) {
     allPassed = false;
-    console.error("  ✗ [FAIL] Neon Realtime Error:", err.message, "\n");
+    console.error("  ✗ [FAIL] Neon Realtime Error:", err instanceof Error ? err.message : String(err), "\n");
   }
 
-  console.log("=================================================");
   if (allPassed) {
     console.log("🎉 ALL 4 NEON SERVICES VERIFIED END-TO-END! (100% SUCCESS)");
-    console.log("=================================================");
     process.exit(0);
   } else {
     console.log("⚠️ SOME SERVICES FAILED VERIFICATION");
-    console.log("=================================================");
     process.exit(1);
   }
 }

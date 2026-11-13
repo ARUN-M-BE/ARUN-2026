@@ -21,7 +21,7 @@ interface __BaseEnv_CloudflareEnv {
 }
 
 declare namespace Cloudflare {
-  interface Env extends __BaseEnv_CloudflareEnv {}
+  type Env = __BaseEnv_CloudflareEnv;
 }
 
-interface CloudflareEnv extends __BaseEnv_CloudflareEnv {}
+type CloudflareEnv = __BaseEnv_CloudflareEnv;

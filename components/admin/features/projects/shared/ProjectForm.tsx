@@ -12,8 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Loader2, ArrowLeft, Save, Plus, Trash2 } from "lucide-react";
+import { Toggle } from "@/components/ui/toggle";
+import { Loader2, ArrowLeft, Save, Plus, Trash2, Star } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import type { Status } from "@/types";
@@ -31,7 +31,11 @@ export function ProjectForm({ initialData, isEditing = false }: ProjectFormProps
   );
   const [newGalleryUrl, setNewGalleryUrl] = useState("");
   const [galleryImages, setGalleryImages] = useState<string[]>(
-    Array.isArray(initialData?.images) ? initialData.images : []
+    (Array.isArray(initialData?.images) && initialData.images.length > 0
+      ? initialData.images
+      : Array.isArray(initialData?.galleryImages)
+      ? initialData.galleryImages
+      : [])
   );
 
   const {
@@ -47,8 +51,12 @@ export function ProjectForm({ initialData, isEditing = false }: ProjectFormProps
       slug: initialData?.slug || "",
       shortDescription: initialData?.shortDescription || "",
       description: initialData?.description || "",
-      thumbnail: initialData?.thumbnail || "",
-      images: initialData?.images || [],
+      thumbnail: initialData?.thumbnail || initialData?.thumbnailUrl || "",
+      images: (Array.isArray(initialData?.images) && initialData.images.length > 0
+        ? initialData.images
+        : Array.isArray(initialData?.galleryImages)
+        ? initialData.galleryImages
+        : []) as string[],
       liveUrl: initialData?.liveUrl || "",
       githubUrl: initialData?.githubUrl || "",
       techStack: initialData?.techStack || [],
@@ -322,10 +330,16 @@ export function ProjectForm({ initialData, isEditing = false }: ProjectFormProps
                 <Label className="text-xs font-medium text-foreground">Featured Project</Label>
                 <p className="text-[11px] text-muted-foreground">Highlight prominently on portfolio home</p>
               </div>
-              <Switch
-                checked={watch("isFeatured")}
-                onCheckedChange={(checked) => setValue("isFeatured", checked)}
-              />
+              <Toggle
+                pressed={watch("isFeatured")}
+                onPressedChange={(checked) => setValue("isFeatured", checked)}
+                variant="amber"
+                size="sm"
+                className="font-mono text-xs"
+              >
+                <Star className="w-3.5 h-3.5 mr-1" />
+                {watch("isFeatured") ? "Featured" : "Standard"}
+              </Toggle>
             </div>
           </div>
         </CardContent>

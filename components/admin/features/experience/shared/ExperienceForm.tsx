@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { Toggle } from "@/components/ui/toggle";
 import { Loader2, ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -137,12 +137,17 @@ export function ExperienceForm({ initialData, isEditing = false }: { initialData
               <Input type="date" disabled={watch("isCurrent")} {...register("endDate")} />
             </div>
 
-            <div className="flex items-center gap-3 pt-6">
-              <Switch
-                checked={watch("isCurrent")}
-                onCheckedChange={(checked) => setValue("isCurrent", checked)}
-              />
-              <Label className="text-xs font-medium text-zinc-300">Currently Working Here</Label>
+            <div className="flex items-center gap-2.5 pt-6">
+              <Toggle
+                pressed={watch("isCurrent")}
+                onPressedChange={(checked) => setValue("isCurrent", checked)}
+                variant="sky"
+                size="sm"
+                className="font-mono text-xs"
+              >
+                {watch("isCurrent") ? "● Current Role" : "Past Role"}
+              </Toggle>
+              <Label className="text-xs font-medium text-zinc-300">Currently Active</Label>
             </div>
           </div>
 

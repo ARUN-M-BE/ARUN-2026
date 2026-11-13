@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { StatusBadge } from "@/components/admin/status-badge";
 import { DeleteDialog } from "@/components/admin/delete-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle";
 import { deleteProject } from "@/lib/actions";
 import {
   Edit2,
@@ -75,7 +76,9 @@ export function ProjectListClient({ initialData }: { initialData: Project[] }) {
 
   const openDetailModal = (proj: Project) => {
     setDetailProject(proj);
-    const firstImg = proj.thumbnail || (Array.isArray(proj.images) && proj.images.length > 0 ? proj.images[0] : null);
+    const cover = proj.thumbnail || proj.thumbnailUrl;
+    const galleryList = (Array.isArray(proj.images) && proj.images.length > 0 ? proj.images : proj.galleryImages) || [];
+    const firstImg = cover || (galleryList.length > 0 ? galleryList[0] : null);
     setActiveGalleryImg(firstImg);
   };
 
@@ -114,28 +117,33 @@ export function ProjectListClient({ initialData }: { initialData: Project[] }) {
 
         <div className="flex items-center gap-2 shrink-0">
           {/* View mode toggle */}
-          <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border/50">
-            <button
-              type="button"
-              onClick={() => setViewMode("grid")}
-              className={`p-1.5 rounded-lg transition-colors ${
-                viewMode === "grid" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-              }`}
+          <ToggleGroup
+            type="single"
+            value={viewMode}
+            onValueChange={(val) => {
+              if (val === "grid" || val === "list") setViewMode(val);
+            }}
+            className="p-1 bg-muted/40 rounded-xl border border-border/50"
+          >
+            <ToggleGroupItem
+              value="grid"
+              size="icon-sm"
+              variant={viewMode === "grid" ? "primary" : "ghost"}
               title="Grid View"
+              aria-label="Grid View"
             >
               <LayoutGrid className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode("list")}
-              className={`p-1.5 rounded-lg transition-colors ${
-                viewMode === "list" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-              }`}
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="list"
+              size="icon-sm"
+              variant={viewMode === "list" ? "primary" : "ghost"}
               title="List View"
+              aria-label="List View"
             >
               <List className="w-4 h-4" />
-            </button>
-          </div>
+            </ToggleGroupItem>
+          </ToggleGroup>
 
           <Link href="/admin/projects/new">
             <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs shadow-sm">
@@ -164,7 +172,8 @@ export function ProjectListClient({ initialData }: { initialData: Project[] }) {
         /* ── Grid View ────────────────────────────────── */
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filtered.map((project) => {
-            const hasCover = Boolean(project.thumbnail);
+            const coverUrl = project.thumbnail || project.thumbnailUrl;
+            const hasCover = Boolean(coverUrl);
             const techList = (project.techStack as string[]) || [];
 
             return (
@@ -181,7 +190,7 @@ export function ProjectListClient({ initialData }: { initialData: Project[] }) {
                     {hasCover ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={project.thumbnail!}
+                        src={coverUrl!}
                         alt={project.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -318,22 +327,24 @@ export function ProjectListClient({ initialData }: { initialData: Project[] }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((project) => (
-                <TableRow key={project.id} className="border-border hover:bg-muted/20 transition-colors">
-                  <TableCell className="py-3">
-                    <div className="flex items-center gap-3">
-                      {project.thumbnail ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={project.thumbnail}
-                          alt={project.title}
-                          className="w-10 h-10 rounded-xl object-cover border border-border shrink-0"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center text-muted-foreground shrink-0">
-                          <FolderGit2 className="w-4 h-4" />
-                        </div>
-                      )}
+              {filtered.map((project) => {
+                const tableThumb = project.thumbnail || project.thumbnailUrl;
+                return (
+                  <TableRow key={project.id} className="border-border hover:bg-muted/20 transition-colors">
+                    <TableCell className="py-3">
+                      <div className="flex items-center gap-3">
+                        {tableThumb ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={tableThumb}
+                            alt={project.title}
+                            className="w-10 h-10 rounded-xl object-cover border border-border shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center text-muted-foreground shrink-0">
+                            <FolderGit2 className="w-4 h-4" />
+                          </div>
+                        )}
                       <div>
                         <span
                           onClick={() => openDetailModal(project)}
@@ -397,7 +408,8 @@ export function ProjectListClient({ initialData }: { initialData: Project[] }) {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              );
+            })}
             </TableBody>
           </Table>
         </div>
@@ -440,28 +452,32 @@ export function ProjectListClient({ initialData }: { initialData: Project[] }) {
               )}
 
               {/* Gallery Thumbnails */}
-              {Array.isArray(detailProject.images) && detailProject.images.length > 0 && (
-                <div className="space-y-1.5">
-                  <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
-                    Gallery Snapshots ({detailProject.images.length})
-                  </span>
-                  <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                    {detailProject.images.map((imgUrl, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => setActiveGalleryImg(imgUrl)}
-                        className={`w-16 h-12 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
-                          activeGalleryImg === imgUrl ? "border-primary scale-105 shadow-sm" : "border-border opacity-70 hover:opacity-100"
-                        }`}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={imgUrl} alt="" className="w-full h-full object-cover" />
-                      </button>
-                    ))}
+              {(() => {
+                const galleryList = (Array.isArray(detailProject.images) && detailProject.images.length > 0 ? detailProject.images : detailProject.galleryImages) || [];
+                if (galleryList.length === 0) return null;
+                return (
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
+                      Gallery Snapshots ({galleryList.length})
+                    </span>
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                      {galleryList.map((imgUrl, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setActiveGalleryImg(imgUrl)}
+                          className={`w-16 h-12 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
+                            activeGalleryImg === imgUrl ? "border-primary scale-105 shadow-sm" : "border-border opacity-70 hover:opacity-100"
+                          }`}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={imgUrl} alt="" className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* Case Study Details */}
               {detailProject.description && (

@@ -90,6 +90,12 @@ export const SkillController = {
     if (!parsed.success) return { success: false, error: parsed.error.errors[0]?.message };
     return SkillService.createCategory(user.id, parsed.data);
   },
+  async updateCategory(id: string, formData: unknown): Promise<ActionResult> {
+    const user = await requireUser();
+    const parsed = skillCategorySchema.partial().safeParse(formData);
+    if (!parsed.success) return { success: false, error: parsed.error.errors[0]?.message };
+    return SkillService.updateCategory(user.id, id, parsed.data);
+  },
   async deleteCategory(id: string): Promise<ActionResult> {
     const user = await requireUser();
     return SkillService.deleteCategory(user.id, id);
@@ -105,6 +111,12 @@ export const SkillController = {
     const parsed = skillSchema.safeParse(formData);
     if (!parsed.success) return { success: false, error: parsed.error.errors[0]?.message };
     return SkillService.createSkill(user.id, parsed.data);
+  },
+  async updateSkill(id: string, formData: unknown): Promise<ActionResult> {
+    const user = await requireUser();
+    const parsed = skillSchema.partial().safeParse(formData);
+    if (!parsed.success) return { success: false, error: parsed.error.errors[0]?.message };
+    return SkillService.updateSkill(user.id, id, parsed.data);
   },
   async deleteSkill(id: string): Promise<ActionResult> {
     const user = await requireUser();
