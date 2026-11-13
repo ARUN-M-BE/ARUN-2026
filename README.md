@@ -161,3 +161,12 @@ Visit:
 - **DPDP Act 2023:** Consent is captured and stored with explicit timestamps for every contact submission and cookie choice.
 - **IT Act 2000:** Clear disclosures and contact points for grievance redressal.
 - **WCAG 2.2 AA:** Accessible forms, keyboard focus outlines, image alt tags, and native support for `prefers-reduced-motion`.
+
+---
+
+## License & Ownership
+
+Copyright (c) 2026 Arun M ([https://arun-m.in](https://arun-m.in)). All rights reserved.
+
+This repository and its entire contents (code, designs, architecture, and assets) are proprietary and confidential. Unauthorized copying, modification, redistribution, sublicensing, or hosting of this repository or any part of it, commercially or non-commercially, is strictly prohibited without prior written permission from Arun M ([https://arun-m.in](https://arun-m.in)).
+
