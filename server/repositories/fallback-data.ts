@@ -180,31 +180,44 @@ export const fallbackExperiences = [
   },
 ];
 
-export const fallbackEducation = [
+import type { Education, Certification, Testimonial } from "@/types";
+
+export const fallbackEducation: Education[] = [
   {
     id: "edu-btech",
     institution: "National Institute of Technology",
     degree: "Bachelor of Technology in Computer Science & Engineering",
     field: "Computer Science & Distributed Systems",
     location: "India",
+    description: "Graduated with Honors. Specialized in distributed operating systems, relational database theory, algorithms, and cryptographic computing.",
+    grade: "First Class with Distinction",
+    logo: null,
+    url: null,
     startDate: new Date("2016-08-01"),
     endDate: new Date("2020-05-30"),
     isCurrent: false,
-    description: "Graduated with Honors. Specialized in distributed operating systems, relational database theory, algorithms, and cryptographic computing.",
+    sortOrder: 1,
     status: "published",
+    createdAt: new Date("2020-05-30"),
+    updatedAt: new Date("2026-01-01"),
   },
 ];
 
-export const fallbackCertifications = [
+export const fallbackCertifications: Certification[] = [
   {
     id: "cert-aws",
     name: "AWS Certified Solutions Architect - Professional",
     issuer: "Amazon Web Services",
     credentialId: "AWS-PSA-98421",
     credentialUrl: "https://aws.amazon.com",
+    image: null,
     issueDate: new Date("2023-04-15"),
+    expiryDate: new Date("2026-04-15"),
     isFeatured: true,
+    sortOrder: 1,
     status: "published",
+    createdAt: new Date("2023-04-15"),
+    updatedAt: new Date("2026-01-01"),
   },
   {
     id: "cert-cka",
@@ -212,23 +225,33 @@ export const fallbackCertifications = [
     issuer: "Cloud Native Computing Foundation (CNCF)",
     credentialId: "CKA-77412",
     credentialUrl: "https://www.cncf.io",
+    image: null,
     issueDate: new Date("2022-09-10"),
+    expiryDate: new Date("2025-09-10"),
     isFeatured: true,
+    sortOrder: 2,
     status: "published",
+    createdAt: new Date("2022-09-10"),
+    updatedAt: new Date("2026-01-01"),
   },
 ];
 
-export const fallbackTestimonials = [
+export const fallbackTestimonials: Testimonial[] = [
   {
     id: "test-david",
     name: "David Vance",
     title: "VP of Engineering",
     company: "FinTech Scaleup",
     content: "Arun is a phenomenal software architect. His rare ability to combine deeply resilient backend systems with jaw-dropping 3D interactive frontends elevated our flagship platform beyond expectations.",
-    rating: 5,
-    isFeatured: true,
-    status: "published",
     avatar: "/avatars/david.jpg",
+    rating: 5,
+    projectId: null,
+    isFeatured: true,
+    isVerified: true,
+    sortOrder: 1,
+    status: "published",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2026-01-01"),
   },
   {
     id: "test-elena",
@@ -236,10 +259,15 @@ export const fallbackTestimonials = [
     title: "Chief Product Officer",
     company: "Spatial Analytics Lab",
     content: "Working with Arun transformed our user experience. He delivered a high-performance WebGL digital twin interface with 60 FPS performance and flawless mobile responsiveness.",
-    rating: 5,
-    isFeatured: true,
-    status: "published",
     avatar: "/avatars/elena.jpg",
+    rating: 5,
+    projectId: null,
+    isFeatured: true,
+    isVerified: true,
+    sortOrder: 2,
+    status: "published",
+    createdAt: new Date("2025-02-01"),
+    updatedAt: new Date("2026-01-01"),
   },
 ];
 

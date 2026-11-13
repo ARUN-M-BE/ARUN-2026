@@ -8,7 +8,6 @@ import {
   ServiceRepository,
   TestimonialRepository,
   MessageRepository,
-  NavigationRepository,
   SettingsRepository,
   LegalRepository,
   MediaRepository,

@@ -5,8 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import {
   Activity,
-  ArrowUpRight,
-  Clock,
   Globe,
   PieChart as PieChartIcon,
   Play,
@@ -14,10 +12,8 @@ import {
   Radio,
   Server,
   TrendingUp,
-  Users,
   Zap,
   BarChart3,
-  Layers,
 } from "lucide-react";
 
 type TimeRange = "1s" | "1m" | "1h" | "24h" | "7d" | "30d" | "1y";

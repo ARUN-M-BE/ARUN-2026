@@ -9,26 +9,27 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { upsertSeoMetadata } from "@/lib/actions";
-import { Loader2, Save, Search, Sparkles } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
+import type { SeoMetadata } from "@/types";
 
-export function SeoClient({ initialMetadata }: { initialMetadata: any[] }) {
+export function SeoClient({ initialMetadata }: { initialMetadata: SeoMetadata[] }) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
 
-  const homeSeo = initialMetadata.find((m) => m.page === "home") || {};
+  const homeSeo = initialMetadata.find((m) => m.page === "home");
 
-  const [title, setTitle] = useState(homeSeo.title || "Full-Stack Architect & 3D Web Creative Developer");
+  const [title, setTitle] = useState(homeSeo?.title || "Full-Stack Architect & 3D Web Creative Developer");
   const [description, setDescription] = useState(
-    homeSeo.description ||
+    homeSeo?.description ||
       "Interactive 3D developer portfolio showcasing high-performance web architecture, WebGL experiences, and cloud microservices."
   );
   const [keywords, setKeywords] = useState(
-    Array.isArray(homeSeo.keywords) ? homeSeo.keywords.join(", ") : "React Three Fiber, Next.js, TypeScript, PostgreSQL, 3D Web"
+    Array.isArray(homeSeo?.keywords) ? homeSeo.keywords.join(", ") : "React Three Fiber, Next.js, TypeScript, PostgreSQL, 3D Web"
   );
-  const [ogImage, setOgImage] = useState(homeSeo.ogImage || "");
-  const [canonicalUrl, setCanonicalUrl] = useState(homeSeo.canonicalUrl || "");
-  const [noIndex, setNoIndex] = useState(homeSeo.noIndex || false);
+  const [ogImage, setOgImage] = useState(homeSeo?.ogImage || "");
+  const [canonicalUrl, setCanonicalUrl] = useState(homeSeo?.canonicalUrl || "");
+  const [noIndex, setNoIndex] = useState(homeSeo?.noIndex || false);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();

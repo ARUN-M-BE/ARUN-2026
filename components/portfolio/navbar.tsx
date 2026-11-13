@@ -34,7 +34,6 @@ import {
   GraduationCap,
   Mail,
   Layers,
-  CircleDot,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 

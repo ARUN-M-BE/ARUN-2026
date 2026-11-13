@@ -3,11 +3,11 @@
  * Follows the backend-development and testing-qa skill standards.
  */
 
-import { hashPassword, verifyPassword, slugify, sanitizeHtml, formatApiResponse } from "../backend/src/utils";
-import { contactFormSchema, projectSchema, skillSchema } from "../backend/src/validators";
-import { rateLimiter } from "../backend/src/middleware/rate-limit";
-import { db } from "../backend/src/config/database";
-import { ProfileRepository, ProjectRepository, SkillRepository } from "../backend/src/repositories";
+import { hashPassword, verifyPassword, slugify, sanitizeHtml, formatApiResponse } from "../server/utils";
+import { contactFormSchema } from "../server/validators";
+import { rateLimiter } from "../server/middleware/rate-limit";
+import { db } from "../server/config/database";
+import { ProfileRepository, ProjectRepository, SkillRepository } from "../server/repositories";
 import { sql } from "drizzle-orm";
 
 async function runTestSuite() {
@@ -82,8 +82,9 @@ async function runTestSuite() {
   try {
     const res = await db.execute(sql`SELECT 1 as connected`);
     assert(res !== undefined, "Database connectivity probe succeeded (SELECT 1)");
-  } catch (err: any) {
-    console.warn(`  ! Database unreachable in this environment: ${err.message}`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn(`  ! Database unreachable in this environment: ${message}`);
   }
 
   // 7. Database Resilience & Graceful Fallback Integrity

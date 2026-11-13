@@ -7,9 +7,6 @@ import {
   Globe2,
   Cpu,
   ShieldCheck,
-  Radio,
-  Clock,
-  ArrowUpRight,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 
