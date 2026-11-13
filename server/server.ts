@@ -1,6 +1,5 @@
 /**
  * Standalone Backend Server Entrypoint
- * Matches backend/src/server.js architecture standard.
  */
 
 import http from "http";
@@ -53,4 +52,3 @@ if (require.main === module || process.argv[1]?.includes("server.ts") || process
 
 export { server, startServer };
 export default server;
-

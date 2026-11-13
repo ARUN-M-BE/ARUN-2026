@@ -1,6 +1,6 @@
 /**
  * Application Request Dispatcher & Middleware Orchestrator
- * Matches the classic backend/src/app.js architecture standard.
+ * Matches clean architecture standards.
  */
 
 import http from "http";
