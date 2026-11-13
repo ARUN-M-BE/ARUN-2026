@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/context/themeProvider";
 import { LanguageProvider } from "@/context/languageContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
+import { PageViewTracker } from "@/components/portfolio/page-view-tracker";
 import type { Metadata, Viewport } from "next";
 
 export const viewport: Viewport = {
@@ -147,6 +148,7 @@ export default function RootLayout({
         >
           <LanguageProvider>
             <TooltipProvider>
+              <PageViewTracker />
               {children}
               <Toaster richColors position="top-right" closeButton />
             </TooltipProvider>

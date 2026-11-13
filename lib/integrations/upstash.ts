@@ -66,6 +66,34 @@ class UpstashService {
   }
 
   /**
+   * Atomic Redis INCR with TTL via Upstash REST pipeline
+   * Used for page-view counters (best effort, DB remains source of truth).
+   */
+  async increment(key: string, ttlSeconds = 86400): Promise<number | null> {
+    if (!this.isConfigured()) return null;
+
+    try {
+      const res = await fetch(`${this.restUrl}/pipeline`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.restToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify([
+          ["INCR", key],
+          ["EXPIRE", key, ttlSeconds],
+        ]),
+      });
+      if (!res.ok) return null;
+      const results = await res.json() as Array<{ result?: number }>;
+      const value = results[0]?.result;
+      return typeof value === "number" ? value : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Sliding window rate limiter (free tier)
    * @param identifier user IP or session id
    * @param limit max allowed requests in window (default 30)

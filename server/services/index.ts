@@ -12,6 +12,7 @@ import {
   LegalRepository,
   MediaRepository,
   AuditRepository,
+  PageViewRepository,
 } from "../repositories";
 import { revalidatePath } from "next/cache";
 
@@ -600,6 +601,36 @@ export const MediaService = {
 export const AuditService = {
   async getLogs(opts?: { search?: string; status?: string; page?: number; limit?: number; folder?: string; entity?: string }) {
     return AuditRepository.findMany(opts);
+  },
+};
+
+// --- Page View Analytics Service -------------------------
+export interface PageViewInput {
+  path: string;
+  referrer?: string | null;
+  countryCode?: string | null;
+  countryName?: string | null;
+  city?: string | null;
+  device?: string | null;
+  visitorHash?: string | null;
+}
+
+export const AnalyticsService = {
+  /**
+   * Records one page view. The insert is authoritative: any database error is
+   * surfaced to the caller instead of being swallowed.
+   */
+  async recordPageView(data: PageViewInput) {
+    const safePath = (data.path || "/").split("?")[0].slice(0, 300) || "/";
+    const row = await PageViewRepository.create({
+      ...data,
+      path: safePath,
+      referrer: data.referrer ? data.referrer.slice(0, 500) : null,
+    });
+    return { id: row?.id, path: safePath, createdAt: row?.createdAt };
+  },
+  async getSummary() {
+    return PageViewRepository.getSummary();
   },
 };
 

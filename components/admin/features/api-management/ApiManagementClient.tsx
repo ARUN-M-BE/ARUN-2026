@@ -18,6 +18,8 @@ import {
   Database,
   Mail,
   Flame,
+  Eye,
+  MousePointerClick,
 } from "lucide-react";
 
 interface ApiEndpointConfig {
@@ -81,6 +83,26 @@ const API_ENDPOINTS: ApiEndpointConfig[] = [
     plan: "Free / Database",
     description: "Public verified social profiles and network links.",
     icon: Globe,
+  },
+  {
+    id: "pageview",
+    name: "Page View Analytics",
+    endpoint: "/api/analytics/pageview",
+    method: "GET",
+    category: "Core API",
+    plan: "Neon + Upstash + IPstack",
+    description: "Aggregated page views, unique visitors, top pages and geo split.",
+    icon: Eye,
+  },
+  {
+    id: "pageview_beacon",
+    name: "Page View Beacon",
+    endpoint: "/api/analytics/pageview",
+    method: "POST",
+    category: "Core API",
+    plan: "Consent-gated (DPDP 2023)",
+    description: "Records a consent-approved page view with geo and device enrichment.",
+    icon: MousePointerClick,
   },
   {
     id: "resend",
@@ -243,7 +265,10 @@ export function ApiManagementClient() {
             <Server className="size-4 text-sky-400" />
           </div>
           <div className="mt-2 text-2xl font-bold tracking-tight text-foreground">{API_ENDPOINTS.length}</div>
-          <p className="mt-1 text-xs text-muted-foreground">5 Core REST + 4 Free Integrations</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {API_ENDPOINTS.filter((e) => e.category === "Core API").length} Core REST +{" "}
+            {API_ENDPOINTS.filter((e) => e.category === "Free Integration").length} Free Integrations
+          </p>
         </div>
 
         <div className="rounded-2xl border border-border/70 bg-card/60 p-5 backdrop-blur-sm">

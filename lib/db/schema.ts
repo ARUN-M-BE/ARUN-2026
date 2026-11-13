@@ -452,6 +452,27 @@ export const auditLog = pgTable(
   ]
 );
 
+// ─── Page Views (Privacy-First Analytics) ─────────────────
+export const pageViews = pgTable(
+  "page_views",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    path: text("path").notNull(),
+    referrer: text("referrer"),
+    countryCode: text("country_code"),
+    countryName: text("country_name"),
+    city: text("city"),
+    device: text("device"),
+    visitorHash: text("visitor_hash"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("page_views_created_idx").on(table.createdAt),
+    index("page_views_path_idx").on(table.path),
+    index("page_views_visitor_idx").on(table.visitorHash),
+  ]
+);
+
 // ─── Relations ────────────────────────────────────────────
 export const skillCategoriesRelations = relations(skillCategories, ({ many }) => ({
   skills: many(skills),
