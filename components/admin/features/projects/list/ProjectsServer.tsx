@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { ProjectListClient } from "@/components/admin/features/projects/list/ProjectsListClient";
+import type { Project } from "@/types";
 
 export default async function AdminProjectsPage({
   searchParams,
@@ -32,7 +33,7 @@ export default async function AdminProjectsPage({
         </Link>
       </PageHeader>
 
-      <ProjectListClient initialData={data.items} />
+      <ProjectListClient initialData={data.items as unknown as Project[]} />
     </div>
   );
 }

@@ -1,17 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUp, Layers, Shield } from "lucide-react";
+import { ArrowUp, Layers, Shield, ExternalLink } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import type { SocialLink } from "@/types";
 
-export function PortfolioFooter() {
+interface PortfolioFooterProps {
+  socialLinks?: SocialLink[];
+}
+
+export function PortfolioFooter({ socialLinks = [] }: PortfolioFooterProps) {
   const { t, language } = useLanguage();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const footerSocials = (socialLinks || []).filter(
+    (s) => s.isActive !== false && (!s.placements || s.placements.includes("footer"))
+  );
 
   return (
     <footer className="relative overflow-hidden border-t border-border bg-card/60 pb-8 pt-12 sm:pt-16 text-xs">
@@ -36,34 +45,57 @@ export function PortfolioFooter() {
             </p>
           </div>
 
-          {/* Legal Navigation Links */}
-          <nav aria-label={language === "ar" ? "روابط قانونية" : "Legal links"} className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
-            <Link href="/legal/privacy-policy" className="hover:text-foreground transition-colors">
-              {t("footer.privacy", "Privacy Policy")}
-            </Link>
-            <Link href="/legal/terms-and-conditions" className="hover:text-foreground transition-colors">
-              {t("footer.terms", "Terms of Service")}
-            </Link>
-            <Link href="/legal/cookie-policy" className="hover:text-foreground transition-colors">
-              {t("footer.cookies", "Cookie Policy")}
-            </Link>
-            <Link href="/admin" className="hover:text-sky-500 transition-colors flex items-center gap-1.5 text-sky-600 dark:text-sky-400 font-semibold">
-              <Shield className="w-3.5 h-3.5" />
-              <span>{t("nav.admin", "CMS Portal")}</span>
-            </Link>
-          </nav>
+          {/* Social Links Placement (Footer) */}
+          {footerSocials.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              {footerSocials.map((item) => (
+                <a
+                  key={item.id}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-card/80 text-foreground transition-all text-xs shadow-xs ${
+                    item.style === "pill" ? "rounded-full" : ""
+                  }`}
+                  style={item.color ? { borderColor: `${item.color}30` } : undefined}
+                >
+                  <span className="font-medium">{item.label || item.platform}</span>
+                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                </a>
+              ))}
+            </div>
+          )}
 
-          {/* Back to top button */}
-          <Button
-            onClick={scrollToTop}
-            variant="outline"
-            size="sm"
-            className="h-10 rounded-xl border-border bg-card px-4 text-xs shadow-xs hover:border-sky-500/40 hover:bg-card"
-            aria-label={language === "ar" ? "العودة إلى الأعلى" : "Back to top"}
-          >
-            <span>{language === "ar" ? "أعلى الصفحة" : "Top of Page"}</span>
-            <ArrowUp className="size-3.5 ml-1.5" />
-          </Button>
+          {/* Legal Navigation Links & Top Button */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <nav aria-label={language === "ar" ? "روابط قانونية" : "Legal links"} className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+              <Link href="/legal/privacy-policy" className="hover:text-foreground transition-colors">
+                {t("footer.privacy", "Privacy Policy")}
+              </Link>
+              <Link href="/legal/terms-and-conditions" className="hover:text-foreground transition-colors">
+                {t("footer.terms", "Terms of Service")}
+              </Link>
+              <Link href="/legal/cookie-policy" className="hover:text-foreground transition-colors">
+                {t("footer.cookies", "Cookie Policy")}
+              </Link>
+              <Link href="/admin" className="hover:text-sky-500 transition-colors flex items-center gap-1.5 text-sky-600 dark:text-sky-400 font-semibold">
+                <Shield className="w-3.5 h-3.5" />
+                <span>{t("nav.admin", "CMS Portal")}</span>
+              </Link>
+            </nav>
+
+            {/* Back to top button */}
+            <Button
+              onClick={scrollToTop}
+              variant="outline"
+              size="sm"
+              className="h-10 rounded-xl border-border bg-card px-4 text-xs shadow-xs hover:border-sky-500/40 hover:bg-card"
+              aria-label={language === "ar" ? "العودة إلى الأعلى" : "Back to top"}
+            >
+              <span>{language === "ar" ? "أعلى الصفحة" : "Top of Page"}</span>
+              <ArrowUp className="size-3.5 ml-1.5" />
+            </Button>
+          </div>
         </div>
 
         {/* Statutory Compliance Disclosure */}

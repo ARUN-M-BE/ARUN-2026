@@ -20,10 +20,11 @@ import {
 import { toast } from "sonner";
 import Link from "next/link";
 import { useLanguage } from "@/context/languageContext";
+import type { Profile, SocialLink } from "@/types";
 
 interface ContactSectionProps {
-  profile: any;
-  socialLinks: any[];
+  profile: Profile | null;
+  socialLinks: SocialLink[];
 }
 
 export function ContactSection({ profile, socialLinks = [] }: ContactSectionProps) {
@@ -109,27 +110,36 @@ export function ContactSection({ profile, socialLinks = [] }: ContactSectionProp
               </div>
             </div>
 
-            {/* Social handles list */}
-            {(socialLinks || []).length > 0 && (
-              <div className="pt-6 border-t border-border">
-                <h4 className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-3">
-                  {language === "ar" ? "الشبكات المهنية وروابط المطور" : "Developer Handles & Networks"}
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {socialLinks.map((s) => (
-                    <a
-                      key={s.id}
-                      href={s.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-xl bg-secondary hover:bg-secondary/80 border border-border text-xs text-foreground transition-all flex items-center gap-1.5 shadow-xs"
-                    >
-                      <span>{s.label || s.platform}</span>
-                    </a>
-                  ))}
+            {/* Social handles list (Placement: Contact) */}
+            {(() => {
+              const contactSocials = (socialLinks || []).filter(
+                (s) => s.isActive !== false && (!s.placements || s.placements.includes("contact"))
+              );
+              if (contactSocials.length === 0) return null;
+              return (
+                <div className="pt-6 border-t border-border">
+                  <h4 className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-3">
+                    {language === "ar" ? "الشبكات المهنية وروابط المطور" : "Developer Handles & Networks"}
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {contactSocials.map((s) => (
+                      <a
+                        key={s.id}
+                        href={s.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`px-3 py-1.5 rounded-xl bg-secondary hover:bg-secondary/80 border border-border text-xs text-foreground transition-all flex items-center gap-1.5 shadow-xs ${
+                          s.style === "pill" ? "rounded-full" : ""
+                        }`}
+                        style={s.color ? { borderColor: `${s.color}40` } : undefined}
+                      >
+                        <span className="font-medium">{s.label || s.platform}</span>
+                      </a>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
 
           {/* Right Column: Interactive Form */}

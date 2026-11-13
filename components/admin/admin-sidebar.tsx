@@ -36,6 +36,7 @@ const navigationGroups = [
   {
     title: "Portfolio Content",
     items: [
+      { name: "Sections Manager", href: "/admin/sections", icon: Layers },
       { name: "Profile", href: "/admin/profile", icon: User },
       { name: "Projects", href: "/admin/projects", icon: FolderGit2 },
       { name: "Skills & Constellation", href: "/admin/skills", icon: Cpu },

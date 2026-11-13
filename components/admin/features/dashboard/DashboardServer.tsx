@@ -10,7 +10,6 @@ import {
   Cpu,
   Briefcase,
   Mail,
-  Sparkles,
   ArrowRight,
   Plus,
   Eye,
@@ -18,6 +17,11 @@ import {
   Award,
   MessageSquareQuote,
   CheckCircle2,
+  Layers,
+  Compass,
+  Share2,
+  User,
+  SlidersHorizontal,
 } from "lucide-react";
 
 export default async function AdminDashboardPage() {
@@ -30,9 +34,17 @@ export default async function AdminDashboardPage() {
 
   const statCards = [
     {
+      title: "Sections",
+      value: stats.sections,
+      desc: `${stats.publishedSections} published, ${stats.draftSections} drafts`,
+      icon: Layers,
+      color: "from-sky-500/20 to-sky-500/5 text-sky-400 border-sky-500/20",
+      href: "/admin/sections",
+    },
+    {
       title: "Projects",
       value: stats.projects,
-      desc: "Portfolio projects in universe",
+      desc: `${stats.publishedProjects ?? stats.projects} live in universe`,
       icon: FolderGit2,
       color: "from-cyan-500/20 to-cyan-500/5 text-cyan-400 border-cyan-500/20",
       href: "/admin/projects",
@@ -85,21 +97,13 @@ export default async function AdminDashboardPage() {
       color: "from-indigo-500/20 to-indigo-500/5 text-indigo-400 border-indigo-500/20",
       href: "/admin/testimonials",
     },
-    {
-      title: "Services",
-      value: stats.services,
-      desc: "Commercial offerings",
-      icon: Sparkles,
-      color: "from-amber-500/20 to-amber-500/5 text-amber-400 border-amber-500/20",
-      href: "/admin/services",
-    },
   ];
 
   return (
     <div className="space-y-8">
       <PageHeader
         title="Universe Command Center"
-        description="Monitor system statistics, manage 3D portfolio assets, and respond to incoming inquiries."
+        description="Monitor system statistics, manage sections & navbar, showcase projects, and respond to incoming inquiries."
       >
         <div className="flex items-center gap-2">
           <Link href="/admin/projects/new">
@@ -116,6 +120,142 @@ export default async function AdminDashboardPage() {
           </a>
         </div>
       </PageHeader>
+
+      {/* Quick Actions Control Bar */}
+      <Card className="bg-card/70 border-border">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal className="w-4 h-4 text-cyan-400" />
+              <CardTitle className="text-xs uppercase tracking-wider text-muted-foreground font-mono">
+                Website Management Quick Actions
+              </CardTitle>
+            </div>
+            <span className="text-[11px] font-mono text-cyan-400">v2.4 Control Suite</span>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+            <Link href="/admin/sections">
+              <Button variant="outline" className="w-full justify-start text-xs border-border hover:border-sky-500/40 hover:bg-sky-500/10 h-10 px-3">
+                <Layers className="w-3.5 h-3.5 mr-2 text-sky-400 shrink-0" />
+                <span className="truncate">Manage Sections</span>
+              </Button>
+            </Link>
+            <Link href="/admin/projects/new">
+              <Button variant="outline" className="w-full justify-start text-xs border-border hover:border-cyan-500/40 hover:bg-cyan-500/10 h-10 px-3">
+                <Plus className="w-3.5 h-3.5 mr-2 text-cyan-400 shrink-0" />
+                <span className="truncate">Add Project</span>
+              </Button>
+            </Link>
+            <Link href="/admin/navigation">
+              <Button variant="outline" className="w-full justify-start text-xs border-border hover:border-indigo-500/40 hover:bg-indigo-500/10 h-10 px-3">
+                <Compass className="w-3.5 h-3.5 mr-2 text-indigo-400 shrink-0" />
+                <span className="truncate">Customize Navbar</span>
+              </Button>
+            </Link>
+            <Link href="/admin/social-links">
+              <Button variant="outline" className="w-full justify-start text-xs border-border hover:border-pink-500/40 hover:bg-pink-500/10 h-10 px-3">
+                <Share2 className="w-3.5 h-3.5 mr-2 text-pink-400 shrink-0" />
+                <span className="truncate">Manage Socials</span>
+              </Button>
+            </Link>
+            <Link href="/admin/profile">
+              <Button variant="outline" className="w-full justify-start text-xs border-border hover:border-amber-500/40 hover:bg-amber-500/10 h-10 px-3">
+                <User className="w-3.5 h-3.5 mr-2 text-amber-400 shrink-0" />
+                <span className="truncate">Customize Profile</span>
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Website Sections & Projects Status Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Sections Breakdown */}
+        <Card className="bg-gradient-to-br from-card to-card/60 border-border">
+          <CardHeader className="pb-3 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-sm font-semibold text-white flex items-center gap-2">
+                <Layers className="w-4 h-4 text-sky-400" />
+                Website Sections Overview
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground mt-0.5">
+                Total lifecycle state of page sections
+              </CardDescription>
+            </div>
+            <Link href="/admin/sections">
+              <Button variant="ghost" size="sm" className="text-xs text-sky-400 hover:text-sky-300 h-8">
+                Configure
+                <ArrowRight className="w-3 h-3 ml-1" />
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-4 gap-2 text-center">
+              <div className="p-3 rounded-xl bg-secondary/50 border border-border">
+                <div className="text-xl font-bold text-white font-mono">{stats.sections}</div>
+                <div className="text-[10px] uppercase font-mono text-muted-foreground mt-1">Total</div>
+              </div>
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                <div className="text-xl font-bold text-emerald-400 font-mono">{stats.publishedSections}</div>
+                <div className="text-[10px] uppercase font-mono text-emerald-400/80 mt-1">Published</div>
+              </div>
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                <div className="text-xl font-bold text-amber-400 font-mono">{stats.draftSections}</div>
+                <div className="text-[10px] uppercase font-mono text-amber-400/80 mt-1">Drafts</div>
+              </div>
+              <div className="p-3 rounded-xl bg-zinc-500/10 border border-border">
+                <div className="text-xl font-bold text-zinc-400 font-mono">{stats.unpublishedSections}</div>
+                <div className="text-[10px] uppercase font-mono text-zinc-400/80 mt-1">Hidden</div>
+              </div>
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-3 flex items-center justify-between">
+              <span>* Draft and hidden sections are never rendered on the live website.</span>
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Projects Breakdown */}
+        <Card className="bg-gradient-to-br from-card to-card/60 border-border">
+          <CardHeader className="pb-3 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-sm font-semibold text-white flex items-center gap-2">
+                <FolderGit2 className="w-4 h-4 text-cyan-400" />
+                Projects Showcase Status
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground mt-0.5">
+                Distribution of published works & in-progress drafts
+              </CardDescription>
+            </div>
+            <Link href="/admin/projects">
+              <Button variant="ghost" size="sm" className="text-xs text-cyan-400 hover:text-cyan-300 h-8">
+                View All
+                <ArrowRight className="w-3 h-3 ml-1" />
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="p-3 rounded-xl bg-secondary/50 border border-border">
+                <div className="text-xl font-bold text-white font-mono">{stats.projects}</div>
+                <div className="text-[10px] uppercase font-mono text-muted-foreground mt-1">Total</div>
+              </div>
+              <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+                <div className="text-xl font-bold text-cyan-400 font-mono">{stats.publishedProjects ?? stats.projects}</div>
+                <div className="text-[10px] uppercase font-mono text-cyan-400/80 mt-1">Published</div>
+              </div>
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                <div className="text-xl font-bold text-amber-400 font-mono">{stats.draftProjects ?? 0}</div>
+                <div className="text-[10px] uppercase font-mono text-amber-400/80 mt-1">Drafts</div>
+              </div>
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-3 flex items-center justify-between">
+              <span>Supports grid & list views, image galleries, and category filters.</span>
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Profile quick banner */}
       <Card className="bg-gradient-to-r from-card to-card/60 border-border/80 overflow-hidden relative">
@@ -260,9 +400,9 @@ export default async function AdminDashboardPage() {
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                Cache Invalidation
+                Sections & Nav Management
               </span>
-              <span className="font-mono text-white">Targeted RSC</span>
+              <span className="font-mono text-sky-400">Integrated</span>
             </div>
 
             <div className="pt-4 border-t border-border">

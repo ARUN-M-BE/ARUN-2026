@@ -34,10 +34,38 @@ import {
   GraduationCap,
   Mail,
   Layers,
+  User,
+  Compass,
+  Star,
+  Globe,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+import type { NavigationItem, SocialLink } from "@/types";
 
-export function PortfolioNavbar() {
+interface PortfolioNavbarProps {
+  navigation?: NavigationItem[];
+  socialLinks?: SocialLink[];
+}
+
+function resolveIcon(name?: string | null) {
+  switch (name) {
+    case "Sparkles": return Sparkles;
+    case "FolderGit2": return FolderGit2;
+    case "Cpu": return Cpu;
+    case "Briefcase": return Briefcase;
+    case "GraduationCap": return GraduationCap;
+    case "Activity": return Activity;
+    case "Mail": return Mail;
+    case "User": return User;
+    case "Compass": return Compass;
+    case "Star": return Star;
+    case "Layers": return Layers;
+    case "Globe": return Globe;
+    default: return Sparkles;
+  }
+}
+
+export function PortfolioNavbar({ navigation = [], socialLinks = [] }: PortfolioNavbarProps) {
   const { theme, setTheme } = useTheme();
   const { language, toggleLanguage, t } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
@@ -111,15 +139,24 @@ export function PortfolioNavbar() {
     }
   };
 
-  const navLinks = [
-    { label: t("nav.universe", "Universe"), href: "#hero", icon: Sparkles },
-    { label: t("nav.projects", "Projects"), href: "#projects", icon: FolderGit2 },
-    { label: t("nav.skills", "Skills"), href: "#skills", icon: Cpu },
-    { label: t("nav.experience", "Experience"), href: "#experience", icon: Briefcase },
-    { label: t("nav.credentials", "Credentials"), href: "#education", icon: GraduationCap },
-    { label: t("nav.analytics", "Live Telemetry"), href: "#analytics", icon: Activity },
-    { label: t("nav.contact", "Contact"), href: "#contact", icon: Mail },
-  ];
+  const navLinks = navigation && navigation.length > 0
+    ? navigation.map((item) => ({
+        label: item.label,
+        href: item.href,
+        icon: resolveIcon(item.icon),
+        badge: item.badge,
+        style: item.style,
+        color: item.color,
+      }))
+    : [
+        { label: t("nav.universe", "Universe"), href: "#hero", icon: Sparkles, badge: null, style: "default", color: "sky" },
+        { label: t("nav.projects", "Projects"), href: "#projects", icon: FolderGit2, badge: null, style: "default", color: "indigo" },
+        { label: t("nav.skills", "Skills"), href: "#skills", icon: Cpu, badge: null, style: "default", color: "violet" },
+        { label: t("nav.experience", "Experience"), href: "#experience", icon: Briefcase, badge: null, style: "default", color: "emerald" },
+        { label: t("nav.credentials", "Credentials"), href: "#education", icon: GraduationCap, badge: null, style: "default", color: "blue" },
+        { label: t("nav.analytics", "Live Telemetry"), href: "#analytics", icon: Activity, badge: "LIVE", style: "glow", color: "emerald" },
+        { label: t("nav.contact", "Contact"), href: "#contact", icon: Mail, badge: null, style: "pill", color: "amber" },
+      ];
 
   return (
     <header
@@ -168,15 +205,52 @@ export function PortfolioNavbar() {
               href={link.href}
               onMouseEnter={() => playChime(440, 0.08)}
               onClick={() => playChime(880, 0.12)}
-              className="px-3.5 py-1.5 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-background/90 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary inline-flex items-center gap-1.5 ${
+                link.style === "pill"
+                  ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                  : link.style === "glow"
+                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20"
+                  : "text-muted-foreground hover:text-foreground hover:bg-background/90"
+              }`}
             >
-              {link.label}
+              <span>{link.label}</span>
+              {link.badge && (
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30">
+                  {link.badge}
+                </span>
+              )}
             </a>
           ))}
         </nav>
 
         {/* Right Action Cluster */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Quick Socials (Navbar Placement) */}
+          {(() => {
+            const navbarSocials = (socialLinks || []).filter(
+              (s) => s.isActive !== false && (!s.placements || s.placements.includes("navbar"))
+            );
+            if (navbarSocials.length === 0) return null;
+            return (
+              <div className="hidden xl:flex items-center gap-1">
+                {navbarSocials.slice(0, 3).map((item) => (
+                  <a
+                    key={item.id}
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={item.label || item.platform}
+                    title={item.label || item.platform}
+                    className="size-9 rounded-xl border border-border bg-card/60 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all text-xs"
+                    style={item.color ? { color: item.color } : undefined}
+                  >
+                    <span className="font-mono text-[10px] font-bold">{item.platform.slice(0, 2).toUpperCase()}</span>
+                  </a>
+                ))}
+              </div>
+            );
+          })()}
+
           {/* Command Palette */}
           <CommandPalette />
 
@@ -305,6 +379,30 @@ export function PortfolioNavbar() {
                     );
                   })}
                 </nav>
+
+                {/* Mobile Socials */}
+                {(() => {
+                  const navbarSocials = (socialLinks || []).filter(
+                    (s) => s.isActive !== false && (!s.placements || s.placements.includes("navbar"))
+                  );
+                  if (navbarSocials.length === 0) return null;
+                  return (
+                    <div className="pt-4 flex flex-wrap gap-2">
+                      {navbarSocials.map((item) => (
+                        <a
+                          key={item.id}
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2.5 py-1 rounded-lg border border-border bg-secondary text-xs text-foreground font-mono flex items-center gap-1.5"
+                          style={item.color ? { borderColor: `${item.color}40` } : undefined}
+                        >
+                          <span>{item.label || item.platform}</span>
+                        </a>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
 
               <div className="space-y-3 pt-6 border-t border-border">

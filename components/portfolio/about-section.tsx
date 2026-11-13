@@ -71,33 +71,33 @@ export function AboutSection({ profile }: AboutSectionProps) {
                 {profile?.bio ||
                   (language === "ar"
                     ? "أنا مهندس برمجيات ومصمم تجارب تفاعلية ثلاثية الأبعاد، متخصص في البنى السحابية المتقدمة وتطبيقات الويب عالية الأداء. قمت بتوجيه فرق تقنية لبناء منصات تخدم ملايين الطلبات المتزامنة بأعلى كفاءة."
-                    : "I am a Senior Software Architect and Creative Developer specialized in full-stack cloud ecosystems and immersive 3D web applications. Over the last decade, I have guided engineering teams from seed-stage prototypes to high-scale platforms serving millions of concurrent requests.")}
+                    : "Results-driven Front End Developer with 3+ years of experience building responsive, scalable, and user-centric web applications using React.js, Next.js, TypeScript, and JavaScript (ES6+). Currently at SYNKCODE, Dubai, developing reusable UI components, integrating RESTful APIs with Django backends, and managing application state with React Hooks, Redux, and Context API.")}
               </p>
               <p>
                 {language === "ar"
                   ? "ترتكز فلسفتي على دقة الصنعة البرمجية: تصميم مخططات قواعد بيانات متينة، كتابة شفرة آمنة من الأخطاء من خلال TypeScript، وبناء واجهات سلسة تحترم تجربة المستخدم واستهلاك البطارية."
-                  : "My philosophy centers on uncompromising software craftsmanship: clean relational schemas, type-level invariants, modular component trees, and cinematic motion design that delights users while respecting accessibility standards and battery life."}
+                  : " Strong grasp of component-based architecture, server-side rendering, performance optimization, cross-browser compatibility, and UI/UX best practices."}
               </p>
             </div>
 
             {/* Quick Specs Pill Grid */}
             <div className="pt-6 border-t border-border grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs font-mono">
               <div className="p-3 rounded-xl bg-card/60 border border-border">
-                <span className="text-muted-foreground block text-[11px] mb-1 flex items-center gap-1">
+                <span className="text-muted-foreground text-[11px] mb-1 flex items-center gap-1">
                   <Terminal className="w-3 h-3 text-sky-500" />
                   {language === "ar" ? "اللغات الأساسية" : "Primary Stack"}
                 </span>
                 <span className="text-sky-600 dark:text-sky-400 font-bold">TypeScript & Go</span>
               </div>
               <div className="p-3 rounded-xl bg-card/60 border border-border">
-                <span className="text-muted-foreground block text-[11px] mb-1 flex items-center gap-1">
+                <span className="text-muted-foreground text-[11px] mb-1 flex items-center gap-1">
                   <Database className="w-3 h-3 text-indigo-500" />
                   {language === "ar" ? "قواعد البيانات" : "Database Engine"}
                 </span>
                 <span className="text-foreground font-bold">PostgreSQL & Drizzle</span>
               </div>
               <div className="p-3 rounded-xl bg-card/60 border border-border col-span-2 sm:col-span-1">
-                <span className="text-muted-foreground block text-[11px] mb-1 flex items-center gap-1">
+                <span className="text-muted-foreground text-[11px] mb-1 flex items-center gap-1">
                   <Globe2 className="w-3 h-3 text-emerald-500" />
                   {language === "ar" ? "محرك الجرافيكس" : "3D Graphics"}
                 </span>

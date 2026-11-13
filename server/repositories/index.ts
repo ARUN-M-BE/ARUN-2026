@@ -10,6 +10,9 @@ import {
   fallbackEducation,
   fallbackCertifications,
   fallbackTestimonials,
+  fallbackSocialLinks,
+  fallbackNavigation,
+  fallbackWebsiteSections,
 } from "./fallback-data";
 
 // ─── Profile Repository ──────────────────────────────────
@@ -639,20 +642,50 @@ export const MessageRepository = {
   },
 };
 
+// ─── Social Link Repository ──────────────────────────────
+export const SocialLinkRepository = {
+  async findMany() {
+    try {
+      const items = await db.select().from(schema.socialLinks).orderBy(asc(schema.socialLinks.sortOrder));
+      return items && items.length > 0 ? items : fallbackSocialLinks;
+    } catch {
+      return fallbackSocialLinks;
+    }
+  },
+  async findPublished() {
+    try {
+      const items = await db
+        .select()
+        .from(schema.socialLinks)
+        .where(and(eq(schema.socialLinks.isActive, true), eq(schema.socialLinks.status, "published")))
+        .orderBy(asc(schema.socialLinks.sortOrder));
+      return items && items.length > 0 ? items : fallbackSocialLinks.filter((s) => s.isActive && s.status === "published");
+    } catch {
+      return fallbackSocialLinks.filter((s) => s.isActive && s.status === "published");
+    }
+  },
+};
+
 // ─── Navigation Repository ───────────────────────────────
 export const NavigationRepository = {
   async findMany() {
     try {
-      return await db.select().from(schema.navigation).orderBy(asc(schema.navigation.sortOrder));
+      const items = await db.select().from(schema.navigation).orderBy(asc(schema.navigation.sortOrder));
+      return items && items.length > 0 ? items : fallbackNavigation;
     } catch {
-      return [];
+      return fallbackNavigation;
     }
   },
   async findActive() {
     try {
-      return await db.select().from(schema.navigation).where(eq(schema.navigation.isActive, true)).orderBy(asc(schema.navigation.sortOrder));
+      const items = await db
+        .select()
+        .from(schema.navigation)
+        .where(and(eq(schema.navigation.isActive, true), eq(schema.navigation.status, "published")))
+        .orderBy(asc(schema.navigation.sortOrder));
+      return items && items.length > 0 ? items : fallbackNavigation.filter((i) => i.isActive && i.status === "published");
     } catch {
-      return [];
+      return fallbackNavigation.filter((i) => i.isActive && i.status === "published");
     }
   },
   async create(data: any) {
@@ -665,6 +698,18 @@ export const NavigationRepository = {
       return { ...data, id: "nav-" + Date.now() };
     }
   },
+  async update(id: string, data: any) {
+    try {
+      if (isUUID(id)) {
+        const [updated] = await db.update(schema.navigation).set({ ...data, updatedAt: new Date() }).where(eq(schema.navigation.id, id)).returning();
+        return updated;
+      }
+      return null;
+    } catch (err) {
+      console.warn("[NavigationRepository.update] Error:", err);
+      return { ...data, id };
+    }
+  },
   async delete(id: string) {
     try {
       if (isUUID(id)) {
@@ -674,6 +719,143 @@ export const NavigationRepository = {
     } catch (err) {
       console.warn("[NavigationRepository.delete] Error:", err);
       return null;
+    }
+  },
+  async reorder(orderedIds: string[]) {
+    try {
+      const promises = orderedIds.map((id, index) => {
+        if (isUUID(id)) {
+          return db.update(schema.navigation).set({ sortOrder: index + 1, updatedAt: new Date() }).where(eq(schema.navigation.id, id));
+        }
+        return Promise.resolve();
+      });
+      await Promise.all(promises);
+      return true;
+    } catch (err) {
+      console.warn("[NavigationRepository.reorder] Error:", err);
+      return false;
+    }
+  },
+};
+
+// ─── Website Section Repository ───────────────────────────
+export const SectionRepository = {
+  async findMany() {
+    try {
+      const items = await db.select().from(schema.websiteSections).orderBy(asc(schema.websiteSections.sortOrder));
+      return items && items.length > 0 ? items : fallbackWebsiteSections;
+    } catch {
+      return fallbackWebsiteSections;
+    }
+  },
+  async findPublished() {
+    try {
+      const items = await db
+        .select()
+        .from(schema.websiteSections)
+        .where(eq(schema.websiteSections.status, "published"))
+        .orderBy(asc(schema.websiteSections.sortOrder));
+      return items && items.length > 0 ? items : fallbackWebsiteSections.filter((s) => s.status === "published");
+    } catch {
+      return fallbackWebsiteSections.filter((s) => s.status === "published");
+    }
+  },
+  async getById(id: string) {
+    try {
+      if (isUUID(id)) {
+        const [sec] = await db.select().from(schema.websiteSections).where(eq(schema.websiteSections.id, id)).limit(1);
+        return sec || fallbackWebsiteSections.find((s) => s.id === id) || null;
+      }
+      return fallbackWebsiteSections.find((s) => s.id === id) || null;
+    } catch {
+      return fallbackWebsiteSections.find((s) => s.id === id) || null;
+    }
+  },
+  async getByKey(sectionKey: string) {
+    try {
+      const [sec] = await db.select().from(schema.websiteSections).where(eq(schema.websiteSections.sectionKey, sectionKey)).limit(1);
+      return sec || fallbackWebsiteSections.find((s) => s.sectionKey === sectionKey) || null;
+    } catch {
+      return fallbackWebsiteSections.find((s) => s.sectionKey === sectionKey) || null;
+    }
+  },
+  async create(data: any) {
+    try {
+      const { id: _ignored, ...cleanData } = data;
+      const [sec] = await db.insert(schema.websiteSections).values(cleanData).returning();
+      return sec;
+    } catch (err) {
+      console.warn("[SectionRepository.create] Error:", err);
+      return { ...data, id: "sec-" + Date.now() };
+    }
+  },
+  async update(id: string, data: any) {
+    try {
+      if (isUUID(id)) {
+        const [updated] = await db
+          .update(schema.websiteSections)
+          .set({ ...data, updatedAt: new Date() })
+          .where(eq(schema.websiteSections.id, id))
+          .returning();
+        return updated;
+      }
+      return null;
+    } catch (err) {
+      console.warn("[SectionRepository.update] Error:", err);
+      return { ...data, id };
+    }
+  },
+  async duplicate(id: string) {
+    try {
+      const original = await this.getById(id);
+      if (!original) throw new Error("Section not found");
+      const newKey = `${original.sectionKey}-copy-${Date.now().toString().slice(-4)}`;
+      const duplicatedData = {
+        sectionKey: newKey,
+        title: `${original.title} (Copy)`,
+        subtitle: original.subtitle,
+        badge: original.badge,
+        description: original.description,
+        content: original.content,
+        componentType: original.componentType,
+        sortOrder: original.sortOrder + 1,
+        status: "draft" as const,
+        styles: original.styles,
+        metadata: original.metadata,
+      };
+      return await this.create(duplicatedData);
+    } catch (err) {
+      console.warn("[SectionRepository.duplicate] Error:", err);
+      return null;
+    }
+  },
+  async delete(id: string) {
+    try {
+      if (isUUID(id)) {
+        return await db.delete(schema.websiteSections).where(eq(schema.websiteSections.id, id));
+      }
+      return null;
+    } catch (err) {
+      console.warn("[SectionRepository.delete] Error:", err);
+      return null;
+    }
+  },
+  async reorder(orderedIds: string[]) {
+    try {
+      const promises = orderedIds.map((id, index) => {
+        if (isUUID(id)) {
+          return db
+            .update(schema.websiteSections)
+            .set({ sortOrder: index + 1, updatedAt: new Date() })
+            .where(eq(schema.websiteSections.id, id));
+        }
+        return Promise.resolve();
+      });
+      await Promise.all(promises);
+      return true;
+    } catch (err) {
+      console.warn("[SectionRepository.reorder] Error:", err);
+      return false;
     }
   },
 };

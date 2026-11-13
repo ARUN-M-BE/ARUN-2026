@@ -66,7 +66,7 @@ export function CommandPalette() {
       >
         <span className="text-foreground/80">{language === "ar" ? "بحث سريع..." : "Search portfolio..."}</span>
         <kbd className="rounded-md border border-border bg-secondary px-1.5 py-0.5 text-[10px] font-mono text-foreground shadow-xs">
-          ⌘K
+          ⌘
         </kbd>
       </Button>
 
