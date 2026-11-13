@@ -169,8 +169,9 @@ export function NavigationClient({ initialData }: { initialData: NavigationItem[
       } else {
         const res = await createNavigation(payload);
         if (res.success && res.data) {
+          const created = res.data;
           toast.success("Navigation item added");
-          setItems((prev) => [...prev, res.data]);
+          setItems((prev) => [...prev, created]);
           setIsDialogOpen(false);
           router.refresh();
         } else {

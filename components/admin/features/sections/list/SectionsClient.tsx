@@ -146,8 +146,9 @@ export function SectionsClient({ initialData }: { initialData: WebsiteSection[] 
       } else {
         const res = await createSection(payload);
         if (res.success && res.data) {
+          const newSec = res.data;
           toast.success("Section created successfully");
-          setSections((prev) => [...prev, res.data]);
+          setSections((prev) => [...prev, newSec]);
           setIsFormOpen(false);
           router.refresh();
         } else {
@@ -164,8 +165,9 @@ export function SectionsClient({ initialData }: { initialData: WebsiteSection[] 
     try {
       const res = await duplicateSection(sec.id);
       if (res.success && res.data) {
+        const dupSec = res.data;
         toast.success(`Duplicated "${sec.title}" as draft`);
-        setSections((prev) => [...prev, res.data]);
+        setSections((prev) => [...prev, dupSec]);
         router.refresh();
       } else {
         toast.error("Duplication failed", { description: res.error });

@@ -187,10 +187,14 @@ export const contactFormSchema = z.object({
 export const navigationSchema = z.object({
   label: z.string().min(1, "Label is required"),
   href: z.string().min(1, "Link is required"),
-  icon: z.string().optional(),
+  icon: z.string().optional().nullable(),
+  color: z.string().optional().nullable(),
+  badge: z.string().optional().nullable(),
+  style: z.string().optional().nullable(),
   isExternal: z.boolean().default(false),
   sortOrder: z.coerce.number().int().default(0),
   isActive: z.boolean().default(true),
+  status: z.enum(["published", "draft", "unpublished"]).default("published"),
   group: z.string().default("main"),
   parentId: z.string().optional().nullable(),
 });

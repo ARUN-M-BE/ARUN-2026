@@ -225,8 +225,9 @@ export function SocialLinksClient({ initialData }: { initialData: SocialLink[] }
       } else {
         const res = await createSocialLink(payload);
         if (res.success && res.data) {
+          const newLink = res.data;
           toast.success("Social link added");
-          setLinks((prev) => [...prev, res.data]);
+          setLinks((prev) => [...prev, newLink]);
           setIsDialogOpen(false);
           router.refresh();
         } else {

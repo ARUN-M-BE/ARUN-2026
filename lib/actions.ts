@@ -181,7 +181,7 @@ export async function deleteTestimonial(id: string) {
 }
 
 // ─── Messages & Consent ───────────────────────────────────
-export async function getContactMessages(opts?: any) {
+export async function getContactMessages(opts?: { search?: string; status?: string; page?: number; limit?: number }) {
   return MessageController.getContactMessages(opts);
 }
 export async function submitContactForm(data: unknown) {
@@ -193,28 +193,35 @@ export async function updateMessageStatus(id: string, status: string) {
 export async function deleteMessage(id: string) {
   return MessageController.deleteMessage(id);
 }
-export async function recordConsent(data: any) {
+export async function recordConsent(data: {
+  type: string;
+  consentGiven: boolean;
+  preferences?: Record<string, unknown>;
+  ipAddress?: string;
+  userAgent?: string;
+  expiresAt?: Date;
+}) {
   return MessageRepository.recordConsent(data);
 }
 
 // ─── Social Links ─────────────────────────────────────────
-export async function getSocialLinks() {
+export async function getSocialLinks(): Promise<SocialLink[]> {
   try {
     const items = await db.select().from(schema.socialLinks).orderBy(schema.socialLinks.sortOrder);
-    return items && items.length > 0 ? items : fallbackSocialLinks;
+    return items && items.length > 0 ? (items as SocialLink[]) : fallbackSocialLinks;
   } catch (err) {
     console.warn("[actions.getSocialLinks] DB query failed, using fallback:", err);
     return fallbackSocialLinks;
   }
 }
-export async function getPublicSocialLinks(placement?: string) {
+export async function getPublicSocialLinks(placement?: string): Promise<SocialLink[]> {
   try {
     const items = await db
       .select()
       .from(schema.socialLinks)
       .where(and(eq(schema.socialLinks.isActive, true), eq(schema.socialLinks.status, "published")))
       .orderBy(schema.socialLinks.sortOrder);
-    const source = items && items.length > 0 ? items : fallbackSocialLinks.filter((l) => l.isActive && l.status === "published");
+    const source = items && items.length > 0 ? (items as SocialLink[]) : fallbackSocialLinks.filter((l) => l.isActive && l.status === "published");
     if (!placement) return source;
     return source.filter((item) => {
       if (!item.placements || !Array.isArray(item.placements)) return true;
@@ -227,23 +234,23 @@ export async function getPublicSocialLinks(placement?: string) {
     return source.filter((item) => (item.placements as string[] | undefined)?.includes(placement));
   }
 }
-export async function createSocialLink(data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+export async function createSocialLink(data: SocialLinkFormData): Promise<{ success: boolean; data?: SocialLink; error?: string }> {
   await requireAdmin();
   try {
-    const { id: _ignored, ...cleanData } = data;
-    const [item] = await db.insert(schema.socialLinks).values(cleanData).returning();
+    const { id: _ignored, ...cleanData } = data as Record<string, unknown>;
+    const [item] = await db.insert(schema.socialLinks).values(cleanData as typeof schema.socialLinks.$inferInsert).returning();
     revalidatePath("/");
     revalidatePath("/admin/social-links");
-    return { success: true, data: item };
-  } catch (err: any) {
+    return { success: true, data: item as SocialLink };
+  } catch (err: unknown) {
     console.warn("[actions.createSocialLink] Error:", err);
-    return { success: true, data: { ...data, id: "soc-" + Date.now() } };
+    return { success: true, data: { ...data, id: "soc-" + Date.now() } as SocialLink };
   }
 }
-export async function updateSocialLink(id: string, data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+export async function updateSocialLink(id: string, data: Partial<SocialLinkFormData>): Promise<{ success: boolean; data?: SocialLink; error?: string }> {
   await requireAdmin();
   try {
-    const { id: _ignored, ...cleanData } = data;
+    const { id: _ignored, ...cleanData } = data as Record<string, unknown>;
     const updateData = { ...cleanData, updatedAt: new Date() };
 
     // 1. Try direct UUID update
@@ -253,7 +260,7 @@ export async function updateSocialLink(id: string, data: any): Promise<{ success
         const [item] = await db.update(schema.socialLinks).set(updateData).where(eq(schema.socialLinks.id, id)).returning();
         revalidatePath("/");
         revalidatePath("/admin/social-links");
-        return { success: true, data: item };
+        return { success: true, data: item as SocialLink };
       }
     }
 
@@ -270,32 +277,32 @@ export async function updateSocialLink(id: string, data: any): Promise<{ success
         const [item] = await db.update(schema.socialLinks).set(updateData).where(eq(schema.socialLinks.id, existingPlatform.id)).returning();
         revalidatePath("/");
         revalidatePath("/admin/social-links");
-        return { success: true, data: item };
+        return { success: true, data: item as SocialLink };
       }
     }
 
     // 3. Insert fresh into DB
     const [inserted] = await db.insert(schema.socialLinks).values({
-      platform: cleanData.platform || "Custom",
-      url: cleanData.url || "https://arun-m.in",
-      icon: cleanData.icon || null,
-      label: cleanData.label || cleanData.platform || "Link",
-      color: cleanData.color || null,
-      size: cleanData.size || "md",
-      style: cleanData.style || "default",
-      placements: cleanData.placements || ["footer", "contact"],
-      sortOrder: typeof cleanData.sortOrder === "number" ? cleanData.sortOrder : 0,
-      isActive: typeof cleanData.isActive === "boolean" ? cleanData.isActive : true,
-      status: cleanData.status || "published",
+      platform: data.platform || "Custom",
+      url: data.url || "https://arun-m.in",
+      icon: data.icon || null,
+      label: data.label || data.platform || "Link",
+      color: data.color || null,
+      size: data.size || "md",
+      style: data.style || "default",
+      placements: data.placements || ["footer", "contact"],
+      sortOrder: typeof data.sortOrder === "number" ? data.sortOrder : 0,
+      isActive: typeof data.isActive === "boolean" ? data.isActive : true,
+      status: data.status || "published",
       updatedAt: new Date(),
     }).returning();
 
     revalidatePath("/");
     revalidatePath("/admin/social-links");
-    return { success: true, data: inserted };
-  } catch (err: any) {
+    return { success: true, data: inserted as SocialLink };
+  } catch (err: unknown) {
     console.warn("[actions.updateSocialLink] Error:", err);
-    return { success: true, data: { ...data, id } };
+    return { success: true, data: { ...data, id } as SocialLink };
   }
 }
 export async function deleteSocialLink(id: string): Promise<{ success: boolean; error?: string }> {
@@ -310,9 +317,9 @@ export async function deleteSocialLink(id: string): Promise<{ success: boolean; 
     revalidatePath("/");
     revalidatePath("/admin/social-links");
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.deleteSocialLink] Error:", err);
-    return { success: false, error: err.message || "Failed to delete social link" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to delete social link" };
   }
 }
 export async function reorderSocialLinks(orderedIds: string[]): Promise<{ success: boolean; error?: string }> {
@@ -328,41 +335,41 @@ export async function reorderSocialLinks(orderedIds: string[]): Promise<{ succes
     revalidatePath("/");
     revalidatePath("/admin/social-links");
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.reorderSocialLinks] Error:", err);
     return { success: true };
   }
 }
 
 // ─── Navigation ───────────────────────────────────────────
-export async function getNavigation() {
+export async function getNavigation(): Promise<NavigationItem[]> {
   return NavigationRepository.findMany();
 }
-export async function getPublicNavigation() {
+export async function getPublicNavigation(): Promise<NavigationItem[]> {
   return NavigationRepository.findActive();
 }
-export async function createNavigation(data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+export async function createNavigation(data: NavigationFormData): Promise<{ success: boolean; data?: NavigationItem; error?: string }> {
   await requireAdmin();
   try {
     const item = await NavigationRepository.create(data);
     revalidatePath("/");
     revalidatePath("/admin/navigation");
     return { success: true, data: item };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.createNavigation] Error:", err);
-    return { success: false, error: err.message || "Failed to create navigation" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to create navigation" };
   }
 }
-export async function updateNavigation(id: string, data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+export async function updateNavigation(id: string, data: Partial<NavigationFormData>): Promise<{ success: boolean; data?: NavigationItem; error?: string }> {
   await requireAdmin();
   try {
     const item = await NavigationRepository.update(id, data);
     revalidatePath("/");
     revalidatePath("/admin/navigation");
     return { success: true, data: item };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.updateNavigation] Error:", err);
-    return { success: false, error: err.message || "Failed to update navigation" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to update navigation" };
   }
 }
 export async function deleteNavigation(id: string): Promise<{ success: boolean; error?: string }> {
@@ -372,9 +379,9 @@ export async function deleteNavigation(id: string): Promise<{ success: boolean; 
     revalidatePath("/");
     revalidatePath("/admin/navigation");
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.deleteNavigation] Error:", err);
-    return { success: false, error: err.message || "Failed to delete navigation" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to delete navigation" };
   }
 }
 export async function reorderNavigation(orderedIds: string[]): Promise<{ success: boolean; error?: string }> {
@@ -384,53 +391,55 @@ export async function reorderNavigation(orderedIds: string[]): Promise<{ success
     revalidatePath("/");
     revalidatePath("/admin/navigation");
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.reorderNavigation] Error:", err);
     return { success: true };
   }
 }
 
 // ─── Website Sections Management ──────────────────────────
-export async function getSections() {
-  return SectionRepository.findMany();
+export async function getSections(): Promise<WebsiteSection[]> {
+  const items = await SectionRepository.findMany();
+  return items as unknown as WebsiteSection[];
 }
-export async function getPublicSections() {
-  return SectionRepository.findPublished();
+export async function getPublicSections(): Promise<WebsiteSection[]> {
+  const items = await SectionRepository.findPublished();
+  return items as unknown as WebsiteSection[];
 }
-export async function createSection(data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+export async function createSection(data: SectionFormData): Promise<{ success: boolean; data?: WebsiteSection; error?: string }> {
   await requireAdmin();
   try {
     const sec = await SectionRepository.create(data);
     revalidatePath("/");
     revalidatePath("/admin/sections");
     return { success: true, data: sec };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.createSection] Error:", err);
-    return { success: false, error: err.message || "Failed to create section" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to create section" };
   }
 }
-export async function updateSection(id: string, data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+export async function updateSection(id: string, data: Partial<SectionFormData>): Promise<{ success: boolean; data?: WebsiteSection; error?: string }> {
   await requireAdmin();
   try {
     const updated = await SectionRepository.update(id, data);
     revalidatePath("/");
     revalidatePath("/admin/sections");
     return { success: true, data: updated };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.updateSection] Error:", err);
-    return { success: false, error: err.message || "Failed to update section" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to update section" };
   }
 }
-export async function duplicateSection(id: string): Promise<{ success: boolean; data?: any; error?: string }> {
+export async function duplicateSection(id: string): Promise<{ success: boolean; data?: WebsiteSection; error?: string }> {
   await requireAdmin();
   try {
     const duplicated = await SectionRepository.duplicate(id);
     revalidatePath("/");
     revalidatePath("/admin/sections");
     return { success: true, data: duplicated };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.duplicateSection] Error:", err);
-    return { success: false, error: err.message || "Failed to duplicate section" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to duplicate section" };
   }
 }
 export async function deleteSection(id: string): Promise<{ success: boolean; error?: string }> {
@@ -440,9 +449,9 @@ export async function deleteSection(id: string): Promise<{ success: boolean; err
     revalidatePath("/");
     revalidatePath("/admin/sections");
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.deleteSection] Error:", err);
-    return { success: false, error: err.message || "Failed to delete section" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to delete section" };
   }
 }
 export async function reorderSections(orderedIds: string[]): Promise<{ success: boolean; error?: string }> {
@@ -452,7 +461,7 @@ export async function reorderSections(orderedIds: string[]): Promise<{ success: 
     revalidatePath("/");
     revalidatePath("/admin/sections");
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.reorderSections] Error:", err);
     return { success: true };
   }
@@ -464,9 +473,9 @@ export async function toggleSectionStatus(id: string, status: "draft" | "publish
     revalidatePath("/");
     revalidatePath("/admin/sections");
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.toggleSectionStatus] Error:", err);
-    return { success: false, error: err.message };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to toggle section status" };
   }
 }
 
@@ -474,7 +483,7 @@ export async function toggleSectionStatus(id: string, status: "draft" | "publish
 export async function getSiteSettings() {
   return SettingsController.getSiteSettings();
 }
-export async function updateSiteSetting(key: string, value: any) {
+export async function updateSiteSetting(key: string, value: unknown) {
   return SettingsController.updateSiteSetting(key, value);
 }
 
@@ -491,7 +500,7 @@ export async function getSeoMetadata(page?: string) {
     return page ? null : [];
   }
 }
-export async function upsertSeoMetadata(data: any): Promise<{ success: boolean; error?: string }> {
+export async function upsertSeoMetadata(data: SeoMetadataFormData): Promise<{ success: boolean; error?: string }> {
   await requireAdmin();
   try {
     const [existing] = await db.select().from(schema.seoMetadata).where(eq(schema.seoMetadata.page, data.page)).limit(1);
@@ -502,9 +511,9 @@ export async function upsertSeoMetadata(data: any): Promise<{ success: boolean; 
     }
     revalidatePath("/admin/seo");
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.warn("[actions.upsertSeoMetadata] Error:", err);
-    return { success: false, error: err.message || "Failed to upsert SEO metadata" };
+    return { success: false, error: err instanceof Error ? err.message : "Failed to upsert SEO metadata" };
   }
 }
 
@@ -523,18 +532,41 @@ export async function deleteLegalDocument(id: string) {
 }
 
 // ─── Media Assets ─────────────────────────────────────────
-export async function getMediaAssets(opts?: any) {
+export async function getMediaAssets(opts?: { page?: number; limit?: number; folder?: string; search?: string; type?: string }) {
   return MediaController.getMediaAssets(opts);
 }
-export async function createMediaAsset(data: any) {
-  return MediaController.createMediaAsset(data);
+export async function createMediaAsset(data: {
+  filename?: string;
+  fileName?: string;
+  originalFilename?: string;
+  mimeType?: string;
+  size?: number;
+  fileSize?: number;
+  url?: string;
+  fileUrl?: string;
+  altText?: string;
+  copyright?: string;
+  folder?: string;
+  metadata?: Record<string, unknown>;
+}) {
+  return MediaController.createMediaAsset({
+    filename: data.filename || data.fileName || "asset",
+    originalFilename: data.originalFilename || data.filename || data.fileName || "asset",
+    mimeType: data.mimeType || "application/octet-stream",
+    size: data.size || data.fileSize || 0,
+    url: data.url || data.fileUrl || "",
+    altText: data.altText,
+    copyright: data.copyright,
+    folder: data.folder || "general",
+    metadata: data.metadata,
+  });
 }
 export async function deleteMediaAsset(id: string) {
   return MediaController.deleteMediaAsset(id);
 }
 
 // ─── Audit Log ────────────────────────────────────────────
-export async function getAuditLogs(opts?: any) {
+export async function getAuditLogs(opts?: { page?: number; limit?: number; entity?: string; action?: string; search?: string }) {
   return AuditController.getAuditLogs(opts);
 }
 
