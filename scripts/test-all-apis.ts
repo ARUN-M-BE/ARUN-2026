@@ -143,9 +143,6 @@ const apisToTest: ApiTestDefinition[] = [
 ];
 
 async function main() {
-  console.log("================================================================================");
-  console.log("            EXECUTING FULL SYSTEM API VALIDATION TEST SUITE                     ");
-  console.log("================================================================================\n");
 
   let passedCount = 0;
   let failedCount = 0;
