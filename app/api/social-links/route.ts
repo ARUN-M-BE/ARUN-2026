@@ -3,9 +3,9 @@ import { getSocialLinks, getPublicSocialLinks, createSocialLink, updateSocialLin
 import { requireAdmin } from "@/server/middleware/auth-guard";
 import { socialLinkSchema } from "@/lib/validations";
 
-export async function GET(request?: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request?.url || "http://localhost:3000/api/social-links");
+    const { searchParams } = new URL(request.url);
     const placement = searchParams.get("placement") || undefined;
     const links = placement ? await getPublicSocialLinks(placement) : await getSocialLinks();
     return NextResponse.json({ success: true, data: links });
