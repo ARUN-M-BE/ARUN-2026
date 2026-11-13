@@ -1,16 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
-import { ArrowUpRight, ArrowRight, ExternalLink, Layers, Zap, Shield, Database } from "lucide-react";
-import { LimeUnderlineSwoosh, CarrotCurlyArrow, CarrotThreeLineSpark, GithubIcon } from "./voldog-doodles";
+import { ArrowUpRight, ArrowRight, Layers, Zap, Shield, Database } from "lucide-react";
+import { LimeUnderlineSwoosh, CarrotThreeLineSpark, GithubIcon } from "./voldog-doodles";
 
 interface VoldogProjectsProps {
   projects: any[];
 }
 
 export function VoldogProjects({ projects }: VoldogProjectsProps) {
-  const [filter, setFilter] = useState("all");
 
   const fallbackProjects = [
     {

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { VoldogNavbar } from "./voldog-navbar";
 import { VoldogHero } from "./voldog-hero";
 import { VoldogFinder } from "./voldog-finder";
@@ -32,8 +31,8 @@ export function VoldogLayout({
   projects = [],
   categoriesWithSkills = [],
   experiences = [],
-  education = [],
-  certifications = [],
+  education: _education = [],
+  certifications: _certifications = [],
   testimonials = [],
   socialLinks = [],
   onSwitchTheme,

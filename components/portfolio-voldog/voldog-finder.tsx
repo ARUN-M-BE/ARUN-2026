@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { ArrowRight, ChevronDown, CheckCircle2, Sparkles, SlidersHorizontal } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, ChevronDown, CheckCircle2 } from "lucide-react";
 import { CarrotThreeLineSpark } from "./voldog-doodles";
 
 export function VoldogFinder() {

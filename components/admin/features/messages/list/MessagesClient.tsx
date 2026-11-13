@@ -4,16 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DeleteDialog } from "@/components/admin/delete-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
 import { updateMessageStatus, deleteMessage } from "@/lib/actions";
-import { Mail, Trash2, Eye, ShieldCheck, Clock } from "lucide-react";
+import { Mail, Trash2, Eye, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
-export function MessagesClient({ initialData, totalPages }: { initialData: any[]; totalPages: number }) {
+export function MessagesClient({ initialData, totalPages: _totalPages }: { initialData: any[]; totalPages?: number }) {
   const router = useRouter();
   const [messages, setMessages] = useState(initialData);
   const [selectedMsg, setSelectedMsg] = useState<any | null>(null);

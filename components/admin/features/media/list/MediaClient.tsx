@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { DeleteDialog } from "@/components/admin/delete-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
 import { createMediaAsset, deleteMediaAsset } from "@/lib/actions";
-import { Plus, Trash2, Image, Copy, ExternalLink, Loader2 } from "lucide-react";
+import { Plus, Trash2, Image, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function MediaClient({ initialData }: { initialData: any[] }) {

@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
-import { ArrowRight, Server, Box, Cpu, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, Server, Box } from "lucide-react";
 import { WhiteHeroScribble, LimeUnderlineSwoosh, CarrotThreeLineSpark } from "./voldog-doodles";
 
 interface VoldogHeroProps {
   profile?: any;
 }
 
-export function VoldogHero({ profile }: VoldogHeroProps) {
+export function VoldogHero({ profile: _profile }: VoldogHeroProps) {
   const [activeDomain, setActiveDomain] = useState<"cloud" | "creative">("cloud");
 
   return (

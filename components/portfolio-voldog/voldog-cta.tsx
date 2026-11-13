@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { ArrowRight, Send, CheckCircle2, ShieldCheck, Mail, Phone } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, Send, CheckCircle2, ShieldCheck, Mail } from "lucide-react";
 import { LimeUnderlineSwoosh } from "./voldog-doodles";
 import { toast } from "sonner";
 
@@ -10,7 +10,7 @@ interface VoldogCtaProps {
   socialLinks?: any[];
 }
 
-export function VoldogCta({ profile, socialLinks }: VoldogCtaProps) {
+export function VoldogCta({ profile: _profile, socialLinks: _socialLinks }: VoldogCtaProps) {
   const [form, setForm] = useState({ name: "", email: "", message: "", budget: "Enterprise Scale" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);

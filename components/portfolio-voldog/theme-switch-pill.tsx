@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { Sparkles, Palette, Check } from "lucide-react";
+import { Palette } from "lucide-react";
 
 interface ThemeSwitchPillProps {
   currentTheme: "cyberpunk" | "voldog";

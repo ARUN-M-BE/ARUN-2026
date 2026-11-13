@@ -2,6 +2,8 @@
   "name": "arun-2026",
   "version": "1.0.0",
   "private": true,
+  "license": "UNLICENSED",
+  "author": "Arun M <arun@arun-m.in> (https://arun-m.in)",
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack && opennextjs-cloudflare build --skipNextBuild",

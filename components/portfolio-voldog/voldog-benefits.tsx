@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { Check, Cpu, Shield, Zap, Sparkles, Terminal, Activity } from "lucide-react";
+import { Check, Shield, Zap, Activity, Cpu } from "lucide-react";
 import { LimeUnderlineSwoosh, CarrotThreeLineSpark } from "./voldog-doodles";
 
 export function VoldogBenefits() {
@@ -61,7 +60,7 @@ export function VoldogBenefits() {
           25px Lime Zest check disc, 19px Butcher Green title, 17px note
         */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {benefits.map((b, idx) => (
+          {benefits.map((b) => (
             <div
               key={b.title}
               className="bg-white rounded-[29px] p-8 sm:p-9 border border-[#0a0000]/[0.09] shadow-benefit-card flex gap-5 items-start transition-all hover:-translate-y-1 hover:shadow-md"

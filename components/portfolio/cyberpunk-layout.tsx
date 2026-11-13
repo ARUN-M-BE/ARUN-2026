@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { PortfolioNavbar } from "@/components/portfolio/navbar";
 import { MouseGlow } from "@/components/portfolio/mouse-glow";
 import { HeroSection } from "@/components/portfolio/hero-section";
@@ -36,7 +35,7 @@ export function CyberpunkLayout({
   certifications = [],
   testimonials = [],
   socialLinks = [],
-  onSwitchTheme,
+  onSwitchTheme: _onSwitchTheme,
 }: CyberpunkLayoutProps) {
   return (
     <div className="min-h-screen bg-background text-foreground relative selection:bg-primary/20 selection:text-primary transition-colors duration-300 overflow-x-hidden">

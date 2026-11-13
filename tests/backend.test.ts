@@ -67,6 +67,22 @@ async function runTestSuite() {
   });
   assert(invalidContact.success === false, "Invalid contact form properly flagged by Zod");
 
+  const validProject = projectSchema.safeParse({
+    title: "Test Project",
+    slug: "test-project",
+    summary: "A valid test project summary",
+    status: "published",
+  });
+  assert(validProject.success === true, "Valid project schema parsed successfully");
+
+  const validSkill = skillSchema.safeParse({
+    name: "TypeScript",
+    slug: "typescript",
+    level: 95,
+    status: "published",
+  });
+  assert(validSkill.success === true, "Valid skill schema parsed successfully");
+
   // 5. Rate Limiting Middleware
   console.log("\n[5] Testing Rate Limiting (Token Bucket / Window)");
   const testIp = "192.168.1.100";

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { VoldogLayout } from "@/components/portfolio-voldog/voldog-layout";
 import { CyberpunkLayout } from "@/components/portfolio/cyberpunk-layout";
 import { ThemeSwitchPill } from "@/components/portfolio-voldog/theme-switch-pill";

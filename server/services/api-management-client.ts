@@ -3,7 +3,7 @@
  * Handles Edge REST API CRUD operations, schema synchronization, and health monitoring.
  */
 
-import { Logger, formatApiResponse, formatApiError } from "@/server/utils";
+import { Logger } from "@/server/utils";
 
 export interface ApiClientConfig {
   baseUrl: string;

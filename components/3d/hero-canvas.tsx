@@ -22,13 +22,13 @@ function InteractiveSculpture({
   const satelliteGroupRef = useRef<THREE.Group>(null!);
   const floatGroupRef = useRef<THREE.Group>(null!);
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     const pulseFactor = isPulsing ? 1.4 : 1.0;
 
     // Smooth floating animation without heavy external library
     if (floatGroupRef.current) {
-      floatGroupRef.current.position.y = Math.sin(state.clock.elapsedTime * 1.8) * 0.12;
-      floatGroupRef.current.rotation.z = Math.cos(state.clock.elapsedTime * 0.9) * 0.05;
+      floatGroupRef.current.position.y = Math.sin(_state.clock.elapsedTime * 1.8) * 0.12;
+      floatGroupRef.current.rotation.z = Math.cos(_state.clock.elapsedTime * 0.9) * 0.05;
     }
 
     if (meshRef.current) {
@@ -141,7 +141,7 @@ function CosmicParticles({ count = 120 }: { count?: number }) {
   const skyRef = useRef<THREE.Points>(null!);
   const indigoRef = useRef<THREE.Points>(null!);
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (skyRef.current) {
       skyRef.current.rotation.y += delta * 0.025;
       skyRef.current.rotation.x -= delta * 0.01;

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Menu, X, Sparkles } from "lucide-react";
+import { Menu, X, Sparkles } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "./voldog-doodles";
 
 interface VoldogNavbarProps {

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Star } from "lucide-react";
 import { LimeUnderlineSwoosh, CarrotThreeLineSpark } from "./voldog-doodles";
 

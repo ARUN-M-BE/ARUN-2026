@@ -1,8 +1,7 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
-import { Mail, Shield, Terminal, ArrowUp } from "lucide-react";
+import { Mail, Shield, ArrowUp } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "./voldog-doodles";
 
 export function VoldogFooter() {

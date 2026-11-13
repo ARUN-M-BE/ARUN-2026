@@ -1,6 +1,6 @@
 "use client";
 
-import { GraduationCap, Award, ExternalLink, Calendar, MapPin, CheckCircle2 } from "lucide-react";
+import { GraduationCap, Award, ExternalLink } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 
 interface EducationSectionProps {

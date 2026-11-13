@@ -1,5 +1,3 @@
-import React from "react";
-
 /**
  * Hand-drawn SVG doodle accents according to the VOLDOG Food style reference:
  * - Lime Zest #e1e53f underline swooshes

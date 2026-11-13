@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { Briefcase, Calendar, MapPin, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { LimeUnderlineSwoosh, CarrotThreeLineSpark } from "./voldog-doodles";
 
 interface VoldogExperienceProps {

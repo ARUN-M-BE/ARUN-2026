@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { LimeUnderlineSwoosh, CarrotCurlyArrow } from "./voldog-doodles";
 
 export function VoldogRibbon() {

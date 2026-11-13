@@ -13,8 +13,7 @@ import {
   MediaService,
   AuditService,
 } from "../services";
-import { NavigationRepository } from "../repositories";
-import { requireAdmin, getSessionUser } from "../middleware/auth-guard";
+import { requireAdmin } from "../middleware/auth-guard";
 import {
   profileSchema,
   projectSchema,

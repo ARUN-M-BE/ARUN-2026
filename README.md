@@ -84,21 +84,6 @@ npm install --legacy-peer-deps
 
 ### 2. Configure Environment (`.env.local`)
 Create a `.env.local` file with your database and authentication configuration:
-```env
-# Database (PostgreSQL)
-DATABASE_URL=postgresql://postgres:admin@localhost:5432/portfolio
-
-# Authentication
-AUTH_SECRET=dev-secret-change-in-production-openssl-rand-base64-32
-NEXTAUTH_URL=http://localhost:3000
-
-# Seed Admin Credentials
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=ChangeMe123!
-
-# Public Site URL
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
 
 ### 3. Initialize Database & Seed
 ```bash
@@ -117,8 +102,6 @@ npm run dev
 Visit:
 - **Public Portfolio:** `http://localhost:3000`
 - **Admin CMS Dashboard:** `http://localhost:3000/admin`
-  - **Login:** `admin@example.com`
-  - **Password:** `ChangeMe123!`
 
 ---
 
@@ -161,3 +144,15 @@ Visit:
 - **DPDP Act 2023:** Consent is captured and stored with explicit timestamps for every contact submission and cookie choice.
 - **IT Act 2000:** Clear disclosures and contact points for grievance redressal.
 - **WCAG 2.2 AA:** Accessible forms, keyboard focus outlines, image alt tags, and native support for `prefers-reduced-motion`.
+
+---
+
+## ⚖️ Copyright & License
+
+Copyright © 2026 **Arun M** ([arun-m.in](https://arun-m.in)). All Rights Reserved.
+
+This repository, source code, 3D WebGL assets, design systems, algorithms, database schemas, and documentation are proprietary and confidential.
+
+- **No Unauthorized Distribution:** No permission is granted to copy, download, modify, merge, publish, distribute, sublicense, duplicate, or sell this software, repository, or any portion thereof without explicit written permission from the copyright holder.
+- **Inquiries:** For licensing inquiries, permissions, or architectural consultations, visit [arun-m.in](https://arun-m.in) or email `arun@arun-m.in`.
+

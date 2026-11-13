@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { upsertSeoMetadata } from "@/lib/actions";
-import { Loader2, Save, Search, Sparkles } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 
 export function SeoClient({ initialMetadata }: { initialMetadata: any[] }) {

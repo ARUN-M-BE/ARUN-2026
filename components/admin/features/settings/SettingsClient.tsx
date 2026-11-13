@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { updateSiteSetting } from "@/lib/actions";
-import { Loader2, Save, Palette, Shield, Globe, Bell, Check, Sparkles, Layers } from "lucide-react";
+import { Loader2, Save, Palette, Shield, Globe, Bell, Check } from "lucide-react";
 import { toast } from "sonner";
 
 export function SettingsClient({ initialSettings }: { initialSettings: any[] }) {
@@ -34,8 +34,8 @@ export function SettingsClient({ initialSettings }: { initialSettings: any[] }) 
     getVal("site_description", "Raw distributed architecture engineered for sub-50ms global scale.")
   );
   const [siteUrl, setSiteUrl] = useState(getVal("site_url", "https://arun-m.in"));
-  const [primaryColor, setPrimaryColor] = useState(getVal("theme_primary_color", "#204e4a"));
-  const [accentColor, setAccentColor] = useState(getVal("theme_accent_color", "#e1e53f"));
+  const [primaryColor] = useState(getVal("theme_primary_color", "#204e4a"));
+  const [accentColor] = useState(getVal("theme_accent_color", "#e1e53f"));
   const [cookieBanner, setCookieBanner] = useState(getVal("enable_cookie_banner", true));
   const [dataRetention, setDataRetention] = useState(getVal("data_retention_days", 365));
   const [emailNotify, setEmailNotify] = useState(getVal("contact_email_notifications", true));

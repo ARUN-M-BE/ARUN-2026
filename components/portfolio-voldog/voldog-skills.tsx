@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Server, Cpu, Box, Cloud, ShieldCheck, Terminal, Database, Code2 } from "lucide-react";
+import { useState } from "react";
+import { Server, Box, ShieldCheck, Code2 } from "lucide-react";
 import { LimeUnderlineSwoosh, CarrotThreeLineSpark } from "./voldog-doodles";
 
 interface VoldogSkillsProps {
