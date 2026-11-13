@@ -23,6 +23,7 @@ import {
   History,
   Layers,
   Share2,
+  Server,
 } from "lucide-react";
 
 const navigationGroups = [
@@ -62,6 +63,7 @@ const navigationGroups = [
       { name: "Legal & DPDP 2023", href: "/admin/legal", icon: Scale },
       { name: "Site Settings", href: "/admin/settings", icon: Settings },
       { name: "Security & Audit", href: "/admin/audit-log", icon: History },
+      { name: "API Management", href: "/admin/api-management", icon: Server },
     ],
   },
 ];

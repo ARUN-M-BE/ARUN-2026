@@ -25,7 +25,9 @@
     "build:cloudflare": "opennextjs-cloudflare build",
     "deploy:cloudflare": "opennextjs-cloudflare deploy",
     "cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts"
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts",
+    "test:integrations": "tsx tests/integrations.test.ts",
+    "test:all": "tsx tests/backend.test.ts && tsx tests/integrations.test.ts"
   },
   "dependencies": {
     "@auth/core": "^0.41.3",

@@ -33,7 +33,7 @@ import type {
   SectionFormData,
   SeoMetadataFormData,
 } from "@/lib/validations";
-import type { SocialLink, NavigationItem, WebsiteSection } from "@/types";
+import type { SocialLink, NavigationItem, WebsiteSection, MessageStatus } from "@/types";
 
 // ─── Profile ──────────────────────────────────────────────
 export async function getProfile() {
@@ -187,7 +187,7 @@ export async function getContactMessages(opts?: { search?: string; status?: stri
 export async function submitContactForm(data: unknown) {
   return MessageController.submitContactForm(data);
 }
-export async function updateMessageStatus(id: string, status: string) {
+export async function updateMessageStatus(id: string, status: MessageStatus) {
   return MessageController.updateMessageStatus(id, status);
 }
 export async function deleteMessage(id: string) {
@@ -402,7 +402,7 @@ export async function createNavigation(data: NavigationFormData): Promise<{ succ
     const item = await NavigationRepository.create(data);
     revalidatePath("/");
     revalidatePath("/admin/navigation");
-    return { success: true, data: item };
+    return { success: true, data: item as unknown as NavigationItem };
   } catch (err: unknown) {
     console.warn("[actions.createNavigation] Error:", err);
     return { success: false, error: err instanceof Error ? err.message : "Failed to create navigation" };
@@ -414,7 +414,7 @@ export async function updateNavigation(id: string, data: Partial<NavigationFormD
     const item = await NavigationRepository.update(id, data);
     revalidatePath("/");
     revalidatePath("/admin/navigation");
-    return { success: true, data: item };
+    return { success: true, data: item as unknown as NavigationItem };
   } catch (err: unknown) {
     console.warn("[actions.updateNavigation] Error:", err);
     return { success: false, error: err instanceof Error ? err.message : "Failed to update navigation" };
@@ -460,7 +460,7 @@ export async function createSection(data: SectionFormData): Promise<{ success: b
     const sec = await SectionRepository.create(data);
     revalidatePath("/");
     revalidatePath("/admin/sections");
-    return { success: true, data: sec };
+    return { success: true, data: sec as unknown as WebsiteSection };
   } catch (err: unknown) {
     console.warn("[actions.createSection] Error:", err);
     return { success: false, error: err instanceof Error ? err.message : "Failed to create section" };
@@ -472,7 +472,7 @@ export async function updateSection(id: string, data: Partial<SectionFormData>):
     const updated = await SectionRepository.update(id, data);
     revalidatePath("/");
     revalidatePath("/admin/sections");
-    return { success: true, data: updated };
+    return { success: true, data: updated as unknown as WebsiteSection };
   } catch (err: unknown) {
     console.warn("[actions.updateSection] Error:", err);
     return { success: false, error: err instanceof Error ? err.message : "Failed to update section" };
@@ -484,7 +484,7 @@ export async function duplicateSection(id: string): Promise<{ success: boolean; 
     const duplicated = await SectionRepository.duplicate(id);
     revalidatePath("/");
     revalidatePath("/admin/sections");
-    return { success: true, data: duplicated };
+    return { success: true, data: (duplicated as unknown as WebsiteSection) || undefined };
   } catch (err: unknown) {
     console.warn("[actions.duplicateSection] Error:", err);
     return { success: false, error: err instanceof Error ? err.message : "Failed to duplicate section" };

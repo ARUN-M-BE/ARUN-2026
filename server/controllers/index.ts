@@ -28,6 +28,7 @@ import {
   legalDocumentSchema,
 } from "../validators";
 import { ActionResult } from "../constants";
+import type { MessageStatus } from "@/types";
 
 async function requireUser() {
   const session = await requireAdmin();
@@ -265,7 +266,7 @@ export const MessageController = {
     if (!parsed.success) return { success: false, error: parsed.error.errors[0]?.message };
     return MessageService.submitContact(parsed.data);
   },
-  async updateMessageStatus(id: string, status: string): Promise<ActionResult> {
+  async updateMessageStatus(id: string, status: MessageStatus): Promise<ActionResult> {
     const user = await requireUser();
     return MessageService.updateStatus(user.id, id, status);
   },

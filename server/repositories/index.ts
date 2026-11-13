@@ -1,6 +1,6 @@
 import { db } from "../config/database";
 import * as schema from "../models/schema";
-import type { Status, MessageStatus, Project, SkillCategory, Skill, NavigationItem, WebsiteSection, SocialLink } from "@/types";
+import type { Status, MessageStatus, MediaAsset } from "@/types";
 import { eq, desc, asc, and, or, ilike, count } from "drizzle-orm";
 import { isUUID } from "@/lib/utils";
 import {
@@ -41,12 +41,12 @@ export const ProfileRepository = {
       if (existingRow) {
         const [updated] = await db
           .update(schema.profile)
-          .set({ ...cleanData, updatedAt: new Date() })
+          .set({ ...cleanData, updatedAt: new Date() } as Partial<typeof schema.profile.$inferInsert>)
           .where(eq(schema.profile.id, existingRow.id))
           .returning();
         return updated;
       }
-      const [inserted] = await db.insert(schema.profile).values(cleanData).returning();
+      const [inserted] = await db.insert(schema.profile).values(cleanData as typeof schema.profile.$inferInsert).returning();
       return inserted;
     } catch (err) {
       console.warn("[ProfileRepository.upsert] DB update bypassed or failed:", err);
@@ -104,7 +104,7 @@ export const ProjectRepository = {
   async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
-      const [item] = await db.insert(schema.projects).values(cleanData).returning();
+      const [item] = await db.insert(schema.projects).values(cleanData as typeof schema.projects.$inferInsert).returning();
       return item;
     } catch (err) {
       console.warn("[ProjectRepository.create] DB insert failed:", err);
@@ -120,26 +120,26 @@ export const ProjectRepository = {
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.projects).where(eq(schema.projects.id, id)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.projects).set(updateData).where(eq(schema.projects.id, id)).returning();
+          const [updated] = await db.update(schema.projects).set(updateData as Partial<typeof schema.projects.$inferInsert>).where(eq(schema.projects.id, id)).returning();
           return updated;
         }
       }
 
       // 2. Try finding by slug (including cleanSlug)
       const cleanSlug = id.replace(/^proj-/, "");
-      const targetSlug = data.slug || cleanSlug;
+      const targetSlug = (typeof data.slug === "string" ? data.slug : null) || cleanSlug;
       const [bySlug] = await db.select().from(schema.projects).where(
         or(eq(schema.projects.slug, targetSlug), eq(schema.projects.slug, id), eq(schema.projects.slug, cleanSlug))
       ).limit(1);
       if (bySlug) {
-        const [updated] = await db.update(schema.projects).set(updateData).where(eq(schema.projects.id, bySlug.id)).returning();
+        const [updated] = await db.update(schema.projects).set(updateData as Partial<typeof schema.projects.$inferInsert>).where(eq(schema.projects.id, bySlug.id)).returning();
         return updated;
       }
 
       // 3. Fallback item promotion to database
-      const insertData = { ...updateData, slug: targetSlug };
+      const insertData: Record<string, unknown> = { ...updateData, slug: targetSlug };
       if (isUUID(id)) insertData.id = id;
-      const [created] = await db.insert(schema.projects).values(insertData).returning();
+      const [created] = await db.insert(schema.projects).values(insertData as typeof schema.projects.$inferInsert).returning();
       return created;
     } catch (err) {
       console.warn("[ProjectRepository.update] DB update/upsert error:", err);
@@ -175,7 +175,7 @@ export const SkillRepository = {
   async createCategory(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
-      const [cat] = await db.insert(schema.skillCategories).values(cleanData).returning();
+      const [cat] = await db.insert(schema.skillCategories).values(cleanData as typeof schema.skillCategories.$inferInsert).returning();
       return cat;
     } catch (err) {
       console.warn("[SkillRepository.createCategory] Error:", err);
@@ -189,7 +189,7 @@ export const SkillRepository = {
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.skillCategories).where(eq(schema.skillCategories.id, id)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.skillCategories).set(updateData).where(eq(schema.skillCategories.id, id)).returning();
+          const [updated] = await db.update(schema.skillCategories).set(updateData as Partial<typeof schema.skillCategories.$inferInsert>).where(eq(schema.skillCategories.id, id)).returning();
           return updated;
         }
       }
@@ -204,12 +204,11 @@ export const SkillRepository = {
         return updated;
       }
       const [created] = await db.insert(schema.skillCategories).values({
-        name: cleanData.name || "Category",
-        slug: cleanData.slug || cleanSlug,
-        status: cleanData.status || "published",
+        name: (cleanData.name as string) || "Category",
+        slug: (cleanData.slug as string) || cleanSlug,
+        status: (cleanData.status as Status) || "published",
         sortOrder: typeof cleanData.sortOrder === "number" ? cleanData.sortOrder : 0,
-        updatedAt: new Date(),
-      }).returning();
+      } as typeof schema.skillCategories.$inferInsert).returning();
       return created;
     } catch (err) {
       console.warn("[SkillRepository.updateCategory] Error:", err);
@@ -260,9 +259,9 @@ export const SkillRepository = {
       const { id: _ignored, ...cleanData } = data;
       const safeData = {
         ...cleanData,
-        categoryId: isUUID(data?.categoryId) ? data.categoryId : null,
+        categoryId: typeof data?.categoryId === "string" && isUUID(data.categoryId) ? data.categoryId : null,
       };
-      const [skill] = await db.insert(schema.skills).values(safeData).returning();
+      const [skill] = await db.insert(schema.skills).values(safeData as typeof schema.skills.$inferInsert).returning();
       return skill;
     } catch (err) {
       console.warn("[SkillRepository.createSkill] Error:", err);
@@ -274,13 +273,13 @@ export const SkillRepository = {
       const { id: _ignored, ...cleanData } = data;
       const safeData = {
         ...cleanData,
-        categoryId: isUUID(data?.categoryId) ? data.categoryId : null,
+        categoryId: typeof data?.categoryId === "string" && isUUID(data.categoryId) ? data.categoryId : null,
         updatedAt: new Date(),
       };
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.skills).where(eq(schema.skills.id, id)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.skills).set(safeData).where(eq(schema.skills.id, id)).returning();
+          const [updated] = await db.update(schema.skills).set(safeData as Partial<typeof schema.skills.$inferInsert>).where(eq(schema.skills.id, id)).returning();
           return updated;
         }
       }
@@ -291,19 +290,19 @@ export const SkillRepository = {
         .where(or(eq(schema.skills.slug, id), eq(schema.skills.slug, cleanSlug)))
         .limit(1);
       if (existingSlug) {
-        const [updated] = await db.update(schema.skills).set(safeData).where(eq(schema.skills.id, existingSlug.id)).returning();
+        const [updated] = await db.update(schema.skills).set(safeData as Partial<typeof schema.skills.$inferInsert>).where(eq(schema.skills.id, existingSlug.id)).returning();
         return updated;
       }
       const [created] = await db.insert(schema.skills).values({
-        name: cleanData.name || "New Skill",
-        slug: cleanData.slug || cleanSlug,
+        name: (cleanData.name as string) || "New Skill",
+        slug: (cleanData.slug as string) || cleanSlug,
         level: typeof cleanData.level === "number" ? cleanData.level : 85,
-        categoryId: safeData.categoryId,
+        categoryId: safeData.categoryId as string | null,
         isFeatured: typeof cleanData.isFeatured === "boolean" ? cleanData.isFeatured : true,
-        status: cleanData.status || "published",
+        status: (cleanData.status as Status) || "published",
         sortOrder: typeof cleanData.sortOrder === "number" ? cleanData.sortOrder : 0,
         updatedAt: new Date(),
-      }).returning();
+      } as typeof schema.skills.$inferInsert).returning();
       return created;
     } catch (err) {
       console.warn("[SkillRepository.updateSkill] Error:", err);
@@ -347,7 +346,7 @@ export const ExperienceRepository = {
   async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
-      const [exp] = await db.insert(schema.experience).values(cleanData).returning();
+      const [exp] = await db.insert(schema.experience).values(cleanData as typeof schema.experience.$inferInsert).returning();
       return exp;
     } catch (err) {
       console.warn("[ExperienceRepository.create] Error:", err);
@@ -361,20 +360,20 @@ export const ExperienceRepository = {
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.experience).where(eq(schema.experience.id, id)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.experience).set(updateData).where(eq(schema.experience.id, id)).returning();
+          const [updated] = await db.update(schema.experience).set(updateData as Partial<typeof schema.experience.$inferInsert>).where(eq(schema.experience.id, id)).returning();
           return updated;
         }
       }
-      if (data.company) {
+      if (typeof data.company === "string") {
         const [existing] = await db.select().from(schema.experience).where(eq(schema.experience.company, data.company)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.experience).set(updateData).where(eq(schema.experience.id, existing.id)).returning();
+          const [updated] = await db.update(schema.experience).set(updateData as Partial<typeof schema.experience.$inferInsert>).where(eq(schema.experience.id, existing.id)).returning();
           return updated;
         }
       }
-      const insertData = { ...updateData };
+      const insertData: Record<string, unknown> = { ...updateData };
       if (isUUID(id)) insertData.id = id;
-      const [created] = await db.insert(schema.experience).values(insertData).returning();
+      const [created] = await db.insert(schema.experience).values(insertData as typeof schema.experience.$inferInsert).returning();
       return created;
     } catch (err) {
       console.warn("[ExperienceRepository.update] Error:", err);
@@ -415,7 +414,7 @@ export const EducationRepository = {
   async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
-      const [edu] = await db.insert(schema.education).values(cleanData).returning();
+      const [edu] = await db.insert(schema.education).values(cleanData as typeof schema.education.$inferInsert).returning();
       return edu;
     } catch (err) {
       console.warn("[EducationRepository.create] Error:", err);
@@ -429,20 +428,20 @@ export const EducationRepository = {
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.education).where(eq(schema.education.id, id)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.education).set(updateData).where(eq(schema.education.id, id)).returning();
+          const [updated] = await db.update(schema.education).set(updateData as Partial<typeof schema.education.$inferInsert>).where(eq(schema.education.id, id)).returning();
           return updated;
         }
       }
-      if (data.institution) {
+      if (typeof data.institution === "string") {
         const [existing] = await db.select().from(schema.education).where(eq(schema.education.institution, data.institution)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.education).set(updateData).where(eq(schema.education.id, existing.id)).returning();
+          const [updated] = await db.update(schema.education).set(updateData as Partial<typeof schema.education.$inferInsert>).where(eq(schema.education.id, existing.id)).returning();
           return updated;
         }
       }
-      const insertData = { ...updateData };
+      const insertData: Record<string, unknown> = { ...updateData };
       if (isUUID(id)) insertData.id = id;
-      const [created] = await db.insert(schema.education).values(insertData).returning();
+      const [created] = await db.insert(schema.education).values(insertData as typeof schema.education.$inferInsert).returning();
       return created;
     } catch (err) {
       console.warn("[EducationRepository.update] Error:", err);
@@ -483,7 +482,7 @@ export const CertificationRepository = {
   async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
-      const [cert] = await db.insert(schema.certifications).values(cleanData).returning();
+      const [cert] = await db.insert(schema.certifications).values(cleanData as typeof schema.certifications.$inferInsert).returning();
       return cert;
     } catch (err) {
       console.warn("[CertificationRepository.create] Error:", err);
@@ -497,20 +496,20 @@ export const CertificationRepository = {
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.certifications).where(eq(schema.certifications.id, id)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.certifications).set(updateData).where(eq(schema.certifications.id, id)).returning();
+          const [updated] = await db.update(schema.certifications).set(updateData as Partial<typeof schema.certifications.$inferInsert>).where(eq(schema.certifications.id, id)).returning();
           return updated;
         }
       }
-      if (data.name) {
+      if (typeof data.name === "string") {
         const [existing] = await db.select().from(schema.certifications).where(eq(schema.certifications.name, data.name)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.certifications).set(updateData).where(eq(schema.certifications.id, existing.id)).returning();
+          const [updated] = await db.update(schema.certifications).set(updateData as Partial<typeof schema.certifications.$inferInsert>).where(eq(schema.certifications.id, existing.id)).returning();
           return updated;
         }
       }
-      const insertData = { ...updateData };
+      const insertData: Record<string, unknown> = { ...updateData };
       if (isUUID(id)) insertData.id = id;
-      const [created] = await db.insert(schema.certifications).values(insertData).returning();
+      const [created] = await db.insert(schema.certifications).values(insertData as typeof schema.certifications.$inferInsert).returning();
       return created;
     } catch (err) {
       console.warn("[CertificationRepository.update] Error:", err);
@@ -549,7 +548,7 @@ export const ServiceRepository = {
   async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
-      const [svc] = await db.insert(schema.services).values(cleanData).returning();
+      const [svc] = await db.insert(schema.services).values(cleanData as typeof schema.services.$inferInsert).returning();
       return svc;
     } catch (err) {
       console.warn("[ServiceRepository.create] Error:", err);
@@ -563,20 +562,20 @@ export const ServiceRepository = {
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.services).where(eq(schema.services.id, id)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.services).set(updateData).where(eq(schema.services.id, id)).returning();
+          const [updated] = await db.update(schema.services).set(updateData as Partial<typeof schema.services.$inferInsert>).where(eq(schema.services.id, id)).returning();
           return updated;
         }
       }
-      if (data.title) {
+      if (typeof data.title === "string") {
         const [existing] = await db.select().from(schema.services).where(eq(schema.services.title, data.title)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.services).set(updateData).where(eq(schema.services.id, existing.id)).returning();
+          const [updated] = await db.update(schema.services).set(updateData as Partial<typeof schema.services.$inferInsert>).where(eq(schema.services.id, existing.id)).returning();
           return updated;
         }
       }
-      const insertData = { ...updateData };
+      const insertData: Record<string, unknown> = { ...updateData };
       if (isUUID(id)) insertData.id = id;
-      const [created] = await db.insert(schema.services).values(insertData).returning();
+      const [created] = await db.insert(schema.services).values(insertData as typeof schema.services.$inferInsert).returning();
       return created;
     } catch (err) {
       console.warn("[ServiceRepository.update] Error:", err);
@@ -617,7 +616,7 @@ export const TestimonialRepository = {
   async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
-      const [t] = await db.insert(schema.testimonials).values(cleanData).returning();
+      const [t] = await db.insert(schema.testimonials).values(cleanData as typeof schema.testimonials.$inferInsert).returning();
       return t;
     } catch (err) {
       console.warn("[TestimonialRepository.create] Error:", err);
@@ -631,20 +630,20 @@ export const TestimonialRepository = {
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.testimonials).where(eq(schema.testimonials.id, id)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.testimonials).set(updateData).where(eq(schema.testimonials.id, id)).returning();
+          const [updated] = await db.update(schema.testimonials).set(updateData as Partial<typeof schema.testimonials.$inferInsert>).where(eq(schema.testimonials.id, id)).returning();
           return updated;
         }
       }
-      if (data.name) {
+      if (typeof data.name === "string") {
         const [existing] = await db.select().from(schema.testimonials).where(eq(schema.testimonials.name, data.name)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.testimonials).set(updateData).where(eq(schema.testimonials.id, existing.id)).returning();
+          const [updated] = await db.update(schema.testimonials).set(updateData as Partial<typeof schema.testimonials.$inferInsert>).where(eq(schema.testimonials.id, existing.id)).returning();
           return updated;
         }
       }
-      const insertData = { ...updateData };
+      const insertData: Record<string, unknown> = { ...updateData };
       if (isUUID(id)) insertData.id = id;
-      const [created] = await db.insert(schema.testimonials).values(insertData).returning();
+      const [created] = await db.insert(schema.testimonials).values(insertData as typeof schema.testimonials.$inferInsert).returning();
       return created;
     } catch (err) {
       console.warn("[TestimonialRepository.update] Error:", err);
@@ -672,7 +671,7 @@ export const MessageRepository = {
       const limit = opts?.limit || 20;
       const offset = (page - 1) * limit;
       const conditions = [];
-      if (opts?.status) conditions.push(eq(schema.contactMessages.messageStatus, opts.status as Status));
+      if (opts?.status) conditions.push(eq(schema.contactMessages.messageStatus, opts.status as MessageStatus));
       const where = conditions.length > 0 ? and(...conditions) : undefined;
       const [items, [{ total }]] = await Promise.all([
         db.select().from(schema.contactMessages).where(where).orderBy(desc(schema.contactMessages.createdAt)).limit(limit).offset(offset),
@@ -686,7 +685,7 @@ export const MessageRepository = {
   async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
-      return await db.insert(schema.contactMessages).values(cleanData);
+      return await db.insert(schema.contactMessages).values(cleanData as typeof schema.contactMessages.$inferInsert);
     } catch (err) {
       console.warn("[MessageRepository.create] Stored in local fallback log:", err);
       return null;
@@ -694,7 +693,7 @@ export const MessageRepository = {
   },
   async recordConsent(data: Record<string, unknown>) {
     try {
-      return await db.insert(schema.consentRecords).values(data);
+      return await db.insert(schema.consentRecords).values(data as typeof schema.consentRecords.$inferInsert);
     } catch (err) {
       console.warn("[MessageRepository.recordConsent] Consent recorded in fallback mode:", err);
       return null;
@@ -773,7 +772,7 @@ export const NavigationRepository = {
   async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
-      const [nav] = await db.insert(schema.navigation).values(cleanData).returning();
+      const [nav] = await db.insert(schema.navigation).values(cleanData as typeof schema.navigation.$inferInsert).returning();
       return nav;
     } catch (err) {
       console.warn("[NavigationRepository.create] Error:", err);
@@ -787,7 +786,7 @@ export const NavigationRepository = {
       if (isUUID(id)) {
         const [existing] = await db.select().from(schema.navigation).where(eq(schema.navigation.id, id)).limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.navigation).set(updateData).where(eq(schema.navigation.id, id)).returning();
+          const [updated] = await db.update(schema.navigation).set(updateData as Partial<typeof schema.navigation.$inferInsert>).where(eq(schema.navigation.id, id)).returning();
           return updated;
         }
       }
@@ -797,30 +796,30 @@ export const NavigationRepository = {
           .from(schema.navigation)
           .where(
             or(
-              data.href ? eq(schema.navigation.href, data.href) : undefined,
-              data.label ? eq(schema.navigation.label, data.label) : undefined
+              typeof data.href === "string" ? eq(schema.navigation.href, data.href) : undefined,
+              typeof data.label === "string" ? eq(schema.navigation.label, data.label) : undefined
             )
           )
           .limit(1);
         if (existing) {
-          const [updated] = await db.update(schema.navigation).set(updateData).where(eq(schema.navigation.id, existing.id)).returning();
+          const [updated] = await db.update(schema.navigation).set(updateData as Partial<typeof schema.navigation.$inferInsert>).where(eq(schema.navigation.id, existing.id)).returning();
           return updated;
         }
       }
       const [created] = await db.insert(schema.navigation).values({
-        label: cleanData.label || "Link",
-        href: cleanData.href || "#",
-        icon: cleanData.icon || null,
-        color: cleanData.color || null,
-        badge: cleanData.badge || null,
-        style: cleanData.style || "default",
+        label: (cleanData.label as string) || "Link",
+        href: (cleanData.href as string) || "#",
+        icon: (cleanData.icon as string) || null,
+        color: (cleanData.color as string) || null,
+        badge: (cleanData.badge as string) || null,
+        style: (cleanData.style as string) || "default",
         isExternal: Boolean(cleanData.isExternal || cleanData.target === "_blank"),
         sortOrder: typeof cleanData.sortOrder === "number" ? cleanData.sortOrder : 0,
         isActive: typeof cleanData.isActive === "boolean" ? cleanData.isActive : true,
-        status: cleanData.status || "published",
-        group: cleanData.group || "main",
+        status: (cleanData.status as Status) || "published",
+        group: (cleanData.group as string) || "main",
         updatedAt: new Date(),
-      }).returning();
+      } as typeof schema.navigation.$inferInsert).returning();
       return created;
     } catch (err) {
       console.warn("[NavigationRepository.update] Error:", err);
@@ -906,7 +905,7 @@ export const SectionRepository = {
   async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
-      const [sec] = await db.insert(schema.websiteSections).values(cleanData).returning();
+      const [sec] = await db.insert(schema.websiteSections).values(cleanData as typeof schema.websiteSections.$inferInsert).returning();
       return sec;
     } catch (err) {
       console.warn("[SectionRepository.create] Error:", err);
@@ -922,13 +921,13 @@ export const SectionRepository = {
         if (existing) {
           const [updated] = await db
             .update(schema.websiteSections)
-            .set(updateData)
+            .set(updateData as Partial<typeof schema.websiteSections.$inferInsert>)
             .where(eq(schema.websiteSections.id, id))
             .returning();
           return updated;
         }
       }
-      const keyToMatch = data.sectionKey || (id.startsWith("sec-") ? id.replace(/^sec-/, "") : id);
+      const keyToMatch = (typeof data.sectionKey === "string" ? data.sectionKey : null) || (id.startsWith("sec-") ? id.replace(/^sec-/, "") : id);
       if (keyToMatch) {
         const [existing] = await db
           .select()
@@ -938,7 +937,7 @@ export const SectionRepository = {
         if (existing) {
           const [updated] = await db
             .update(schema.websiteSections)
-            .set(updateData)
+            .set(updateData as Partial<typeof schema.websiteSections.$inferInsert>)
             .where(eq(schema.websiteSections.id, existing.id))
             .returning();
           return updated;
@@ -948,18 +947,18 @@ export const SectionRepository = {
         .insert(schema.websiteSections)
         .values({
           sectionKey: keyToMatch || "section",
-          title: cleanData.title || "Section",
-          subtitle: cleanData.subtitle || null,
-          badge: cleanData.badge || null,
-          description: cleanData.description || null,
-          content: cleanData.content || null,
-          componentType: cleanData.componentType || keyToMatch || "custom",
+          title: (cleanData.title as string) || "Section",
+          subtitle: (cleanData.subtitle as string) || null,
+          badge: (cleanData.badge as string) || null,
+          description: (cleanData.description as string) || null,
+          content: (cleanData.content as string) || null,
+          componentType: (cleanData.componentType as string) || keyToMatch || "custom",
           sortOrder: typeof cleanData.sortOrder === "number" ? cleanData.sortOrder : 0,
-          status: cleanData.status || "published",
-          styles: cleanData.styles || null,
-          metadata: cleanData.metadata || null,
+          status: (cleanData.status as Status) || "published",
+          styles: (cleanData.styles as Record<string, unknown>) || null,
+          metadata: (cleanData.metadata as Record<string, unknown>) || null,
           updatedAt: new Date(),
-        })
+        } as typeof schema.websiteSections.$inferInsert)
         .returning();
       return created;
     } catch (err) {
@@ -1070,10 +1069,10 @@ export const LegalRepository = {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
       if (isUUID(id)) {
-        return await db.update(schema.legalDocuments).set(updateData).where(eq(schema.legalDocuments.id, id));
+        return await db.update(schema.legalDocuments).set(updateData as Partial<typeof schema.legalDocuments.$inferInsert>).where(eq(schema.legalDocuments.id, id));
       }
-      if (data.slug) {
-        return await db.update(schema.legalDocuments).set(updateData).where(eq(schema.legalDocuments.slug, data.slug));
+      if (typeof data.slug === "string") {
+        return await db.update(schema.legalDocuments).set(updateData as Partial<typeof schema.legalDocuments.$inferInsert>).where(eq(schema.legalDocuments.slug, data.slug));
       }
       return null;
     } catch (err) {
@@ -1088,7 +1087,7 @@ export const LegalRepository = {
         documentId: isUUID(data?.documentId) ? data.documentId : null,
         changedBy: isUUID(data?.changedBy) ? data.changedBy : null,
       };
-      return await db.insert(schema.legalVersionHistory).values(safeData);
+      return await db.insert(schema.legalVersionHistory).values(safeData as typeof schema.legalVersionHistory.$inferInsert);
     } catch (err) {
       console.warn("[LegalRepository.addVersionHistory] Error:", err);
       return null;
@@ -1108,33 +1107,57 @@ export const LegalRepository = {
 };
 
 // --- Media Repository ------------------------------------
+const inMemoryMediaAssets: MediaAsset[] = [];
+
 export const MediaRepository = {
-  async findMany(opts?: { entity?: string; page?: number; limit?: number }) {
+  async findMany(opts?: { folder?: string; search?: string; type?: string; page?: number; limit?: number }) {
     try {
       const page = opts?.page || 1;
       const limit = opts?.limit || 50;
       const offset = (page - 1) * limit;
-      const where = opts?.entity ? eq(schema.auditLog.entity, opts.entity) : undefined;
+      const conditions = [];
+      if (opts?.folder) conditions.push(eq(schema.mediaAssets.folder, opts.folder));
+      if (opts?.search) conditions.push(ilike(schema.mediaAssets.filename, `%${opts.search}%`));
+      const where = conditions.length > 0 ? and(...conditions) : undefined;
       const [items, [{ total }]] = await Promise.all([
-        db.select().from(schema.auditLog).where(where).orderBy(desc(schema.auditLog.createdAt)).limit(limit).offset(offset),
-        db.select({ total: count() }).from(schema.auditLog).where(where),
+        db.select().from(schema.mediaAssets).where(where).orderBy(desc(schema.mediaAssets.createdAt)).limit(limit).offset(offset),
+        db.select({ total: count() }).from(schema.mediaAssets).where(where),
       ]);
       if (items && items.length > 0) {
         return { items, total, page, limit, pages: Math.ceil(total / limit) };
       }
-      return { items: inMemoryAuditLogs, total: inMemoryAuditLogs.length, page: 1, limit: 50, pages: 1 };
+      return { items: inMemoryMediaAssets, total: inMemoryMediaAssets.length, page: 1, limit: 50, pages: 1 };
     } catch {
-      return { items: inMemoryAuditLogs, total: inMemoryAuditLogs.length, page: 1, limit: 50, pages: 1 };
+      return { items: inMemoryMediaAssets, total: inMemoryMediaAssets.length, page: 1, limit: 50, pages: 1 };
     }
   },
   async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
-      const [asset] = await db.insert(schema.mediaAssets).values(cleanData).returning();
+      const [asset] = await db.insert(schema.mediaAssets).values(cleanData as typeof schema.mediaAssets.$inferInsert).returning();
       return asset;
     } catch (err) {
       console.warn("[MediaRepository.create] Error:", err);
-      return { ...data, id: "media-" + Date.now() };
+      const fallbackItem: MediaAsset = {
+        id: "media-" + Date.now(),
+        filename: String(data.filename || "file"),
+        originalFilename: String(data.originalFilename || "file"),
+        mimeType: String(data.mimeType || "application/octet-stream"),
+        size: Number(data.size || 0),
+        url: String(data.url || ""),
+        altText: (data.altText as string) || null,
+        caption: (data.caption as string) || null,
+        width: typeof data.width === "number" ? data.width : null,
+        height: typeof data.height === "number" ? data.height : null,
+        folder: (data.folder as string) || null,
+        copyright: (data.copyright as string) || null,
+        license: (data.license as string) || null,
+        attribution: (data.attribution as string) || null,
+        uploadedBy: (data.uploadedBy as string) || null,
+        createdAt: new Date(),
+      };
+      inMemoryMediaAssets.unshift(fallbackItem);
+      return fallbackItem;
     }
   },
   async delete(id: string) {
@@ -1142,6 +1165,8 @@ export const MediaRepository = {
       if (isUUID(id)) {
         return await db.delete(schema.mediaAssets).where(eq(schema.mediaAssets.id, id));
       }
+      const idx = inMemoryMediaAssets.findIndex(m => m.id === id);
+      if (idx !== -1) inMemoryMediaAssets.splice(idx, 1);
       return null;
     } catch (err) {
       console.warn("[MediaRepository.delete] Error:", err);

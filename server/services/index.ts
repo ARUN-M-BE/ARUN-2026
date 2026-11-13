@@ -15,6 +15,7 @@ import {
 } from "../repositories";
 import { revalidatePath } from "next/cache";
 import { ActionResult } from "../constants";
+import type { MessageStatus } from "@/types";
 
 function toSafeDate(val: unknown): Date | undefined {
   if (!val) return undefined;
@@ -26,13 +27,6 @@ function toSafeDate(val: unknown): Date | undefined {
   return undefined;
 }
 
-function getErrorMessage(err: unknown, fallback: string): string {
-  if (err instanceof Error) return err.message;
-  if (typeof err === "object" && err !== null && "message" in err) {
-    return String((err as { message: unknown }).message);
-  }
-  return fallback;
-}
 
 // --- Profile Service -------------------------------------
 export const ProfileService = {
@@ -478,7 +472,7 @@ export const MessageService = {
       return { success: false, error: (err instanceof Error ? err.message : String(err)) || "Failed to submit message" };
     }
   },
-  async updateStatus(userId: string, id: string, status: string): Promise<ActionResult> {
+  async updateStatus(userId: string, id: string, status: MessageStatus): Promise<ActionResult> {
     try {
       await MessageRepository.updateStatus(id, status);
       await AuditRepository.log({ userId, action: "update_status", entity: "contact_message", entityId: id, details: { status } });
