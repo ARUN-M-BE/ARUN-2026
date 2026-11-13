@@ -17,25 +17,31 @@ import {
   GitCompare,
   Check,
   Sparkles,
+  LayoutGrid,
+  List,
+  Images,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+import type { Project } from "@/types";
 
 interface ProjectsSectionProps {
-  projects: any[];
+  projects: Project[];
 }
 
 export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
   const { t, language } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [search, setSearch] = useState("");
-  const [activeProject, setActiveProject] = useState<any | null>(null);
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   // Comparison mode
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
 
   // Extract unique categories safely
-  const categories = ["All", ...Array.from(new Set((projects || []).map((p) => p.category).filter(Boolean)))];
+  const categories = ["All", ...Array.from(new Set((projects || []).map((p) => p.category).filter(Boolean))) as string[]];
 
   const filtered = (projects || []).filter((p) => {
     const matchesCat = selectedCategory === "All" || p.category === selectedCategory;
@@ -59,6 +65,11 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
     }
   };
 
+  const openProjectModal = (project: Project) => {
+    setActiveProject(project);
+    setActiveImageIndex(0);
+  };
+
   const comparedProjects = (projects || []).filter((p) => compareIds.includes(p.id));
 
   return (
@@ -79,7 +90,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
             </p>
           </div>
 
-          {/* Search & Compare Controls */}
+          {/* Search, View Mode & Compare Controls */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             {compareIds.length > 0 && (
               <Button
@@ -92,6 +103,28 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                 <span>{t("projects.compareButton", "Compare Architecture")} ({compareIds.length}/2)</span>
               </Button>
             )}
+
+            {/* Grid / List Switcher */}
+            <div className="inline-flex items-center p-1 rounded-xl bg-card border border-border">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setViewMode("grid")}
+                className={`h-8 w-8 rounded-lg ${viewMode === "grid" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground"}`}
+                title="Grid View"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setViewMode("list")}
+                className={`h-8 w-8 rounded-lg ${viewMode === "list" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground"}`}
+                title="List View"
+              >
+                <List className="w-4 h-4" />
+              </Button>
+            </div>
 
             <div className="relative w-full sm:w-64">
               <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
@@ -126,7 +159,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
           ))}
         </div>
 
-        {/* Project Grid with 3D Tilt Effect */}
+        {/* Project View Display */}
         {filtered.length === 0 ? (
           <div className="text-center py-20 border border-dashed border-border rounded-3xl p-8 bg-card/40">
             <Layers className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
@@ -137,7 +170,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
               {language === "ar" ? "جرب البحث عن تقنية أخرى أو مسح الفلتر" : "Try searching for a different framework or clear the filter."}
             </p>
           </div>
-        ) : (
+        ) : viewMode === "grid" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((project) => {
               const isSelectedForCompare = compareIds.includes(project.id);
@@ -145,8 +178,8 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                 <TiltCard
                   key={project.id}
                   maxTilt={8}
-                  className="rounded-3xl glass-panel hover:border-sky-500/40 transition-colors flex flex-col justify-between overflow-hidden relative cursor-pointer border border-border shadow-xs"
-                  onClick={() => setActiveProject(project)}
+                  className="rounded-3xl glass-panel hover:border-sky-500/40 transition-colors flex flex-col justify-between overflow-hidden relative cursor-pointer border border-border shadow-xs group"
+                  onClick={() => openProjectModal(project)}
                 >
                   {/* Visual Thumbnail */}
                   <div className="aspect-[16/10] bg-muted relative overflow-hidden flex items-center justify-center">
@@ -154,7 +187,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                       <img
                         src={project.thumbnailUrl}
                         alt={project.title}
-                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-tr from-sky-500/10 via-indigo-500/10 to-card flex items-center justify-center">
@@ -167,6 +200,14 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                       <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-500/40 text-[10px] font-mono text-amber-600 dark:text-amber-300 flex items-center gap-1 font-bold">
                         <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                         FEATURED
+                      </div>
+                    )}
+
+                    {/* Gallery indicator */}
+                    {project.galleryImages && project.galleryImages.length > 0 && (
+                      <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-mono text-white flex items-center gap-1">
+                        <Images className="w-3 h-3 text-cyan-400" />
+                        <span>+{project.galleryImages.length}</span>
                       </div>
                     )}
 
@@ -266,12 +307,96 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
               );
             })}
           </div>
+        ) : (
+          /* List View */
+          <div className="space-y-4">
+            {filtered.map((project) => {
+              const isSelectedForCompare = compareIds.includes(project.id);
+              return (
+                <div
+                  key={project.id}
+                  onClick={() => openProjectModal(project)}
+                  className="rounded-2xl bg-card border border-border hover:border-sky-500/40 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-all cursor-pointer group shadow-xs"
+                >
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 min-w-0 flex-1">
+                    <div className="w-full sm:w-36 h-24 rounded-xl overflow-hidden bg-muted shrink-0 relative">
+                      {project.thumbnailUrl ? (
+                        <img src={project.thumbnailUrl} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                      ) : (
+                        <div className="w-full h-full bg-secondary flex items-center justify-center">
+                          <FolderGit2 className="w-6 h-6 text-muted-foreground" />
+                        </div>
+                      )}
+                      {project.isFeatured && (
+                        <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono bg-amber-500/90 text-black font-bold">
+                          ★
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 space-y-1.5 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono text-sky-500 uppercase font-semibold">
+                          {project.category || "General"}
+                        </span>
+                        {project.client && (
+                          <span className="text-[10px] text-muted-foreground">• {project.client}</span>
+                        )}
+                      </div>
+                      <h3 className="font-bold text-base text-foreground group-hover:text-sky-500 transition-colors">
+                        {project.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2 max-w-2xl">
+                        {project.shortDescription || project.description}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {((project.techStack as string[]) || []).slice(0, 5).map((tech) => (
+                          <span key={tech} className="px-2 py-0.5 rounded text-[10px] font-mono bg-secondary border border-border text-foreground">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0 self-end md:self-center" onClick={(e) => e.stopPropagation()}>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={isSelectedForCompare ? "default" : "outline"}
+                      onClick={(e) => toggleCompare(project.id, e)}
+                      className={`h-9 rounded-xl px-3 text-xs font-mono ${
+                        isSelectedForCompare ? "bg-indigo-600 text-white" : "border-border text-foreground"
+                      }`}
+                    >
+                      {isSelectedForCompare ? <Check className="w-3.5 h-3.5 mr-1" /> : <GitCompare className="w-3.5 h-3.5 mr-1" />}
+                      Compare
+                    </Button>
+                    {project.githubUrl && (
+                      <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground">
+                          <Code2 className="w-4 h-4" />
+                        </Button>
+                      </a>
+                    )}
+                    {project.liveUrl && (
+                      <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+                        <Button size="icon" className="h-9 w-9 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 text-white">
+                          <ExternalLink className="w-4 h-4" />
+                        </Button>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
 
       {/* Case Study Detail Modal */}
       <Dialog open={!!activeProject} onOpenChange={(open) => !open && setActiveProject(null)}>
-        <DialogContent className="bg-card/95 border-border backdrop-blur-xl max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl p-6">
+        <DialogContent className="bg-card/95 border-border backdrop-blur-xl max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 sm:p-8">
           {activeProject && (
             <div className="space-y-6">
               <DialogHeader className="space-y-2">
@@ -280,27 +405,63 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                     {activeProject.category || "CASE STUDY"}
                   </Badge>
                   {activeProject.client && <span>• Client: {activeProject.client}</span>}
+                  {activeProject.isFeatured && (
+                    <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-500 bg-amber-500/10">
+                      ★ FEATURED
+                    </Badge>
+                  )}
                 </div>
-                <DialogTitle className="text-lg sm:text-xl font-bold text-foreground">
+                <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground">
                   {activeProject.title}
                 </DialogTitle>
-                <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
+                <DialogDescription className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   {activeProject.shortDescription}
                 </DialogDescription>
               </DialogHeader>
 
-              {activeProject.thumbnailUrl && (
-                <div className="aspect-video rounded-2xl overflow-hidden border border-border">
-                  <img src={activeProject.thumbnailUrl} alt={activeProject.title} className="w-full h-full object-cover" />
-                </div>
-              )}
+              {/* Media Visual Showcase */}
+              {(() => {
+                const allImages = [
+                  ...(activeProject.thumbnailUrl ? [activeProject.thumbnailUrl] : []),
+                  ...((activeProject.galleryImages as string[]) || []),
+                ];
+                const currentImg = allImages[activeImageIndex] || activeProject.thumbnailUrl;
+
+                return (
+                  <div className="space-y-3">
+                    {currentImg && (
+                      <div className="aspect-video rounded-2xl overflow-hidden border border-border bg-black/40">
+                        <img src={currentImg} alt={activeProject.title} className="w-full h-full object-cover" />
+                      </div>
+                    )}
+
+                    {/* Image thumbnails row */}
+                    {allImages.length > 1 && (
+                      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                        {allImages.map((img, idx) => (
+                          <button
+                            key={img + idx}
+                            type="button"
+                            onClick={() => setActiveImageIndex(idx)}
+                            className={`w-16 h-12 rounded-lg overflow-hidden border-2 transition-all shrink-0 ${
+                              activeImageIndex === idx ? "border-sky-500 scale-105" : "border-border/60 opacity-60 hover:opacity-100"
+                            }`}
+                          >
+                            <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               <div className="space-y-3">
                 <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <Layers className="w-3.5 h-3.5 text-sky-500" />
                   Architecture Overview & Highlights
                 </h4>
-                <div className="p-4 rounded-2xl bg-secondary/60 border border-border text-xs text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                <div className="p-4 sm:p-5 rounded-2xl bg-secondary/60 border border-border text-xs sm:text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap font-sans">
                   {activeProject.description || "Detailed case study description."}
                 </div>
               </div>
@@ -312,7 +473,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {((activeProject.techStack as string[]) || []).map((tech: string) => (
-                    <Badge key={tech} className="bg-secondary border border-border text-foreground text-xs font-mono">
+                    <Badge key={tech} className="bg-secondary border border-border text-foreground text-xs font-mono py-1 px-2.5">
                       {tech}
                     </Badge>
                   ))}

@@ -251,8 +251,13 @@ export const socialLinks = pgTable("social_links", {
   url: text("url").notNull(),
   icon: text("icon"),
   label: text("label"),
+  color: text("color"),
+  size: text("size").default("md"),
+  style: text("style").default("default"),
+  placements: jsonb("placements").$type<string[]>().default(["footer", "contact"]),
   sortOrder: integer("sort_order").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
+  status: statusEnum("status").notNull().default("published"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -295,14 +300,43 @@ export const navigation = pgTable("navigation", {
   label: text("label").notNull(),
   href: text("href").notNull(),
   icon: text("icon"),
+  color: text("color"),
+  badge: text("badge"),
+  style: text("style").default("default"),
   isExternal: boolean("is_external").notNull().default(false),
   sortOrder: integer("sort_order").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
+  status: statusEnum("status").notNull().default("published"),
   group: text("group").notNull().default("main"),
   parentId: uuid("parent_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// ─── Website Sections ─────────────────────────────────────
+export const websiteSections = pgTable(
+  "website_sections",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sectionKey: text("section_key").notNull().unique(),
+    title: text("title").notNull(),
+    subtitle: text("subtitle"),
+    badge: text("badge"),
+    description: text("description"),
+    content: text("content"),
+    componentType: text("component_type").notNull().default("builtin"),
+    sortOrder: integer("sort_order").notNull().default(0),
+    status: statusEnum("status").notNull().default("published"),
+    styles: jsonb("styles"),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("sections_status_idx").on(table.status),
+    index("sections_sort_order_idx").on(table.sortOrder),
+  ]
+);
 
 // ─── SEO Metadata ─────────────────────────────────────────
 export const seoMetadata = pgTable(

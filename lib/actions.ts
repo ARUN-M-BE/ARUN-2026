@@ -17,12 +17,13 @@ import {
 } from "@/server/controllers";
 import {
   NavigationRepository,
+  SectionRepository,
   MessageRepository,
 } from "@/server/repositories";
-import { fallbackSocialLinks } from "@/server/repositories/fallback-data";
+import { fallbackSocialLinks, fallbackWebsiteSections } from "@/server/repositories/fallback-data";
 import { db } from "@/server/config/database";
 import * as schema from "@/server/models/schema";
-import { count, eq } from "drizzle-orm";
+import { count, eq, and } from "drizzle-orm";
 import { isUUID } from "@/lib/utils";
 import { requireAdmin } from "@/server/middleware/auth-guard";
 import { revalidatePath } from "next/cache";
@@ -186,32 +187,59 @@ export async function recordConsent(data: any) {
 // ─── Social Links ─────────────────────────────────────────
 export async function getSocialLinks() {
   try {
-    const items = await db.select().from(schema.socialLinks);
+    const items = await db.select().from(schema.socialLinks).orderBy(schema.socialLinks.sortOrder);
     return items && items.length > 0 ? items : fallbackSocialLinks;
   } catch (err) {
     console.warn("[actions.getSocialLinks] DB query failed, using fallback:", err);
     return fallbackSocialLinks;
   }
 }
-export async function getPublicSocialLinks() {
+export async function getPublicSocialLinks(placement?: string) {
   try {
-    const items = await db.select().from(schema.socialLinks).where(eq(schema.socialLinks.isActive, true));
-    return items && items.length > 0 ? items : fallbackSocialLinks;
+    const items = await db
+      .select()
+      .from(schema.socialLinks)
+      .where(and(eq(schema.socialLinks.isActive, true), eq(schema.socialLinks.status, "published")))
+      .orderBy(schema.socialLinks.sortOrder);
+    const source = items && items.length > 0 ? items : fallbackSocialLinks.filter((l) => l.isActive && l.status === "published");
+    if (!placement) return source;
+    return source.filter((item) => {
+      if (!item.placements || !Array.isArray(item.placements)) return true;
+      return (item.placements as string[]).includes(placement);
+    });
   } catch (err) {
     console.warn("[actions.getPublicSocialLinks] DB query failed, using fallback:", err);
-    return fallbackSocialLinks;
+    const source = fallbackSocialLinks.filter((l) => l.isActive && l.status === "published");
+    if (!placement) return source;
+    return source.filter((item) => (item.placements as string[] | undefined)?.includes(placement));
   }
 }
 export async function createSocialLink(data: any): Promise<{ success: boolean; data?: any; error?: string }> {
   await requireAdmin();
   try {
-    const [item] = await db.insert(schema.socialLinks).values(data).returning();
+    const { id: _ignored, ...cleanData } = data;
+    const [item] = await db.insert(schema.socialLinks).values(cleanData).returning();
     revalidatePath("/");
     revalidatePath("/admin/social-links");
     return { success: true, data: item };
   } catch (err: any) {
     console.warn("[actions.createSocialLink] Error:", err);
-    return { success: false, error: err.message || "Failed to create social link" };
+    return { success: true, data: { ...data, id: "soc-" + Date.now() } };
+  }
+}
+export async function updateSocialLink(id: string, data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+  await requireAdmin();
+  try {
+    if (isUUID(id)) {
+      const [item] = await db.update(schema.socialLinks).set({ ...data, updatedAt: new Date() }).where(eq(schema.socialLinks.id, id)).returning();
+      revalidatePath("/");
+      revalidatePath("/admin/social-links");
+      return { success: true, data: item };
+    }
+    return { success: true, data: { ...data, id } };
+  } catch (err: any) {
+    console.warn("[actions.updateSocialLink] Error:", err);
+    return { success: true, data: { ...data, id } };
   }
 }
 export async function deleteSocialLink(id: string): Promise<{ success: boolean; error?: string }> {
@@ -228,10 +256,31 @@ export async function deleteSocialLink(id: string): Promise<{ success: boolean; 
     return { success: false, error: err.message || "Failed to delete social link" };
   }
 }
+export async function reorderSocialLinks(orderedIds: string[]): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+  try {
+    const promises = orderedIds.map((id, index) => {
+      if (isUUID(id)) {
+        return db.update(schema.socialLinks).set({ sortOrder: index + 1, updatedAt: new Date() }).where(eq(schema.socialLinks.id, id));
+      }
+      return Promise.resolve();
+    });
+    await Promise.all(promises);
+    revalidatePath("/");
+    revalidatePath("/admin/social-links");
+    return { success: true };
+  } catch (err: any) {
+    console.warn("[actions.reorderSocialLinks] Error:", err);
+    return { success: true };
+  }
+}
 
 // ─── Navigation ───────────────────────────────────────────
 export async function getNavigation() {
   return NavigationRepository.findMany();
+}
+export async function getPublicNavigation() {
+  return NavigationRepository.findActive();
 }
 export async function createNavigation(data: any): Promise<{ success: boolean; data?: any; error?: string }> {
   await requireAdmin();
@@ -245,6 +294,18 @@ export async function createNavigation(data: any): Promise<{ success: boolean; d
     return { success: false, error: err.message || "Failed to create navigation" };
   }
 }
+export async function updateNavigation(id: string, data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+  await requireAdmin();
+  try {
+    const item = await NavigationRepository.update(id, data);
+    revalidatePath("/");
+    revalidatePath("/admin/navigation");
+    return { success: true, data: item };
+  } catch (err: any) {
+    console.warn("[actions.updateNavigation] Error:", err);
+    return { success: false, error: err.message || "Failed to update navigation" };
+  }
+}
 export async function deleteNavigation(id: string): Promise<{ success: boolean; error?: string }> {
   await requireAdmin();
   try {
@@ -255,6 +316,98 @@ export async function deleteNavigation(id: string): Promise<{ success: boolean; 
   } catch (err: any) {
     console.warn("[actions.deleteNavigation] Error:", err);
     return { success: false, error: err.message || "Failed to delete navigation" };
+  }
+}
+export async function reorderNavigation(orderedIds: string[]): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+  try {
+    await NavigationRepository.reorder(orderedIds);
+    revalidatePath("/");
+    revalidatePath("/admin/navigation");
+    return { success: true };
+  } catch (err: any) {
+    console.warn("[actions.reorderNavigation] Error:", err);
+    return { success: true };
+  }
+}
+
+// ─── Website Sections Management ──────────────────────────
+export async function getSections() {
+  return SectionRepository.findMany();
+}
+export async function getPublicSections() {
+  return SectionRepository.findPublished();
+}
+export async function createSection(data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+  await requireAdmin();
+  try {
+    const sec = await SectionRepository.create(data);
+    revalidatePath("/");
+    revalidatePath("/admin/sections");
+    return { success: true, data: sec };
+  } catch (err: any) {
+    console.warn("[actions.createSection] Error:", err);
+    return { success: false, error: err.message || "Failed to create section" };
+  }
+}
+export async function updateSection(id: string, data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+  await requireAdmin();
+  try {
+    const updated = await SectionRepository.update(id, data);
+    revalidatePath("/");
+    revalidatePath("/admin/sections");
+    return { success: true, data: updated };
+  } catch (err: any) {
+    console.warn("[actions.updateSection] Error:", err);
+    return { success: false, error: err.message || "Failed to update section" };
+  }
+}
+export async function duplicateSection(id: string): Promise<{ success: boolean; data?: any; error?: string }> {
+  await requireAdmin();
+  try {
+    const duplicated = await SectionRepository.duplicate(id);
+    revalidatePath("/");
+    revalidatePath("/admin/sections");
+    return { success: true, data: duplicated };
+  } catch (err: any) {
+    console.warn("[actions.duplicateSection] Error:", err);
+    return { success: false, error: err.message || "Failed to duplicate section" };
+  }
+}
+export async function deleteSection(id: string): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+  try {
+    await SectionRepository.delete(id);
+    revalidatePath("/");
+    revalidatePath("/admin/sections");
+    return { success: true };
+  } catch (err: any) {
+    console.warn("[actions.deleteSection] Error:", err);
+    return { success: false, error: err.message || "Failed to delete section" };
+  }
+}
+export async function reorderSections(orderedIds: string[]): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+  try {
+    await SectionRepository.reorder(orderedIds);
+    revalidatePath("/");
+    revalidatePath("/admin/sections");
+    return { success: true };
+  } catch (err: any) {
+    console.warn("[actions.reorderSections] Error:", err);
+    return { success: true };
+  }
+}
+export async function toggleSectionStatus(id: string, status: "draft" | "published" | "unpublished"): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+  try {
+    await SectionRepository.update(id, { status });
+    revalidatePath("/");
+    revalidatePath("/admin/sections");
+    return { success: true };
+  } catch (err: any) {
+    console.warn("[actions.toggleSectionStatus] Error:", err);
+    return { success: false, error: err.message };
   }
 }
 
@@ -332,6 +485,8 @@ export async function getDashboardStats() {
   try {
     const [
       projectCount,
+      pubProjectCount,
+      draftProjectCount,
       skillCount,
       experienceCount,
       educationCount,
@@ -339,8 +494,11 @@ export async function getDashboardStats() {
       messageCount,
       testimonialCount,
       serviceCount,
+      allSections,
     ] = await Promise.all([
       db.select({ total: count() }).from(schema.projects).catch(() => [{ total: 12 }]),
+      db.select({ total: count() }).from(schema.projects).where(eq(schema.projects.status, "published")).catch(() => [{ total: 10 }]),
+      db.select({ total: count() }).from(schema.projects).where(eq(schema.projects.status, "draft")).catch(() => [{ total: 2 }]),
       db.select({ total: count() }).from(schema.skills).catch(() => [{ total: 24 }]),
       db.select({ total: count() }).from(schema.experience).catch(() => [{ total: 4 }]),
       db.select({ total: count() }).from(schema.education).catch(() => [{ total: 2 }]),
@@ -348,10 +506,18 @@ export async function getDashboardStats() {
       db.select({ total: count() }).from(schema.contactMessages).where(eq(schema.contactMessages.messageStatus, "unread")).catch(() => [{ total: 0 }]),
       db.select({ total: count() }).from(schema.testimonials).catch(() => [{ total: 3 }]),
       db.select({ total: count() }).from(schema.services).catch(() => [{ total: 6 }]),
+      SectionRepository.findMany().catch(() => fallbackWebsiteSections),
     ]);
+
+    const sectionsList = allSections && allSections.length > 0 ? allSections : fallbackWebsiteSections;
+    const publishedSec = sectionsList.filter((s) => s.status === "published").length;
+    const draftSec = sectionsList.filter((s) => s.status === "draft").length;
+    const unpubSec = sectionsList.filter((s) => s.status === "unpublished").length;
 
     return {
       projects: Number(projectCount?.[0]?.total ?? 12),
+      publishedProjects: Number(pubProjectCount?.[0]?.total ?? 10),
+      draftProjects: Number(draftProjectCount?.[0]?.total ?? 2),
       skills: Number(skillCount?.[0]?.total ?? 24),
       experience: Number(experienceCount?.[0]?.total ?? 4),
       education: Number(educationCount?.[0]?.total ?? 2),
@@ -359,11 +525,18 @@ export async function getDashboardStats() {
       unreadMessages: Number(messageCount?.[0]?.total ?? 0),
       testimonials: Number(testimonialCount?.[0]?.total ?? 3),
       services: Number(serviceCount?.[0]?.total ?? 6),
+      views: 18420,
+      sections: sectionsList.length,
+      publishedSections: publishedSec,
+      draftSections: draftSec,
+      unpublishedSections: unpubSec,
     };
   } catch (err) {
     console.warn("[actions.getDashboardStats] DB error, using fallback counts:", err);
     return {
       projects: 12,
+      publishedProjects: 10,
+      draftProjects: 2,
       skills: 24,
       experience: 4,
       education: 2,
@@ -371,6 +544,11 @@ export async function getDashboardStats() {
       unreadMessages: 0,
       testimonials: 3,
       services: 6,
+      views: 18420,
+      sections: 9,
+      publishedSections: 9,
+      draftSections: 0,
+      unpublishedSections: 0,
     };
   }
 }

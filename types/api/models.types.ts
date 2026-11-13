@@ -37,19 +37,21 @@ export interface Project {
   slug: string;
   shortDescription: string | null;
   description: string | null;
-  thumbnail: string | null;
-  images: string[] | null;
+  thumbnail?: string | null;
+  thumbnailUrl?: string | null;
+  images?: string[] | null;
+  galleryImages?: string[] | null;
   liveUrl: string | null;
   githubUrl: string | null;
   techStack: string[] | null;
   category: string | null;
   client: string | null;
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate?: Date | null;
+  endDate?: Date | null;
   isFeatured: boolean;
   sortOrder: number;
   status: Status;
-  metadata: Record<string, unknown> | null;
+  metadata?: Record<string, unknown> | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -176,8 +178,13 @@ export interface SocialLink {
   url: string;
   icon: string | null;
   label: string | null;
+  color?: string | null;
+  size?: string | null;
+  style?: string | null;
+  placements?: string[] | null;
   sortOrder: number;
   isActive: boolean;
+  status?: Status;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -213,11 +220,32 @@ export interface NavigationItem {
   label: string;
   href: string;
   icon: string | null;
+  color?: string | null;
+  badge?: string | null;
+  style?: string | null;
   isExternal: boolean;
   sortOrder: number;
   isActive: boolean;
+  status?: Status;
   group: string;
   parentId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface WebsiteSection {
+  id: string;
+  sectionKey: string;
+  title: string;
+  subtitle: string | null;
+  badge: string | null;
+  description: string | null;
+  content: string | null;
+  componentType: "builtin" | "custom" | string;
+  sortOrder: number;
+  status: Status;
+  styles: Record<string, unknown> | null;
+  metadata: Record<string, unknown> | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -313,11 +341,21 @@ export interface PaginationParams {
 
 export interface DashboardStats {
   projects: number;
+  publishedProjects?: number;
+  draftProjects?: number;
   skills: number;
   experiences: number;
   messages: number;
   unreadMessages: number;
   views: number;
+  sections?: number;
+  publishedSections?: number;
+  draftSections?: number;
+  unpublishedSections?: number;
+  education?: number;
+  certifications?: number;
+  testimonials?: number;
+  services?: number;
 }
 
 export interface ActionResult<T = unknown> {
