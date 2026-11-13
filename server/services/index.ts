@@ -14,6 +14,14 @@ import {
   AuditRepository,
 } from "../repositories";
 import { revalidatePath } from "next/cache";
+
+function safeRevalidate(path: string) {
+  try {
+    safeRevalidate(path);
+  } catch {
+    // Safe no-op outside Next server context (CLI / unit tests)
+  }
+}
 import { ActionResult } from "../constants";
 import type { MessageStatus } from "@/types";
 
@@ -40,8 +48,8 @@ export const ProfileService = {
     try {
       await ProfileRepository.upsert(data);
       await AuditRepository.log({ userId, action: "update", entity: "profile" });
-      revalidatePath("/");
-      revalidatePath("/admin/profile");
+      safeRevalidate("/");
+      safeRevalidate("/admin/profile");
       return { success: true };
     } catch (err: unknown) {
       console.error("[ProfileService.updateProfile] Error:", err);
@@ -69,8 +77,8 @@ export const ProjectService = {
         endDate: toSafeDate(data.endDate),
       });
       await AuditRepository.log({ userId, action: "create", entity: "project", entityId: item?.id });
-      revalidatePath("/");
-      revalidatePath("/admin/projects");
+      safeRevalidate("/");
+      safeRevalidate("/admin/projects");
       return { success: true, data: item };
     } catch (err: unknown) {
       console.error("[ProjectService.createProject] Error:", err);
@@ -85,9 +93,9 @@ export const ProjectService = {
         endDate: toSafeDate(data.endDate),
       });
       await AuditRepository.log({ userId, action: "update", entity: "project", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/projects");
-      revalidatePath(`/admin/projects/${id}/edit`);
+      safeRevalidate("/");
+      safeRevalidate("/admin/projects");
+      safeRevalidate(`/admin/projects/${id}/edit`);
       return { success: true };
     } catch (err: unknown) {
       console.error("[ProjectService.updateProject] Error:", err);
@@ -98,8 +106,8 @@ export const ProjectService = {
     try {
       await ProjectRepository.delete(id);
       await AuditRepository.log({ userId, action: "delete", entity: "project", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/projects");
+      safeRevalidate("/");
+      safeRevalidate("/admin/projects");
       return { success: true };
     } catch (err: unknown) {
       console.error("[ProjectService.deleteProject] Error:", err);
@@ -117,8 +125,8 @@ export const SkillService = {
     try {
       const cat = await SkillRepository.createCategory(data);
       await AuditRepository.log({ userId, action: "create", entity: "skill_category", entityId: cat?.id });
-      revalidatePath("/");
-      revalidatePath("/admin/skills");
+      safeRevalidate("/");
+      safeRevalidate("/admin/skills");
       return { success: true, data: cat };
     } catch (err: unknown) {
       console.error("[SkillService.createCategory] Error:", err);
@@ -129,8 +137,8 @@ export const SkillService = {
     try {
       const cat = await SkillRepository.updateCategory(id, data);
       await AuditRepository.log({ userId, action: "update", entity: "skill_category", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/skills");
+      safeRevalidate("/");
+      safeRevalidate("/admin/skills");
       return { success: true, data: cat };
     } catch (err: unknown) {
       console.error("[SkillService.updateCategory] Error:", err);
@@ -141,8 +149,8 @@ export const SkillService = {
     try {
       await SkillRepository.deleteCategory(id);
       await AuditRepository.log({ userId, action: "delete", entity: "skill_category", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/skills");
+      safeRevalidate("/");
+      safeRevalidate("/admin/skills");
       return { success: true };
     } catch (err: unknown) {
       console.error("[SkillService.deleteCategory] Error:", err);
@@ -159,8 +167,8 @@ export const SkillService = {
     try {
       const skill = await SkillRepository.createSkill(data);
       await AuditRepository.log({ userId, action: "create", entity: "skill", entityId: skill?.id });
-      revalidatePath("/");
-      revalidatePath("/admin/skills");
+      safeRevalidate("/");
+      safeRevalidate("/admin/skills");
       return { success: true, data: skill };
     } catch (err: unknown) {
       console.error("[SkillService.createSkill] Error:", err);
@@ -171,8 +179,8 @@ export const SkillService = {
     try {
       const skill = await SkillRepository.updateSkill(id, data);
       await AuditRepository.log({ userId, action: "update", entity: "skill", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/skills");
+      safeRevalidate("/");
+      safeRevalidate("/admin/skills");
       return { success: true, data: skill };
     } catch (err: unknown) {
       console.error("[SkillService.updateSkill] Error:", err);
@@ -183,8 +191,8 @@ export const SkillService = {
     try {
       await SkillRepository.deleteSkill(id);
       await AuditRepository.log({ userId, action: "delete", entity: "skill", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/skills");
+      safeRevalidate("/");
+      safeRevalidate("/admin/skills");
       return { success: true };
     } catch (err: unknown) {
       console.error("[SkillService.deleteSkill] Error:", err);
@@ -209,8 +217,8 @@ export const ExperienceService = {
         endDate: toSafeDate(data.endDate),
       });
       await AuditRepository.log({ userId, action: "create", entity: "experience", entityId: exp?.id });
-      revalidatePath("/");
-      revalidatePath("/admin/experience");
+      safeRevalidate("/");
+      safeRevalidate("/admin/experience");
       return { success: true, data: exp };
     } catch (err: unknown) {
       console.error("[ExperienceService.createExperience] Error:", err);
@@ -225,9 +233,9 @@ export const ExperienceService = {
         endDate: toSafeDate(data.endDate),
       });
       await AuditRepository.log({ userId, action: "update", entity: "experience", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/experience");
-      revalidatePath(`/admin/experience/${id}/edit`);
+      safeRevalidate("/");
+      safeRevalidate("/admin/experience");
+      safeRevalidate(`/admin/experience/${id}/edit`);
       return { success: true };
     } catch (err: unknown) {
       console.error("[ExperienceService.updateExperience] Error:", err);
@@ -238,8 +246,8 @@ export const ExperienceService = {
     try {
       await ExperienceRepository.delete(id);
       await AuditRepository.log({ userId, action: "delete", entity: "experience", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/experience");
+      safeRevalidate("/");
+      safeRevalidate("/admin/experience");
       return { success: true };
     } catch (err: unknown) {
       console.error("[ExperienceService.deleteExperience] Error:", err);
@@ -264,8 +272,8 @@ export const EducationService = {
         endDate: toSafeDate(data.endDate),
       });
       await AuditRepository.log({ userId, action: "create", entity: "education", entityId: edu?.id });
-      revalidatePath("/");
-      revalidatePath("/admin/education");
+      safeRevalidate("/");
+      safeRevalidate("/admin/education");
       return { success: true, data: edu };
     } catch (err: unknown) {
       console.error("[EducationService.createEducation] Error:", err);
@@ -280,9 +288,9 @@ export const EducationService = {
         endDate: toSafeDate(data.endDate),
       });
       await AuditRepository.log({ userId, action: "update", entity: "education", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/education");
-      revalidatePath(`/admin/education/${id}/edit`);
+      safeRevalidate("/");
+      safeRevalidate("/admin/education");
+      safeRevalidate(`/admin/education/${id}/edit`);
       return { success: true };
     } catch (err: unknown) {
       console.error("[EducationService.updateEducation] Error:", err);
@@ -293,8 +301,8 @@ export const EducationService = {
     try {
       await EducationRepository.delete(id);
       await AuditRepository.log({ userId, action: "delete", entity: "education", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/education");
+      safeRevalidate("/");
+      safeRevalidate("/admin/education");
       return { success: true };
     } catch (err: unknown) {
       console.error("[EducationService.deleteEducation] Error:", err);
@@ -319,8 +327,8 @@ export const CertificationService = {
         expiryDate: toSafeDate(data.expiryDate),
       });
       await AuditRepository.log({ userId, action: "create", entity: "certification", entityId: cert?.id });
-      revalidatePath("/");
-      revalidatePath("/admin/certifications");
+      safeRevalidate("/");
+      safeRevalidate("/admin/certifications");
       return { success: true, data: cert };
     } catch (err: unknown) {
       console.error("[CertificationService.createCertification] Error:", err);
@@ -335,9 +343,9 @@ export const CertificationService = {
         expiryDate: toSafeDate(data.expiryDate),
       });
       await AuditRepository.log({ userId, action: "update", entity: "certification", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/certifications");
-      revalidatePath(`/admin/certifications/${id}/edit`);
+      safeRevalidate("/");
+      safeRevalidate("/admin/certifications");
+      safeRevalidate(`/admin/certifications/${id}/edit`);
       return { success: true };
     } catch (err: unknown) {
       console.error("[CertificationService.updateCertification] Error:", err);
@@ -348,8 +356,8 @@ export const CertificationService = {
     try {
       await CertificationRepository.delete(id);
       await AuditRepository.log({ userId, action: "delete", entity: "certification", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/certifications");
+      safeRevalidate("/");
+      safeRevalidate("/admin/certifications");
       return { success: true };
     } catch (err: unknown) {
       console.error("[CertificationService.deleteCertification] Error:", err);
@@ -370,8 +378,8 @@ export const ServiceOfferingService = {
     try {
       const svc = await ServiceRepository.create(data);
       await AuditRepository.log({ userId, action: "create", entity: "service", entityId: svc?.id });
-      revalidatePath("/");
-      revalidatePath("/admin/services");
+      safeRevalidate("/");
+      safeRevalidate("/admin/services");
       return { success: true, data: svc };
     } catch (err: unknown) {
       console.error("[ServiceOfferingService.createService] Error:", err);
@@ -382,9 +390,9 @@ export const ServiceOfferingService = {
     try {
       await ServiceRepository.update(id, data);
       await AuditRepository.log({ userId, action: "update", entity: "service", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/services");
-      revalidatePath(`/admin/services/${id}/edit`);
+      safeRevalidate("/");
+      safeRevalidate("/admin/services");
+      safeRevalidate(`/admin/services/${id}/edit`);
       return { success: true };
     } catch (err: unknown) {
       console.error("[ServiceOfferingService.updateService] Error:", err);
@@ -395,8 +403,8 @@ export const ServiceOfferingService = {
     try {
       await ServiceRepository.delete(id);
       await AuditRepository.log({ userId, action: "delete", entity: "service", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/services");
+      safeRevalidate("/");
+      safeRevalidate("/admin/services");
       return { success: true };
     } catch (err: unknown) {
       console.error("[ServiceOfferingService.deleteService] Error:", err);
@@ -417,8 +425,8 @@ export const TestimonialService = {
     try {
       const t = await TestimonialRepository.create(data);
       await AuditRepository.log({ userId, action: "create", entity: "testimonial", entityId: t?.id });
-      revalidatePath("/");
-      revalidatePath("/admin/testimonials");
+      safeRevalidate("/");
+      safeRevalidate("/admin/testimonials");
       return { success: true, data: t };
     } catch (err: unknown) {
       console.error("[TestimonialService.createTestimonial] Error:", err);
@@ -429,9 +437,9 @@ export const TestimonialService = {
     try {
       await TestimonialRepository.update(id, data);
       await AuditRepository.log({ userId, action: "update", entity: "testimonial", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/testimonials");
-      revalidatePath(`/admin/testimonials/${id}/edit`);
+      safeRevalidate("/");
+      safeRevalidate("/admin/testimonials");
+      safeRevalidate(`/admin/testimonials/${id}/edit`);
       return { success: true };
     } catch (err: unknown) {
       console.error("[TestimonialService.updateTestimonial] Error:", err);
@@ -442,8 +450,8 @@ export const TestimonialService = {
     try {
       await TestimonialRepository.delete(id);
       await AuditRepository.log({ userId, action: "delete", entity: "testimonial", entityId: id });
-      revalidatePath("/");
-      revalidatePath("/admin/testimonials");
+      safeRevalidate("/");
+      safeRevalidate("/admin/testimonials");
       return { success: true };
     } catch (err: unknown) {
       console.error("[TestimonialService.deleteTestimonial] Error:", err);
@@ -465,7 +473,7 @@ export const MessageService = {
         consentGiven: true,
         preferences: { email: data.email, timestamp: new Date().toISOString() },
       });
-      revalidatePath("/admin/messages");
+      safeRevalidate("/admin/messages");
       return { success: true };
     } catch (err: unknown) {
       console.error("[MessageService.submitContact] Error:", err);
@@ -476,7 +484,7 @@ export const MessageService = {
     try {
       await MessageRepository.updateStatus(id, status);
       await AuditRepository.log({ userId, action: "update_status", entity: "contact_message", entityId: id, details: { status } });
-      revalidatePath("/admin/messages");
+      safeRevalidate("/admin/messages");
       return { success: true };
     } catch (err: unknown) {
       console.error("[MessageService.updateStatus] Error:", err);
@@ -487,7 +495,7 @@ export const MessageService = {
     try {
       await MessageRepository.delete(id);
       await AuditRepository.log({ userId, action: "delete", entity: "contact_message", entityId: id });
-      revalidatePath("/admin/messages");
+      safeRevalidate("/admin/messages");
       return { success: true };
     } catch (err: unknown) {
       console.error("[MessageService.deleteMessage] Error:", err);
@@ -505,8 +513,8 @@ export const SettingsService = {
     try {
       await SettingsRepository.upsert(key, value);
       await AuditRepository.log({ userId, action: "update", entity: "site_setting", entityId: key });
-      revalidatePath("/");
-      revalidatePath("/admin/settings");
+      safeRevalidate("/");
+      safeRevalidate("/admin/settings");
       return { success: true };
     } catch (err: unknown) {
       console.error("[SettingsService.updateSetting] Error:", err);
@@ -537,9 +545,9 @@ export const LegalService = {
         changeNote: "Version revision update",
       });
       await AuditRepository.log({ userId, action: "update", entity: "legal_document", entityId: id });
-      revalidatePath("/admin/legal");
-      revalidatePath(`/admin/legal/${id}/edit`);
-      revalidatePath(`/legal/${data.slug}`);
+      safeRevalidate("/admin/legal");
+      safeRevalidate(`/admin/legal/${id}/edit`);
+      safeRevalidate(`/legal/${data.slug}`);
       return { success: true };
     } catch (err: unknown) {
       console.error("[LegalService.updateDocument] Error:", err);
@@ -550,7 +558,7 @@ export const LegalService = {
     try {
       await LegalRepository.delete(id);
       await AuditRepository.log({ userId, action: "delete", entity: "legal_document", entityId: id });
-      revalidatePath("/admin/legal");
+      safeRevalidate("/admin/legal");
       return { success: true };
     } catch (err: unknown) {
       console.error("[LegalService.deleteDocument] Error:", err);
@@ -568,7 +576,7 @@ export const MediaService = {
     try {
       const item = await MediaRepository.create({ ...data, uploadedBy: userId });
       await AuditRepository.log({ userId, action: "create", entity: "media_asset", entityId: item?.id });
-      revalidatePath("/admin/media");
+      safeRevalidate("/admin/media");
       return { success: true, data: item };
     } catch (err: unknown) {
       console.error("[MediaService.createMedia] Error:", err);
@@ -579,7 +587,7 @@ export const MediaService = {
     try {
       await MediaRepository.delete(id);
       await AuditRepository.log({ userId, action: "delete", entity: "media_asset", entityId: id });
-      revalidatePath("/admin/media");
+      safeRevalidate("/admin/media");
       return { success: true };
     } catch (err: unknown) {
       console.error("[MediaService.deleteMedia] Error:", err);
