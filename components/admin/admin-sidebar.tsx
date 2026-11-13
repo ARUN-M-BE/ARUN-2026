@@ -23,7 +23,6 @@ import {
   History,
   Layers,
   Share2,
-  Server,
 } from "lucide-react";
 
 const navigationGroups = [
@@ -58,7 +57,6 @@ const navigationGroups = [
     title: "Operations & Legal",
     items: [
       { name: "Messages", href: "/admin/messages", icon: Mail },
-      { name: "API Management", href: "/admin/api-management", icon: Server },
       { name: "Site Navigation", href: "/admin/navigation", icon: Navigation },
       { name: "SEO & Meta", href: "/admin/seo", icon: Search },
       { name: "Legal & DPDP 2023", href: "/admin/legal", icon: Scale },

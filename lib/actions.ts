@@ -552,22 +552,3 @@ export async function getDashboardStats() {
     };
   }
 }
-
-// ─── API Management (https://api.arun-m.in) ───────────────
-export async function checkApiManagementHealth() {
-  await requireAdmin();
-  const { apiManagement } = await import("@/server/services/api-management-client");
-  return apiManagement.checkHealth();
-}
-
-export async function getApiManagementDetails() {
-  await requireAdmin();
-  const baseUrl = process.env.API_MANAGEMENT_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.arun-m.in";
-  const hasKey = Boolean(process.env.API_MANAGEMENT_KEY);
-  return {
-    baseUrl,
-    hasKey,
-    testerUrl: `${baseUrl}/tester`,
-    dashboardUrl: `${baseUrl}/dashboard`,
-  };
-}

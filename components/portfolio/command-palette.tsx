@@ -25,6 +25,7 @@ import {
   Sun,
   Moon,
   Languages,
+  Command as CommandIcon,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 import { Button } from "@/components/ui/button";
@@ -65,8 +66,9 @@ export function CommandPalette() {
         title="Quick search (Ctrl+K)"
       >
         <span className="text-foreground/80">{language === "ar" ? "بحث سريع..." : "Search portfolio..."}</span>
-        <kbd className="rounded-md border border-border bg-secondary px-1.5 py-0.5 text-[10px] font-mono text-foreground shadow-xs">
-          ⌘
+        <kbd className="inline-flex items-center gap-1 rounded-md border border-border bg-secondary px-1.5 py-0.5 text-[10px] font-mono text-foreground shadow-xs">
+          <CommandIcon className="w-3 h-3" />
+          <span>K</span>
         </kbd>
       </Button>
 

@@ -7,9 +7,6 @@ interface __BaseEnv_CloudflareEnv {
   NEXTAUTH_SECRET: string;
   ADMIN_EMAIL: string;
   ADMIN_PASSWORD: string;
-  NEXT_PUBLIC_API_URL: string;
-  API_MANAGEMENT_URL: string;
-  API_MANAGEMENT_KEY: string;
   DATABASE_URL_UNPOOLED: string;
   NEON_BRANCH: string;
   NEON_AUTH_BASE_URL: string;
