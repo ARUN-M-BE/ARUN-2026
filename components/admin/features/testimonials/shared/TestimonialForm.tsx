@@ -17,7 +17,7 @@ import { Loader2, ArrowLeft, Save, Star, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
-export function TestimonialForm({ initialData, isEditing = false }: { initialData?: any; isEditing?: boolean }) {
+export function TestimonialForm({ initialData, isEditing = false }: { initialData?: Partial<TestimonialFormData> & { id?: string }; isEditing?: boolean }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -45,7 +45,7 @@ export function TestimonialForm({ initialData, isEditing = false }: { initialDat
   const onSubmit = async (data: TestimonialFormData) => {
     setIsSubmitting(true);
     try {
-      if (isEditing) {
+      if (isEditing && initialData?.id) {
         const res = await updateTestimonial(initialData.id, data);
         if (res.success) {
           toast.success("Testimonial updated");
@@ -131,7 +131,7 @@ export function TestimonialForm({ initialData, isEditing = false }: { initialDat
               <Label className="text-xs font-medium text-zinc-300">Status</Label>
               <Select
                 value={watch("status")}
-                onValueChange={(val: any) => setValue("status", val)}
+                onValueChange={(val: "published" | "draft" | "unpublished") => setValue("status", val)}
               >
                 <SelectTrigger className="bg-background/50 border-border">
                   <SelectValue placeholder="Select status" />

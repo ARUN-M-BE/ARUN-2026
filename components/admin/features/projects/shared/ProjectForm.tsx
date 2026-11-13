@@ -16,10 +16,10 @@ import { Toggle } from "@/components/ui/toggle";
 import { Loader2, ArrowLeft, Save, Plus, Trash2, Star } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import type { Status } from "@/types";
+import type { Status, Project } from "@/types";
 
 interface ProjectFormProps {
-  initialData?: any;
+  initialData?: Partial<Project> & { id?: string };
   isEditing?: boolean;
 }
 
@@ -103,7 +103,7 @@ export function ProjectForm({ initialData, isEditing = false }: ProjectFormProps
     data.images = galleryImages;
 
     try {
-      if (isEditing) {
+      if (isEditing && initialData?.id) {
         const res = await updateProject(initialData.id, data);
         if (res.success) {
           toast.success("Project updated successfully");

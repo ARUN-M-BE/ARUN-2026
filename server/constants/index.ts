@@ -21,7 +21,7 @@ export const DPDP_CONFIG = {
   JURISDICTION: "India (DPDP Act 2023 & IT Act 2000)",
 } as const;
 
-export type ActionResult<T = any> = {
+export type ActionResult<T = unknown> = {
   success: boolean;
   error?: string;
   data?: T;

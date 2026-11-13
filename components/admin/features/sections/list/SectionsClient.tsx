@@ -594,7 +594,7 @@ export function SectionsClient({ initialData }: { initialData: WebsiteSection[] 
             <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
               <div className="space-y-1.5">
                 <Label className="text-xs text-foreground">Component Model</Label>
-                <Select value={componentType} onValueChange={(val) => setComponentType(val as any)}>
+                <Select value={componentType} onValueChange={(val: "builtin" | "custom") => setComponentType(val)}>
                   <SelectTrigger className="bg-background/50 border-border">
                     <SelectValue />
                   </SelectTrigger>

@@ -17,7 +17,7 @@ import { Loader2, ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
-export function CertificationForm({ initialData, isEditing = false }: { initialData?: any; isEditing?: boolean }) {
+export function CertificationForm({ initialData, isEditing = false }: { initialData?: Partial<CertificationFormData> & { id?: string }; isEditing?: boolean }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -44,7 +44,7 @@ export function CertificationForm({ initialData, isEditing = false }: { initialD
   const onSubmit = async (data: CertificationFormData) => {
     setIsSubmitting(true);
     try {
-      if (isEditing) {
+      if (isEditing && initialData?.id) {
         const res = await updateCertification(initialData.id, data);
         if (res.success) {
           toast.success("Certification updated");
@@ -133,7 +133,7 @@ export function CertificationForm({ initialData, isEditing = false }: { initialD
               <Label className="text-xs font-medium text-zinc-300">Status</Label>
               <Select
                 value={watch("status")}
-                onValueChange={(val: any) => setValue("status", val)}
+                onValueChange={(val: "published" | "draft" | "unpublished") => setValue("status", val)}
               >
                 <SelectTrigger className="bg-background/50 border-border">
                   <SelectValue placeholder="Select status" />

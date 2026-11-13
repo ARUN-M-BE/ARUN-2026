@@ -11,8 +11,9 @@ import { EmptyState } from "@/components/admin/empty-state";
 import { deleteLegalDocument } from "@/lib/actions";
 import { Edit2, Trash2, Scale, AlertTriangle, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+import type { LegalDocument } from "@/types";
 
-export function LegalClient({ initialData }: { initialData: any[] }) {
+export function LegalClient({ initialData }: { initialData: LegalDocument[] }) {
   const router = useRouter();
   const [docs, setDocs] = useState(initialData);
   const [deleteId, setDeleteId] = useState<string | null>(null);

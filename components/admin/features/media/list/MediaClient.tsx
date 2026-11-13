@@ -43,7 +43,7 @@ export function MediaClient({ initialData }: { initialData: MediaAsset[] }) {
 
       if (res.success && res.data) {
         toast.success("Media asset registered");
-        setItems((prev) => [res.data, ...prev]);
+        setItems((prev) => [res.data as MediaAsset, ...prev]);
         setFilename("");
         setUrl("");
         setAltText("");

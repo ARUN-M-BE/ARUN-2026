@@ -66,11 +66,11 @@ export default async function HomePage() {
         {sections.map((section) => {
           switch (section.sectionKey) {
             case "hero":
-              return <HeroSection key={section.id} profile={profile as any} />;
+              return <HeroSection key={section.id} profile={profile} />;
             case "about":
-              return <AboutSection key={section.id} profile={profile as any} />;
+              return <AboutSection key={section.id} profile={profile} />;
             case "projects":
-              return <ProjectsSection key={section.id} projects={projects as any} />;
+              return <ProjectsSection key={section.id} projects={projects} />;
             case "skills":
               return <SkillsSection key={section.id} categoriesWithSkills={categoriesWithSkills} />;
             case "telemetry":
@@ -91,8 +91,8 @@ export default async function HomePage() {
               return (
                 <ContactSection
                   key={section.id}
-                  profile={profile as any}
-                  socialLinks={socialLinks as any}
+                  profile={profile}
+                  socialLinks={socialLinks}
                 />
               );
             default:

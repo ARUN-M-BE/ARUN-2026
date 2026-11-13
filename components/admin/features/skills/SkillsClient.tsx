@@ -21,13 +21,14 @@ import {
 } from "@/lib/actions";
 import { Plus, Trash2, Cpu, Sparkles, FolderPlus, Loader2, Star, Edit2 } from "lucide-react";
 import { toast } from "sonner";
+import type { Skill, SkillCategory } from "@/types";
 
 export function SkillsClient({
   initialCategories,
   initialSkills,
 }: {
-  initialCategories: any[];
-  initialSkills: any[];
+  initialCategories: SkillCategory[];
+  initialSkills: Skill[];
 }) {
   const router = useRouter();
   const [categories, setCategories] = useState(initialCategories);
@@ -35,7 +36,7 @@ export function SkillsClient({
 
   // Skill dialog (create & edit)
   const [isSkillOpen, setIsSkillOpen] = useState(false);
-  const [editingSkill, setEditingSkill] = useState<any | null>(null);
+  const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
   const [skillName, setSkillName] = useState("");
   const [skillCategory, setSkillCategory] = useState(categories[0]?.id || "");
   const [skillLevel, setSkillLevel] = useState(85);
@@ -44,7 +45,7 @@ export function SkillsClient({
 
   // Category dialog (create & edit)
   const [isCatOpen, setIsCatOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<any | null>(null);
+  const [editingCategory, setEditingCategory] = useState<SkillCategory | null>(null);
   const [catName, setCatName] = useState("");
   const [isSavingCat, setIsSavingCat] = useState(false);
 
@@ -58,7 +59,7 @@ export function SkillsClient({
     setIsCatOpen(true);
   };
 
-  const openEditCategory = (cat: any) => {
+  const openEditCategory = (cat: SkillCategory) => {
     setEditingCategory(cat);
     setCatName(cat.name);
     setIsCatOpen(true);
@@ -88,7 +89,7 @@ export function SkillsClient({
         const res = await createSkillCategory({ name: catName, slug, status: "published" });
         if (res.success && res.data) {
           toast.success("Category created");
-          setCategories((prev) => [...prev, res.data]);
+          setCategories((prev) => [...prev, res.data as SkillCategory]);
           setCatName("");
           setIsCatOpen(false);
           router.refresh();
@@ -110,7 +111,7 @@ export function SkillsClient({
     setIsSkillOpen(true);
   };
 
-  const openEditSkill = (skill: any) => {
+  const openEditSkill = (skill: Skill) => {
     setEditingSkill(skill);
     setSkillName(skill.name);
     setSkillCategory(skill.categoryId || categories[0]?.id || "");
@@ -152,7 +153,7 @@ export function SkillsClient({
         const res = await createSkill(payload);
         if (res.success && res.data) {
           toast.success("Skill added to constellation");
-          setSkills((prev) => [...prev, res.data]);
+          setSkills((prev) => [...prev, res.data as Skill]);
           setSkillName("");
           setIsSkillOpen(false);
           router.refresh();

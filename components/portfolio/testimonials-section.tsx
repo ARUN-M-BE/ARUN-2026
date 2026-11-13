@@ -2,9 +2,10 @@
 
 import { MessageSquareQuote, Star, CheckCircle2, Quote } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+import type { Testimonial } from "@/types";
 
 interface TestimonialsSectionProps {
-  testimonials: any[];
+  testimonials: Testimonial[];
 }
 
 export function TestimonialsSection({ testimonials = [] }: TestimonialsSectionProps) {

@@ -1,5 +1,6 @@
 import { db } from "../config/database";
 import * as schema from "../models/schema";
+import type { Status, MessageStatus, Project, SkillCategory, Skill, NavigationItem, WebsiteSection, SocialLink } from "@/types";
 import { eq, desc, asc, and, or, ilike, count } from "drizzle-orm";
 import { isUUID } from "@/lib/utils";
 import {
@@ -15,7 +16,7 @@ import {
   fallbackWebsiteSections,
 } from "./fallback-data";
 
-// ─── Profile Repository ──────────────────────────────────
+// --- Profile Repository ----------------------------------
 export const ProfileRepository = {
   async getFirst() {
     try {
@@ -33,7 +34,7 @@ export const ProfileRepository = {
       return fallbackProfile;
     }
   },
-  async upsert(data: any) {
+  async upsert(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const [existingRow] = await db.select().from(schema.profile).limit(1);
@@ -54,7 +55,7 @@ export const ProfileRepository = {
   },
 };
 
-// ─── Project Repository ──────────────────────────────────
+// --- Project Repository ----------------------------------
 export const ProjectRepository = {
   async findMany(opts?: { search?: string; status?: string; page?: number; limit?: number }) {
     try {
@@ -62,7 +63,7 @@ export const ProjectRepository = {
       const limit = opts?.limit || 20;
       const offset = (page - 1) * limit;
       const conditions = [];
-      if (opts?.status) conditions.push(eq(schema.projects.status, opts.status as any));
+      if (opts?.status) conditions.push(eq(schema.projects.status, opts.status as Status));
       if (opts?.search) conditions.push(ilike(schema.projects.title, `%${opts.search}%`));
       const where = conditions.length > 0 ? and(...conditions) : undefined;
       const [items, [{ total }]] = await Promise.all([
@@ -100,7 +101,7 @@ export const ProjectRepository = {
       return fallbackProjects.find((p) => p.id === id || p.slug === id || p.slug === cleanSlug) || null;
     }
   },
-  async create(data: any) {
+  async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const [item] = await db.insert(schema.projects).values(cleanData).returning();
@@ -110,7 +111,7 @@ export const ProjectRepository = {
       return { ...data, id: data.id || "proj-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -161,7 +162,7 @@ export const ProjectRepository = {
   },
 };
 
-// ─── Skill Repository ────────────────────────────────────
+// --- Skill Repository ------------------------------------
 export const SkillRepository = {
   async getCategories() {
     try {
@@ -171,7 +172,7 @@ export const SkillRepository = {
       return fallbackSkillCategories;
     }
   },
-  async createCategory(data: any) {
+  async createCategory(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const [cat] = await db.insert(schema.skillCategories).values(cleanData).returning();
@@ -181,7 +182,7 @@ export const SkillRepository = {
       return { ...data, id: "cat-" + Date.now() };
     }
   },
-  async updateCategory(id: string, data: any) {
+  async updateCategory(id: string, data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -254,7 +255,7 @@ export const SkillRepository = {
       return fallbackSkillCategories;
     }
   },
-  async createSkill(data: any) {
+  async createSkill(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const safeData = {
@@ -268,7 +269,7 @@ export const SkillRepository = {
       return { ...data, id: "sk-" + Date.now() };
     }
   },
-  async updateSkill(id: string, data: any) {
+  async updateSkill(id: string, data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const safeData = {
@@ -325,7 +326,7 @@ export const SkillRepository = {
   },
 };
 
-// ─── Experience Repository ───────────────────────────────
+// --- Experience Repository -------------------------------
 export const ExperienceRepository = {
   async findMany() {
     try {
@@ -343,7 +344,7 @@ export const ExperienceRepository = {
       return fallbackExperiences;
     }
   },
-  async create(data: any) {
+  async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const [exp] = await db.insert(schema.experience).values(cleanData).returning();
@@ -353,7 +354,7 @@ export const ExperienceRepository = {
       return { ...data, id: "exp-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -393,7 +394,7 @@ export const ExperienceRepository = {
   },
 };
 
-// ─── Education Repository ────────────────────────────────
+// --- Education Repository --------------------------------
 export const EducationRepository = {
   async findMany() {
     try {
@@ -411,7 +412,7 @@ export const EducationRepository = {
       return fallbackEducation;
     }
   },
-  async create(data: any) {
+  async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const [edu] = await db.insert(schema.education).values(cleanData).returning();
@@ -421,7 +422,7 @@ export const EducationRepository = {
       return { ...data, id: "edu-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -461,7 +462,7 @@ export const EducationRepository = {
   },
 };
 
-// ─── Certification Repository ────────────────────────────
+// --- Certification Repository ----------------------------
 export const CertificationRepository = {
   async findMany() {
     try {
@@ -479,7 +480,7 @@ export const CertificationRepository = {
       return fallbackCertifications;
     }
   },
-  async create(data: any) {
+  async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const [cert] = await db.insert(schema.certifications).values(cleanData).returning();
@@ -489,7 +490,7 @@ export const CertificationRepository = {
       return { ...data, id: "cert-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -529,7 +530,7 @@ export const CertificationRepository = {
   },
 };
 
-// ─── Service Repository ──────────────────────────────────
+// --- Service Repository ----------------------------------
 export const ServiceRepository = {
   async findMany() {
     try {
@@ -545,7 +546,7 @@ export const ServiceRepository = {
       return [];
     }
   },
-  async create(data: any) {
+  async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const [svc] = await db.insert(schema.services).values(cleanData).returning();
@@ -555,7 +556,7 @@ export const ServiceRepository = {
       return { ...data, id: "svc-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -595,7 +596,7 @@ export const ServiceRepository = {
   },
 };
 
-// ─── Testimonial Repository ──────────────────────────────
+// --- Testimonial Repository ------------------------------
 export const TestimonialRepository = {
   async findMany() {
     try {
@@ -613,7 +614,7 @@ export const TestimonialRepository = {
       return fallbackTestimonials;
     }
   },
-  async create(data: any) {
+  async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const [t] = await db.insert(schema.testimonials).values(cleanData).returning();
@@ -623,7 +624,7 @@ export const TestimonialRepository = {
       return { ...data, id: "test-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -663,7 +664,7 @@ export const TestimonialRepository = {
   },
 };
 
-// ─── Message & DPDP Repository ───────────────────────────
+// --- Message & DPDP Repository ---------------------------
 export const MessageRepository = {
   async findMany(opts?: { status?: string; page?: number; limit?: number }) {
     try {
@@ -671,7 +672,7 @@ export const MessageRepository = {
       const limit = opts?.limit || 20;
       const offset = (page - 1) * limit;
       const conditions = [];
-      if (opts?.status) conditions.push(eq(schema.contactMessages.messageStatus, opts.status as any));
+      if (opts?.status) conditions.push(eq(schema.contactMessages.messageStatus, opts.status as Status));
       const where = conditions.length > 0 ? and(...conditions) : undefined;
       const [items, [{ total }]] = await Promise.all([
         db.select().from(schema.contactMessages).where(where).orderBy(desc(schema.contactMessages.createdAt)).limit(limit).offset(offset),
@@ -682,7 +683,7 @@ export const MessageRepository = {
       return { items: [], total: 0, page: 1, limit: 20, pages: 1 };
     }
   },
-  async create(data: any) {
+  async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       return await db.insert(schema.contactMessages).values(cleanData);
@@ -691,7 +692,7 @@ export const MessageRepository = {
       return null;
     }
   },
-  async recordConsent(data: any) {
+  async recordConsent(data: Record<string, unknown>) {
     try {
       return await db.insert(schema.consentRecords).values(data);
     } catch (err) {
@@ -699,7 +700,7 @@ export const MessageRepository = {
       return null;
     }
   },
-  async updateStatus(id: string, status: any) {
+  async updateStatus(id: string, status: MessageStatus) {
     try {
       if (isUUID(id)) {
         return await db.update(schema.contactMessages).set({ messageStatus: status }).where(eq(schema.contactMessages.id, id));
@@ -723,7 +724,7 @@ export const MessageRepository = {
   },
 };
 
-// ─── Social Link Repository ──────────────────────────────
+// --- Social Link Repository ------------------------------
 export const SocialLinkRepository = {
   async findMany() {
     try {
@@ -747,7 +748,7 @@ export const SocialLinkRepository = {
   },
 };
 
-// ─── Navigation Repository ───────────────────────────────
+// --- Navigation Repository -------------------------------
 export const NavigationRepository = {
   async findMany() {
     try {
@@ -769,7 +770,7 @@ export const NavigationRepository = {
       return fallbackNavigation.filter((i) => i.isActive && i.status === "published");
     }
   },
-  async create(data: any) {
+  async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const [nav] = await db.insert(schema.navigation).values(cleanData).returning();
@@ -779,7 +780,7 @@ export const NavigationRepository = {
       return { ...data, id: "nav-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -861,7 +862,7 @@ export const NavigationRepository = {
   },
 };
 
-// ─── Website Section Repository ───────────────────────────
+// --- Website Section Repository ---------------------------
 export const SectionRepository = {
   async findMany() {
     try {
@@ -902,7 +903,7 @@ export const SectionRepository = {
       return fallbackWebsiteSections.find((s) => s.sectionKey === sectionKey) || null;
     }
   },
-  async create(data: any) {
+  async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const [sec] = await db.insert(schema.websiteSections).values(cleanData).returning();
@@ -912,7 +913,7 @@ export const SectionRepository = {
       return { ...data, id: "sec-" + Date.now() };
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -1024,7 +1025,7 @@ export const SectionRepository = {
   },
 };
 
-// ─── Settings Repository ─────────────────────────────────
+// --- Settings Repository ---------------------------------
 export const SettingsRepository = {
   async findMany() {
     try {
@@ -1033,7 +1034,7 @@ export const SettingsRepository = {
       return [];
     }
   },
-  async upsert(key: string, value: any) {
+  async upsert(key: string, value: unknown) {
     try {
       const [existing] = await db.select().from(schema.siteSettings).where(eq(schema.siteSettings.key, key)).limit(1);
       if (existing) {
@@ -1047,7 +1048,7 @@ export const SettingsRepository = {
   },
 };
 
-// ─── Legal Repository ────────────────────────────────────
+// --- Legal Repository ------------------------------------
 export const LegalRepository = {
   async findMany() {
     try {
@@ -1064,7 +1065,7 @@ export const LegalRepository = {
       return null;
     }
   },
-  async update(id: string, data: any) {
+  async update(id: string, data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const updateData = { ...cleanData, updatedAt: new Date() };
@@ -1080,7 +1081,7 @@ export const LegalRepository = {
       return null;
     }
   },
-  async addVersionHistory(data: any) {
+  async addVersionHistory(data: Record<string, unknown>) {
     try {
       const safeData = {
         ...data,
@@ -1106,23 +1107,27 @@ export const LegalRepository = {
   },
 };
 
-// ─── Media Repository ────────────────────────────────────
+// --- Media Repository ------------------------------------
 export const MediaRepository = {
-  async findMany(opts?: { page?: number; limit?: number }) {
+  async findMany(opts?: { entity?: string; page?: number; limit?: number }) {
     try {
       const page = opts?.page || 1;
-      const limit = opts?.limit || 24;
+      const limit = opts?.limit || 50;
       const offset = (page - 1) * limit;
+      const where = opts?.entity ? eq(schema.auditLog.entity, opts.entity) : undefined;
       const [items, [{ total }]] = await Promise.all([
-        db.select().from(schema.mediaAssets).orderBy(desc(schema.mediaAssets.createdAt)).limit(limit).offset(offset),
-        db.select({ total: count() }).from(schema.mediaAssets),
+        db.select().from(schema.auditLog).where(where).orderBy(desc(schema.auditLog.createdAt)).limit(limit).offset(offset),
+        db.select({ total: count() }).from(schema.auditLog).where(where),
       ]);
-      return { items, total, page, limit, pages: Math.ceil(total / limit) };
+      if (items && items.length > 0) {
+        return { items, total, page, limit, pages: Math.ceil(total / limit) };
+      }
+      return { items: inMemoryAuditLogs, total: inMemoryAuditLogs.length, page: 1, limit: 50, pages: 1 };
     } catch {
-      return { items: [], total: 0, page: 1, limit: 24, pages: 1 };
+      return { items: inMemoryAuditLogs, total: inMemoryAuditLogs.length, page: 1, limit: 50, pages: 1 };
     }
   },
-  async create(data: any) {
+  async create(data: Record<string, unknown>) {
     try {
       const { id: _ignored, ...cleanData } = data;
       const [asset] = await db.insert(schema.mediaAssets).values(cleanData).returning();
@@ -1145,17 +1150,30 @@ export const MediaRepository = {
   },
 };
 
-// ─── Audit Repository ────────────────────────────────────
+// --- Audit Repository ------------------------------------
+const inMemoryAuditLogs: Array<Record<string, unknown>> = [];
+
 export const AuditRepository = {
-  async log(data: any) {
+  async log(data: Record<string, unknown>) {
+    const entry = {
+      id: "audit-" + Date.now() + "-" + Math.random().toString(36).substring(2, 7),
+      userId: typeof data?.userId === "string" && isUUID(data.userId) ? data.userId : null,
+      action: typeof data?.action === "string" ? data.action : "unknown",
+      entity: typeof data?.entity === "string" ? data.entity : "system",
+      entityId: typeof data?.entityId === "string" ? data.entityId : null,
+      details: data?.details || null,
+      createdAt: new Date(),
+    };
+    inMemoryAuditLogs.unshift(entry);
+    if (inMemoryAuditLogs.length > 200) inMemoryAuditLogs.pop();
     try {
       const safeData = {
         ...data,
-        userId: isUUID(data?.userId) ? data.userId : null,
+        userId: typeof data?.userId === "string" && isUUID(data.userId) ? data.userId : null,
       };
-      await db.insert(schema.auditLog).values(safeData);
+      await db.insert(schema.auditLog).values(safeData as typeof schema.auditLog.$inferInsert);
     } catch {
-      // Don't fail primary operation
+      // Offline fallback preserved in memory
     }
   },
   async findMany(opts?: { page?: number; limit?: number }) {

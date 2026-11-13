@@ -15,9 +15,11 @@ interface LanguageContextType {
   t: (key: string, fallback?: string) => string;
 }
 
-const translations: Record<Language, any> = {
-  en: enTranslations,
-  ar: arTranslations,
+type TranslationNode = string | { [key: string]: TranslationNode };
+
+const translations: Record<Language, Record<string, TranslationNode>> = {
+  en: enTranslations as unknown as Record<string, TranslationNode>,
+  ar: arTranslations as unknown as Record<string, TranslationNode>,
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -27,13 +29,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [direction, setDirection] = useState<Direction>("ltr");
 
   useEffect(() => {
-    const saved = localStorage.getItem("preferred_lang") as Language;
-    if (saved && (saved === "en" || saved === "ar")) {
-      setLanguageState(saved);
-      setDirection(saved === "ar" ? "rtl" : "ltr");
-      document.documentElement.lang = saved;
-      document.documentElement.dir = saved === "ar" ? "rtl" : "ltr";
-    }
+    const frameId = requestAnimationFrame(() => {
+      const saved = localStorage.getItem("preferred_lang") as Language;
+      if (saved && (saved === "en" || saved === "ar")) {
+        setLanguageState(saved);
+        setDirection(saved === "ar" ? "rtl" : "ltr");
+        document.documentElement.lang = saved;
+        document.documentElement.dir = saved === "ar" ? "rtl" : "ltr";
+      }
+    });
+    return () => cancelAnimationFrame(frameId);
   }, []);
 
   const setLanguage = (lang: Language) => {
@@ -54,10 +59,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const t = (key: string, fallback?: string): string => {
     try {
       const parts = key.split(".");
-      let current = translations[language];
+      let current: TranslationNode | undefined = translations[language];
       for (const part of parts) {
         if (current && typeof current === "object" && part in current) {
-          current = current[part];
+          current = (current as Record<string, TranslationNode>)[part];
         } else {
           return fallback || key;
         }

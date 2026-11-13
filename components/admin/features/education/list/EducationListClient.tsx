@@ -11,8 +11,9 @@ import { EmptyState } from "@/components/admin/empty-state";
 import { deleteEducation } from "@/lib/actions";
 import { Edit2, Trash2, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
+import type { Education } from "@/types";
 
-export function EducationListClient({ initialData }: { initialData: any[] }) {
+export function EducationListClient({ initialData }: { initialData: Education[] }) {
   const router = useRouter();
   const [items, setItems] = useState(initialData);
   const [deleteId, setDeleteId] = useState<string | null>(null);

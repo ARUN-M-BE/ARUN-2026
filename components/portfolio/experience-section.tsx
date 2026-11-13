@@ -2,9 +2,10 @@
 
 import { Briefcase, Calendar, MapPin, CheckCircle2, Building2 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+import type { Experience } from "@/types";
 
 interface ExperienceSectionProps {
-  experiences: any[];
+  experiences: Experience[];
 }
 
 export function ExperienceSection({ experiences = [] }: ExperienceSectionProps) {
@@ -93,18 +94,22 @@ export function ExperienceSection({ experiences = [] }: ExperienceSectionProps) 
                 )}
 
                 {/* Tech tags */}
-                {exp.technologies && (exp.technologies as string[]).length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 pt-2">
-                    {((exp.technologies as string[]) || []).map((tech: string) => (
-                      <span
-                        key={tech}
-                        className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-secondary border border-border text-foreground"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                {(() => {
+                  const techList = exp.techStack || exp.technologies || [];
+                  if (techList.length === 0) return null;
+                  return (
+                    <div className="flex flex-wrap gap-1.5 pt-2">
+                      {techList.map((tech: string) => (
+                        <span
+                          key={tech}
+                          className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-secondary border border-border text-foreground"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           ))}

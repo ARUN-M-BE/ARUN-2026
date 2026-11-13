@@ -124,7 +124,7 @@ export function ServiceForm({ initialData, isEditing = false }: { initialData?: 
               <Label className="text-xs font-medium text-zinc-300">Status</Label>
               <Select
                 value={watch("status")}
-                onValueChange={(val: any) => setValue("status", val)}
+                onValueChange={(val: "published" | "draft" | "unpublished") => setValue("status", val)}
               >
                 <SelectTrigger className="bg-background/50 border-border">
                   <SelectValue placeholder="Select status" />

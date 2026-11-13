@@ -29,7 +29,7 @@ export function MessagesClient({ initialData, totalPages: _totalPages }: { initi
           prev.map((m) => (m.id === id ? { ...m, messageStatus: newStatus } : m))
         );
         if (selectedMsg && selectedMsg.id === id) {
-          setSelectedMsg((prev: any) => ({ ...prev, messageStatus: newStatus }));
+          setSelectedMsg((prev) => (prev ? { ...prev, messageStatus: newStatus } : null));
         }
         router.refresh();
       }
@@ -55,7 +55,7 @@ export function MessagesClient({ initialData, totalPages: _totalPages }: { initi
     }
   };
 
-  const openMessageModal = (msg: any) => {
+  const openMessageModal = (msg: ContactMessage) => {
     setSelectedMsg(msg);
     if (msg.messageStatus === "unread") {
       handleStatusChange(msg.id, "read");

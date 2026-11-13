@@ -11,8 +11,9 @@ import { EmptyState } from "@/components/admin/empty-state";
 import { deleteExperience } from "@/lib/actions";
 import { Edit2, Trash2, Briefcase } from "lucide-react";
 import { toast } from "sonner";
+import type { Experience } from "@/types";
 
-export function ExperienceListClient({ initialData }: { initialData: any[] }) {
+export function ExperienceListClient({ initialData }: { initialData: Experience[] }) {
   const router = useRouter();
   const [experiences, setExperiences] = useState(initialData);
   const [deleteId, setDeleteId] = useState<string | null>(null);

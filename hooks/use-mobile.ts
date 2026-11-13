@@ -11,8 +11,13 @@ export function useIsMobile() {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     }
     mql.addEventListener("change", onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    return () => mql.removeEventListener("change", onChange)
+    const frameId = requestAnimationFrame(() => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+    })
+    return () => {
+      cancelAnimationFrame(frameId)
+      mql.removeEventListener("change", onChange)
+    }
   }, [])
 
   return !!isMobile
