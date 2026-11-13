@@ -92,6 +92,7 @@ export interface Experience {
   description: string | null;
   achievements: string[] | null;
   techStack: string[] | null;
+  technologies?: string[] | null;
   companyLogo: string | null;
   companyUrl: string | null;
   startDate: Date;
@@ -154,6 +155,8 @@ export interface ServiceOffering {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type Service = ServiceOffering;
 
 export interface Testimonial {
   id: string;

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Toggle, ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -358,13 +357,18 @@ export function NavigationClient({ initialData }: { initialData: NavigationItem[
                           {item.status === "published" ? "Published" : "Draft"}
                         </button>
 
-                        {/* Active Switch */}
-                        <Switch
-                          checked={item.isActive}
-                          onCheckedChange={() => handleQuickToggleActive(item)}
-                          className="scale-75"
+                        {/* Active Toggle */}
+                        <Toggle
+                          size="xs"
+                          variant={item.isActive ? "emerald" : "outline"}
+                          pressed={item.isActive}
+                          onPressedChange={() => handleQuickToggleActive(item)}
                           title="Toggle live visibility"
-                        />
+                          aria-label="Toggle live visibility"
+                          className="h-6 px-2 text-[10px] font-mono"
+                        >
+                          {item.isActive ? "Active" : "Hidden"}
+                        </Toggle>
 
                         {/* Edit button */}
                         <Button

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { Toggle } from "@/components/ui/toggle";
 import { upsertSeoMetadata } from "@/lib/actions";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
@@ -108,7 +108,15 @@ export function SeoClient({ initialMetadata }: { initialMetadata: SeoMetadata[] 
               <Label className="text-xs font-medium text-zinc-300">Robots No-Index</Label>
               <p className="text-[11px] text-muted-foreground">Disallow search engines from indexing the portfolio</p>
             </div>
-            <Switch checked={noIndex} onCheckedChange={setNoIndex} />
+            <Toggle
+              size="sm"
+              variant={noIndex ? "destructive" : "outline"}
+              pressed={noIndex}
+              onPressedChange={setNoIndex}
+              className="h-8 text-xs font-mono"
+            >
+              {noIndex ? "Blocked (No-Index)" : "Indexable (Live)"}
+            </Toggle>
           </div>
         </CardContent>
       </Card>

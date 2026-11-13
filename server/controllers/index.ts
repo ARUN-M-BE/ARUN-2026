@@ -28,6 +28,7 @@ import {
   legalDocumentSchema,
 } from "../validators";
 import { ActionResult } from "../constants";
+import type { MessageStatus } from "@/types";
 
 async function requireUser() {
   const session = await requireAdmin();
@@ -52,7 +53,7 @@ export const ProfileController = {
 
 // ─── Project Controller ──────────────────────────────────
 export const ProjectController = {
-  async getProjects(opts?: any) {
+  async getProjects(opts?: { search?: string; status?: string; page?: number; limit?: number }) {
     return ProjectService.getProjects(opts);
   },
   async getPublicProjects() {
@@ -100,7 +101,7 @@ export const SkillController = {
     const user = await requireUser();
     return SkillService.deleteCategory(user.id, id);
   },
-  async getSkills(opts?: any) {
+  async getSkills(opts?: { categoryId?: string; search?: string }) {
     return SkillService.getSkills(opts);
   },
   async getPublicSkills() {
@@ -256,7 +257,7 @@ export const TestimonialController = {
 
 // ─── Message Controller ──────────────────────────────────
 export const MessageController = {
-  async getContactMessages(opts?: any) {
+  async getContactMessages(opts?: { search?: string; status?: string; page?: number; limit?: number }) {
     await requireUser();
     return MessageService.getMessages(opts);
   },
@@ -265,7 +266,7 @@ export const MessageController = {
     if (!parsed.success) return { success: false, error: parsed.error.errors[0]?.message };
     return MessageService.submitContact(parsed.data);
   },
-  async updateMessageStatus(id: string, status: string): Promise<ActionResult> {
+  async updateMessageStatus(id: string, status: MessageStatus): Promise<ActionResult> {
     const user = await requireUser();
     return MessageService.updateStatus(user.id, id, status);
   },
@@ -280,7 +281,7 @@ export const SettingsController = {
   async getSiteSettings() {
     return SettingsService.getSettings();
   },
-  async updateSiteSetting(key: string, value: any): Promise<ActionResult> {
+  async updateSiteSetting(key: string, value: unknown): Promise<ActionResult> {
     const user = await requireUser();
     return SettingsService.updateSetting(user.id, key, value);
   },
@@ -308,10 +309,21 @@ export const LegalController = {
 
 // ─── Media Controller ────────────────────────────────────
 export const MediaController = {
-  async getMediaAssets(opts?: any) {
+  async getMediaAssets(opts?: { page?: number; limit?: number; folder?: string; search?: string; type?: string }) {
     return MediaService.getMedia(opts);
   },
-  async createMediaAsset(data: any): Promise<ActionResult> {
+  async createMediaAsset(data: {
+    filename?: string;
+    fileName?: string;
+    originalFilename?: string;
+    mimeType?: string;
+    size?: number;
+    url?: string;
+    altText?: string;
+    copyright?: string;
+    folder?: string;
+    metadata?: Record<string, unknown>;
+  }): Promise<ActionResult> {
     const user = await requireUser();
     return MediaService.createMedia(user.id, data);
   },
@@ -323,7 +335,7 @@ export const MediaController = {
 
 // ─── Audit Controller ────────────────────────────────────
 export const AuditController = {
-  async getAuditLogs(opts?: any) {
+  async getAuditLogs(opts?: { page?: number; limit?: number; entity?: string; action?: string; search?: string }) {
     await requireUser();
     return AuditService.getLogs(opts);
   },

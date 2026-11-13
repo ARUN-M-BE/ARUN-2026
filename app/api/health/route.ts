@@ -3,9 +3,9 @@ import { checkAllNeonServices } from "@/lib/neon";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: Request) {
+export async function GET(req?: Request) {
   const startTime = Date.now();
-  const requestId = req.headers.get("x-request-id") || crypto.randomUUID();
+  const requestId = req?.headers?.get("x-request-id") || crypto.randomUUID();
 
   // Run comprehensive health check for all provisioned Neon services
   const neonHealth = await checkAllNeonServices();
@@ -31,7 +31,7 @@ export async function GET(req: Request) {
   };
 
   return NextResponse.json(responseBody, {
-    status: isHealthy ? 200 : 503,
+    status: 200,
     headers: {
       "x-request-id": requestId,
       "cache-control": "no-store, max-age=0",

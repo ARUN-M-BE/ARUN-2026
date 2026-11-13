@@ -12,12 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { Toggle } from "@/components/ui/toggle";
 import { Loader2, ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
-export function ServiceForm({ initialData, isEditing = false }: { initialData?: any; isEditing?: boolean }) {
+export function ServiceForm({ initialData, isEditing = false }: { initialData?: Partial<ServiceFormData> & { id?: string }; isEditing?: boolean }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -43,7 +43,7 @@ export function ServiceForm({ initialData, isEditing = false }: { initialData?: 
   const onSubmit = async (data: ServiceFormData) => {
     setIsSubmitting(true);
     try {
-      if (isEditing) {
+      if (isEditing && initialData?.id) {
         const res = await updateService(initialData.id, data);
         if (res.success) {
           toast.success("Service updated");
@@ -124,7 +124,7 @@ export function ServiceForm({ initialData, isEditing = false }: { initialData?: 
               <Label className="text-xs font-medium text-zinc-300">Status</Label>
               <Select
                 value={watch("status")}
-                onValueChange={(val: any) => setValue("status", val)}
+                onValueChange={(val: "published" | "draft" | "unpublished") => setValue("status", val)}
               >
                 <SelectTrigger className="bg-background/50 border-border">
                   <SelectValue placeholder="Select status" />
@@ -148,12 +148,20 @@ export function ServiceForm({ initialData, isEditing = false }: { initialData?: 
             <Textarea rows={5} placeholder="What is included, deliverables, timeline..." {...register("description")} />
           </div>
 
-          <div className="flex items-center gap-3 pt-4 border-t border-border">
-            <Switch
-              checked={watch("isFeatured")}
-              onCheckedChange={(checked) => setValue("isFeatured", checked)}
-            />
-            <Label className="text-xs font-medium text-zinc-300">Featured Service Offering</Label>
+          <div className="flex items-center justify-between pt-4 border-t border-border">
+            <div>
+              <Label className="text-xs font-medium text-zinc-300">Featured Service Offering</Label>
+              <p className="text-[11px] text-muted-foreground">Highlight this offering on the portfolio services grid</p>
+            </div>
+            <Toggle
+              size="sm"
+              variant={watch("isFeatured") ? "primary" : "outline"}
+              pressed={Boolean(watch("isFeatured"))}
+              onPressedChange={(pressed) => setValue("isFeatured", pressed)}
+              className="h-8 text-xs font-mono"
+            >
+              {watch("isFeatured") ? "★ Featured" : "Standard"}
+            </Toggle>
           </div>
         </CardContent>
       </Card>

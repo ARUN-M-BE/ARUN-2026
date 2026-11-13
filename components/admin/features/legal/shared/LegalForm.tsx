@@ -12,12 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { Toggle } from "@/components/ui/toggle";
 import { Loader2, ArrowLeft, Save, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
-export function LegalForm({ initialData }: { initialData: any }) {
+export function LegalForm({ initialData }: { initialData: Partial<LegalDocumentFormData> & { id: string } }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -119,7 +119,7 @@ export function LegalForm({ initialData }: { initialData: any }) {
               <Label className="text-xs font-medium text-zinc-300">Status</Label>
               <Select
                 value={watch("status")}
-                onValueChange={(val: any) => setValue("status", val)}
+                onValueChange={(val: "published" | "draft" | "unpublished") => setValue("status", val)}
               >
                 <SelectTrigger className="bg-background/50 border-border">
                   <SelectValue placeholder="Select status" />
@@ -144,17 +144,22 @@ export function LegalForm({ initialData }: { initialData: any }) {
             {errors.content && <p className="text-xs text-destructive">{errors.content.message}</p>}
           </div>
 
-          <div className="flex items-center gap-3 pt-4 border-t border-border">
-            <Switch
-              checked={watch("isReviewRequired")}
-              onCheckedChange={(checked) => setValue("isReviewRequired", checked)}
-            />
+          <div className="flex items-center justify-between pt-4 border-t border-border">
             <div>
               <Label className="text-xs font-medium text-zinc-300">Legal Review Required Banner</Label>
               <p className="text-[11px] text-muted-foreground">
                 Displays prominent disclaimer informing visitors that this document is in draft review
               </p>
             </div>
+            <Toggle
+              size="sm"
+              variant={watch("isReviewRequired") ? "amber" : "outline"}
+              pressed={Boolean(watch("isReviewRequired"))}
+              onPressedChange={(pressed) => setValue("isReviewRequired", pressed)}
+              className="h-8 text-xs font-mono"
+            >
+              {watch("isReviewRequired") ? "Review Active" : "No Disclaimer"}
+            </Toggle>
           </div>
         </CardContent>
       </Card>

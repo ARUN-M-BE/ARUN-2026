@@ -6,16 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { Toggle } from "@/components/ui/toggle";
 import { updateSiteSetting } from "@/lib/actions";
 import { Loader2, Save, Palette, Shield, Globe, Bell } from "lucide-react";
 import { toast } from "sonner";
 
-export function SettingsClient({ initialSettings }: { initialSettings: any[] }) {
+export function SettingsClient({ initialSettings }: { initialSettings: Array<{ key: string; value: unknown }> }) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
 
-  const getVal = (key: string, fallback: any) => {
+  const getVal = (key: string, fallback: unknown) => {
     const s = initialSettings.find((item) => item.key === key);
     if (!s || s.value === undefined) return fallback;
     try {
@@ -164,7 +164,15 @@ export function SettingsClient({ initialSettings }: { initialSettings: any[] }) 
                 Displays privacy choice manager to visitors before activating non-essential scripts
               </p>
             </div>
-            <Switch checked={cookieBanner} onCheckedChange={setCookieBanner} />
+            <Toggle
+              size="sm"
+              variant={cookieBanner ? "emerald" : "outline"}
+              pressed={cookieBanner}
+              onPressedChange={setCookieBanner}
+              className="h-8 text-xs font-mono"
+            >
+              {cookieBanner ? "Active" : "Disabled"}
+            </Toggle>
           </div>
 
           <div className="space-y-2 pt-2 border-t border-border">
@@ -198,7 +206,15 @@ export function SettingsClient({ initialSettings }: { initialSettings: any[] }) 
                 Send an immediate notification when a client completes the 3D contact form
               </p>
             </div>
-            <Switch checked={emailNotify} onCheckedChange={setEmailNotify} />
+            <Toggle
+              size="sm"
+              variant={emailNotify ? "amber" : "outline"}
+              pressed={emailNotify}
+              onPressedChange={setEmailNotify}
+              className="h-8 text-xs font-mono"
+            >
+              {emailNotify ? "Subscribed" : "Muted"}
+            </Toggle>
           </div>
         </CardContent>
       </Card>

@@ -14,11 +14,14 @@ export function MouseGlow() {
   const springY = useSpring(mouseY, { stiffness: 250, damping: 25 });
 
   useEffect(() => {
-    setMounted(true);
     // Check if the device has a mouse pointer (not touch-only)
-    if (window.matchMedia("(pointer: fine)").matches) {
-      setIsPointerDevice(true);
-    }
+    const hasPointer = window.matchMedia("(pointer: fine)").matches;
+    const frameId = requestAnimationFrame(() => {
+      setMounted(true);
+      if (hasPointer) {
+        setIsPointerDevice(true);
+      }
+    });
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
@@ -26,7 +29,10 @@ export function MouseGlow() {
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    return () => {
+      cancelAnimationFrame(frameId);
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
   }, [mouseX, mouseY]);
 
   if (!mounted || !isPointerDevice) return null;

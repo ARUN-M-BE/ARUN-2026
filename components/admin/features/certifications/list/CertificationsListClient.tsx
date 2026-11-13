@@ -11,8 +11,9 @@ import { EmptyState } from "@/components/admin/empty-state";
 import { deleteCertification } from "@/lib/actions";
 import { Edit2, Trash2, Award, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import type { Certification } from "@/types";
 
-export function CertificationListClient({ initialData }: { initialData: any[] }) {
+export function CertificationListClient({ initialData }: { initialData: Certification[] }) {
   const router = useRouter();
   const [certs, setCerts] = useState(initialData);
   const [deleteId, setDeleteId] = useState<string | null>(null);

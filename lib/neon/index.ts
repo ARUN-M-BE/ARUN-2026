@@ -38,6 +38,14 @@ export const NEON_CONFIG = {
   },
 };
 
+function getErrorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (typeof err === "object" && err !== null && "message" in err) {
+    return String((err as { message: unknown }).message);
+  }
+  return String(err);
+}
+
 // ─── 1. Postgres Service ────────────────────────────────────
 let serverlessPool: Pool | null = null;
 
@@ -53,7 +61,7 @@ export function getNeonPool(): Pool {
 
 export const neonDb = drizzle(getNeonPool(), { schema });
 
-export async function checkNeonPostgres(): Promise<{ status: "connected" | "error"; latencyMs: number; details?: any }> {
+export async function checkNeonPostgres(): Promise<{ status: "connected" | "error"; latencyMs: number; details?: unknown }> {
   const start = Date.now();
   try {
     const pool = getNeonPool();
@@ -63,11 +71,11 @@ export async function checkNeonPostgres(): Promise<{ status: "connected" | "erro
       latencyMs: Date.now() - start,
       details: result.rows[0],
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       status: "error",
       latencyMs: Date.now() - start,
-      details: err?.message || String(err),
+      details: getErrorMessage(err),
     };
   }
 }
@@ -90,7 +98,7 @@ export async function verifyNeonAuthToken(token: string) {
   return jwtVerify(token, jwks);
 }
 
-export async function checkNeonAuth(): Promise<{ status: "connected" | "error"; latencyMs: number; details?: any }> {
+export async function checkNeonAuth(): Promise<{ status: "connected" | "error"; latencyMs: number; details?: unknown }> {
   const start = Date.now();
   try {
     if (!NEON_CONFIG.auth.jwksUrl) {
@@ -108,13 +116,13 @@ export async function checkNeonAuth(): Promise<{ status: "connected" | "error"; 
     return {
       status: "connected",
       latencyMs: Date.now() - start,
-      details: { keyCount: jwks.keys?.length || 0, keys: jwks.keys?.map((k: any) => ({ kid: k.kid, alg: k.alg, crv: k.crv })) },
+      details: { keyCount: jwks.keys?.length || 0, keys: jwks.keys?.map((k: { kid?: string; alg?: string; crv?: string }) => ({ kid: k.kid, alg: k.alg, crv: k.crv })) },
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       status: "error",
       latencyMs: Date.now() - start,
-      details: err?.message || String(err),
+      details: getErrorMessage(err),
     };
   }
 }
@@ -167,7 +175,7 @@ export async function deleteAsset(key: string) {
   return s3.send(command);
 }
 
-export async function checkNeonObjectStorage(): Promise<{ status: "connected" | "error"; latencyMs: number; details?: any }> {
+export async function checkNeonObjectStorage(): Promise<{ status: "connected" | "error"; latencyMs: number; details?: unknown }> {
   const start = Date.now();
   try {
     const s3 = getNeonS3Client();
@@ -180,17 +188,17 @@ export async function checkNeonObjectStorage(): Promise<{ status: "connected" | 
         targetBucket: NEON_CONFIG.storage.bucket,
       },
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       status: "error",
       latencyMs: Date.now() - start,
-      details: err?.message || String(err),
+      details: getErrorMessage(err),
     };
   }
 }
 
 // ─── 4. Neon Realtime Service ───────────────────────────────
-export async function checkNeonRealtime(): Promise<{ status: "connected" | "error"; latencyMs: number; details?: any }> {
+export async function checkNeonRealtime(): Promise<{ status: "connected" | "error"; latencyMs: number; details?: unknown }> {
   const start = Date.now();
   return new Promise((resolve) => {
     try {
@@ -244,11 +252,11 @@ export async function checkNeonRealtime(): Promise<{ status: "connected" | "erro
           details: { endpoint: wsUrl, note: msg },
         });
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       resolve({
         status: "error",
         latencyMs: Date.now() - start,
-        details: err?.message || String(err),
+        details: getErrorMessage(err),
       });
     }
   });
