@@ -1,0 +1,31 @@
+# ─── Cloudflare Worker secrets template ────────────────────────────────
+# Copy this file to `.dev.vars` (git-ignored) for `npm run preview`, and use
+# the same keys for production via `npm run secrets:push` (wrangler secret bulk)
+# or `wrangler secret put <KEY>`.
+#
+# Public, non-secret values live in wrangler.jsonc `vars`. Everything below
+# is sensitive and must never be committed with real values.
+
+# Database (contains credentials -> treat as secret)
+DATABASE_URL="postgresql://user:password@ep-pooler.region.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+DATABASE_URL_UNPOOLED="postgresql://user:password@ep.region.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+
+# Auth (generate with: openssl rand -base64 32)
+AUTH_SECRET=generate-a-random-secret-with-openssl-rand-base64-32
+NEXTAUTH_SECRET=generate-a-random-secret-with-openssl-rand-base64-32
+ADMIN_PASSWORD=ChangeMe123!
+
+# API Management
+API_MANAGEMENT_KEY=your_api_management_key
+
+# Free service integrations
+MONKEYTYPE_APE_KEY=your_free_monkeytype_ape_key
+IPSTACK_API_KEY=your_free_ipstack_key
+UPSTASH_REDIS_REST_TOKEN=your_free_upstash_token
+RESEND_API_KEY=re_your_free_resend_api_key
+RESEND_WEBHOOK_SECRET=whsec_your_webhook_secret
+
+# Neon services
+NEON_REALTIME_SECRET=nrt_live_your_secret
+AWS_ACCESS_KEY_ID=your-neon-storage-access-key
+AWS_SECRET_ACCESS_KEY=your-neon-storage-secret-key
