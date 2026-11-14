@@ -94,7 +94,7 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
               <a
                 key={item.id}
                 href={`#${item.id}`}
-                className="text-[11px] font-medium tracking-wide text-white/50 transition-colors hover:text-white"
+                className="text-[11px] font-medium tracking-wide text-white/65 transition-colors hover:text-white"
               >
                 {item.label}
               </a>
@@ -108,6 +108,10 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
           </a>
         </div>
       </header>
+
+      {/* Wrapped in a `main` landmark: axe reports a page without one as
+          `landmark-one-main`, and screen-reader users get a skip target. */}
+      <main>
 
       {/* ── Hero ───────────────────────────────────────── */}
       <section id="top" ref={heroRef} className="relative mx-auto max-w-6xl px-5 pb-24 pt-32 sm:pt-40">
@@ -173,7 +177,7 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={projectImage(featured[0])!} alt="" className="h-full w-full object-cover" />
               ) : (
-                <div className="flex h-full items-center justify-center bg-[var(--pf-accent-soft)] text-4xl font-semibold text-white/40">
+                <div className="flex h-full items-center justify-center bg-[var(--pf-accent-soft)] text-4xl font-semibold text-white/60">
                   {featured[0]?.title.slice(0, 2).toUpperCase() ?? "AM"}
                 </div>
               )}
@@ -186,7 +190,7 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
                 </p>
               </div>
             </motion.div>
-            <p className="absolute -bottom-2 left-0 font-mono text-[10px] uppercase tracking-[0.3em] text-white/30">
+            <p className="absolute -bottom-2 left-0 font-mono text-[10px] uppercase tracking-[0.3em] text-white/55">
               scroll · layers drift with you
             </p>
           </div>
@@ -204,7 +208,7 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
           ].map((stat) => (
             <div key={stat.label} className="py-8 text-center">
               <p className="text-3xl font-semibold text-white">{stat.value}</p>
-              <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.3em] text-white/35">{stat.label}</p>
+              <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.3em] text-white/60">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -216,7 +220,7 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
           <div className="lg:sticky lg:top-24 lg:self-start">
             <DesignEyebrow>{copy.work.badge}</DesignEyebrow>
             <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white">{copy.work.title}</h2>
-            <p className="mt-2 text-xs leading-relaxed text-white/45">{copy.work.subtitle}</p>
+            <p className="mt-2 text-xs leading-relaxed text-white/65">{copy.work.subtitle}</p>
           </div>
 
           <div className="space-y-8">
@@ -240,14 +244,14 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
                           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
                         />
                       ) : (
-                        <div className="flex h-full items-center justify-center bg-[var(--pf-accent-soft)] text-xl text-white/40">
+                        <div className="flex h-full items-center justify-center bg-[var(--pf-accent-soft)] text-xl text-white/60">
                           {project.title.slice(0, 2).toUpperCase()}
                         </div>
                       )}
                     </div>
                     <div className="flex flex-col justify-between gap-4 py-1">
                       <div>
-                        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.24em] text-white/35">
+                        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.24em] text-white/60">
                           <span>{String(index + 1).padStart(2, "0")}</span>
                           <span className="h-px w-4 bg-white/20" aria-hidden />
                           {project.category || "Case study"}
@@ -255,7 +259,7 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
                         <h3 className="mt-2 text-lg font-semibold text-white group-hover:text-[var(--pf-accent)]">
                           {project.title}
                         </h3>
-                        <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-white/50">
+                        <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-white/65">
                           {project.shortDescription || project.description}
                         </p>
                       </div>
@@ -311,7 +315,7 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
                   </span>
                   <div>
                     <p className="text-xs font-medium leading-relaxed text-white/85">{item.title}</p>
-                    <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-white/30">
+                    <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-white/55">
                       {item.detail}
                     </p>
                   </div>
@@ -319,7 +323,7 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
               </Reveal>
             ))}
             {achievements.length === 0 && (
-              <p className="rounded-[var(--pf-radius-sm)] border border-dashed border-white/10 p-6 text-xs text-white/40">
+              <p className="rounded-[var(--pf-radius-sm)] border border-dashed border-white/10 p-6 text-xs text-white/60">
                 Achievements appear here once they are added to experience entries in the CMS.
               </p>
             )}
@@ -337,7 +341,7 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
               <div>
                 <div className="flex items-baseline justify-between">
                   <h3 className="text-sm font-semibold text-white/90">{category.name}</h3>
-                  <span className="font-mono text-[10px] text-white/30">
+                  <span className="font-mono text-[10px] text-white/55">
                     {category.skills?.length ?? 0} skills
                   </span>
                 </div>
@@ -346,7 +350,7 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
                     <div key={skill.id}>
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="text-white/65">{skill.name}</span>
-                        <span className="font-mono text-white/30">{skill.level}%</span>
+                        <span className="font-mono text-white/55">{skill.level}%</span>
                       </div>
                       <div className="mt-1.5 h-[3px] overflow-hidden rounded-full bg-white/[0.07]">
                         <motion.div
@@ -377,14 +381,14 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
                 <Reveal key={exp.id} config={config} delay={index * 0.04} as="li">
                   <div className="relative">
                     <span className="absolute -left-[27px] top-1.5 h-2 w-2 rounded-full bg-[var(--pf-accent)]" aria-hidden />
-                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/35">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/60">
                       {experienceRange(exp)}
                     </p>
                     <h3 className="mt-1.5 text-base font-semibold text-white">
-                      {exp.position} <span className="text-white/40">· {exp.company}</span>
+                      {exp.position} <span className="text-white/60">· {exp.company}</span>
                     </h3>
                     {exp.description && (
-                      <p className="mt-2 text-xs leading-relaxed text-white/50">{exp.description}</p>
+                      <p className="mt-2 text-xs leading-relaxed text-white/65">{exp.description}</p>
                     )}
                   </div>
                 </Reveal>
@@ -394,13 +398,13 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
 
           <div className="space-y-10">
             <div>
-              <h3 className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/35">Education</h3>
+              <h3 className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/60">Education</h3>
               <ul className="mt-4 space-y-4">
                 {content.education.map((item) => (
                   <li key={item.id} className="rounded-[var(--pf-radius-sm)] border border-white/[0.07] p-4">
                     <p className="text-xs font-semibold text-white/90">{item.degree}</p>
-                    <p className="mt-0.5 text-[11px] text-white/45">{item.institution}</p>
-                    <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/30">
+                    <p className="mt-0.5 text-[11px] text-white/65">{item.institution}</p>
+                    <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/55">
                       {educationRange(item)}
                     </p>
                   </li>
@@ -408,12 +412,12 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
               </ul>
             </div>
             <div>
-              <h3 className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/35">Certifications</h3>
+              <h3 className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/60">Certifications</h3>
               <ul className="mt-4 space-y-2">
                 {content.certifications.map((cert) => (
                   <li key={cert.id} className="flex items-center justify-between gap-3 border-b border-white/[0.06] py-2">
                     <span className="text-[11px] text-white/70">{cert.name}</span>
-                    <span className="font-mono text-[10px] text-white/30">{cert.issuer}</span>
+                    <span className="font-mono text-[10px] text-white/55">{cert.issuer}</span>
                   </li>
                 ))}
               </ul>
@@ -431,12 +435,12 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
             {content.services.map((service, index) => (
               <Reveal key={service.id} config={config} delay={index * 0.04}>
                 <div className="group grid gap-3 py-6 sm:grid-cols-[60px_1fr_auto] sm:items-start">
-                  <span className="font-mono text-[10px] text-white/25">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="font-mono text-[10px] text-white/65">{String(index + 1).padStart(2, "0")}</span>
                   <div>
                     <h3 className="text-base font-semibold text-white group-hover:text-[var(--pf-accent)]">
                       {service.title}
                     </h3>
-                    <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-white/45">
+                    <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-white/65">
                       {service.shortDescription || service.description}
                     </p>
                   </div>
@@ -477,13 +481,13 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
                     {channel.label === "Email" ? <Mail className="h-3.5 w-3.5" /> : channel.label === "Phone" ? <Phone className="h-3.5 w-3.5" /> : channel.label === "Resume" ? <Download className="h-3.5 w-3.5" /> : <MapPin className="h-3.5 w-3.5" />}
                     {channel.value}
                   </span>
-                  <ArrowUpRight className="h-3.5 w-3.5 text-white/25 transition-colors group-hover:text-[var(--pf-accent)]" />
+                  <ArrowUpRight className="h-3.5 w-3.5 text-white/65 transition-colors group-hover:text-[var(--pf-accent)]" />
                 </a>
               ))}
             </div>
 
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/35">Elsewhere</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/60">Elsewhere</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {content.socialLinks.map((link) => (
                   <a
@@ -498,7 +502,7 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
                   </a>
                 ))}
               </div>
-              <p className="mt-8 text-xs leading-relaxed text-white/35">
+              <p className="mt-8 text-xs leading-relaxed text-white/60">
                 {content.profile?.availability || "Open to architectural advisory and product engagements."}
               </p>
             </div>
@@ -506,8 +510,10 @@ export default function ParallaxDesign({ content, config }: DesignProps) {
         </div>
       </section>
 
+      </main>
+
       <footer className="border-t border-white/[0.06]">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-3 px-5 py-8 text-[11px] text-white/30 sm:flex-row sm:items-center">
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-3 px-5 py-8 text-[11px] text-white/55 sm:flex-row sm:items-center">
           <span className="inline-flex items-center gap-2">
             <CalendarDays className="h-3 w-3" />
             © {new Date().getFullYear()} {name}
