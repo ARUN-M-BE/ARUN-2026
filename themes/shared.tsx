@@ -123,7 +123,9 @@ export function DesignEyebrow({
       className={`inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.28em] ${className}`}
     >
       <span className="h-px w-6 bg-[var(--pf-accent-line)]" aria-hidden />
-      <ShinyText color="rgba(255,255,255,0.45)" shineColor="var(--pf-accent)" className="tracking-[0.28em]">
+      {/* 0.58 alpha clears AA for 10px text on the near-black backdrop; 0.45
+          measured 4.3:1, which is just under the 4.5 threshold. */}
+      <ShinyText color="rgba(255,255,255,0.58)" shineColor="var(--pf-accent)" className="tracking-[0.28em]">
         {children}
       </ShinyText>
     </span>

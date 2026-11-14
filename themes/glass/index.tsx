@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { DesignEyebrow, DesignPill, DesignShell, Reveal } from "@/themes/shared";
+import CountUp from "@/components/CountUp";
 import {
   collectAchievements,
   contactChannels,
@@ -43,23 +44,80 @@ function Glass({
   children,
   className = "",
   strong = false,
+  interactive = false,
 }: {
   children: ReactNode;
   className?: string;
   strong?: boolean;
+  /** Adds the hover lift + edge brightening used by clickable panels. */
+  interactive?: boolean;
 }) {
+  // Four layers are what separate a sheet of glass from a translucent
+  // rectangle: a directional tint (light falls from the top-left), a heavy
+  // backdrop blur with a saturation/contrast boost so the bloom behind the
+  // pane turns into colour, a 1px specular line caught on the top edge, and a
+  // bottom inner shade that gives the sheet thickness.
   const style: CSSProperties = {
     borderRadius: "var(--pf-radius)",
-    background: strong ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.035)",
-    borderColor: "rgba(255,255,255,0.1)",
-    backdropFilter: "blur(var(--pf-blur))",
-    WebkitBackdropFilter: "blur(var(--pf-blur))",
-    boxShadow: "0 30px 80px -50px rgba(0,0,0,1), inset 0 1px 0 rgba(255,255,255,0.08)",
+    background: strong
+      ? "linear-gradient(152deg, rgba(255,255,255,0.135) 0%, rgba(255,255,255,0.062) 46%, rgba(255,255,255,0.024) 100%)"
+      : "linear-gradient(152deg, rgba(255,255,255,0.085) 0%, rgba(255,255,255,0.036) 48%, rgba(255,255,255,0.014) 100%)",
+    // Edge colour lives in a custom property so hover states can move it —
+    // an inline `borderColor` would outrank any class-based style.
+    borderColor: "var(--glass-edge, rgba(255,255,255,0.15))",
+    backdropFilter: "blur(calc(var(--pf-blur) + 5px)) saturate(185%) contrast(1.05)",
+    WebkitBackdropFilter: "blur(calc(var(--pf-blur) + 5px)) saturate(185%) contrast(1.05)",
+    boxShadow: [
+      "inset 0 -24px 40px -40px rgba(0,0,0,0.85)",
+      "0 34px 80px -58px rgba(0,0,0,0.95)",
+    ].join(", "),
   };
 
   return (
-    <div style={style} className={`border ${className}`}>
-      {children}
+    <div
+      style={style}
+      className={`relative isolate border ${
+        interactive
+          ? "transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-0.5 hover:[--glass-edge:var(--pf-accent-line)]"
+          : ""
+      } ${className}`}
+    >
+      {/* Specular highlight on the top edge — the single detail that reads as
+          "polished glass" rather than "grey box with opacity". */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-px"
+        style={{
+          borderRadius: "inherit",
+          background:
+            "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.45) 18%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0.45) 82%, transparent 100%)",
+          maskImage:
+            "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)",
+          WebkitMaskImage:
+            "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)",
+        }}
+      />
+      {/* Diagonal streak, offset from the tint above so highlight and body
+          disagree slightly — that disagreement is what sells the depth. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          borderRadius: "inherit",
+          background:
+            "linear-gradient(118deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 32%, rgba(255,255,255,0) 66%, rgba(255,255,255,0.045) 100%)",
+        }}
+      />
+      {/* Accent bloom just inside the top edge of the heavier panels, so the
+          frosted colour is the theme's own, not a neutral wash. */}
+      {strong && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -top-20 left-1/2 h-40 w-56 -translate-x-1/2 rounded-full opacity-70 blur-[64px]"
+          style={{ background: "var(--pf-accent-soft)" }}
+        />
+      )}
+      <div className="relative">{children}</div>
     </div>
   );
 }
@@ -105,10 +163,36 @@ export default function GlassDesign({ content, config }: DesignProps) {
 
   return (
     <DesignShell config={config}>
-      {/* Ambient light bloom */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div className="absolute -top-40 left-1/2 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full opacity-70 blur-[140px]" style={{ background: "var(--pf-wash)" }} />
-        <div className="absolute bottom-0 right-0 h-[26rem] w-[26rem] rounded-full opacity-50 blur-[150px]" style={{ background: "var(--pf-glow)" }} />
+      {/* Backdrop field. A frosted pane can only read as *glass* when there
+          is something behind it to refract; over near-flat black every panel
+          collapses into a translucent grey rectangle however strong its blur
+          is. The layer is fixed, so the orbs hold their compositional
+          position while the panels scroll across and break them up. */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute -left-[16%] -top-[20%] h-[48rem] w-[48rem] rounded-full opacity-40 blur-[110px]"
+          style={{ background: "radial-gradient(circle, var(--pf-accent) 0%, transparent 64%)" }}
+        />
+        <div
+          className="absolute -right-[18%] top-[18%] h-[42rem] w-[42rem] rounded-full opacity-30 blur-[120px]"
+          style={{ background: "radial-gradient(circle, var(--pf-accent-2) 0%, transparent 66%)" }}
+        />
+        <div
+          className="absolute -bottom-[26%] left-[24%] h-[44rem] w-[44rem] rounded-full opacity-25 blur-[130px]"
+          style={{ background: "radial-gradient(circle, var(--pf-accent) 0%, transparent 68%)" }}
+        />
+        {/* Fine lattice: gives the blur structure to smear, which is what
+            produces the frosted ripple across a panel edge. */}
+        <div
+          className="absolute inset-0 opacity-[0.09]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.6) 1px, transparent 1px)",
+            backgroundSize: "72px 72px",
+            maskImage: "radial-gradient(ellipse at 50% 0%, #000 0%, transparent 70%)",
+            WebkitMaskImage: "radial-gradient(ellipse at 50% 0%, #000 0%, transparent 70%)",
+          }}
+        />
       </div>
 
       <header className="sticky top-0 z-40 px-4 pt-4 sm:px-6">
@@ -116,10 +200,12 @@ export default function GlassDesign({ content, config }: DesignProps) {
           className="mx-auto flex max-w-5xl items-center justify-between gap-4 border px-4 py-2.5"
           style={{
             borderRadius: 999,
-            background: "rgba(255,255,255,0.05)",
-            borderColor: "rgba(255,255,255,0.1)",
-            backdropFilter: "blur(calc(var(--pf-blur) + 6px))",
-            WebkitBackdropFilter: "blur(calc(var(--pf-blur) + 6px))",
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.045) 52%, rgba(255,255,255,0.02) 100%)",
+            borderColor: "rgba(255,255,255,0.13)",
+            backdropFilter: "blur(calc(var(--pf-blur) + 8px)) saturate(190%)",
+            WebkitBackdropFilter: "blur(calc(var(--pf-blur) + 8px)) saturate(190%)",
+            boxShadow: "0 18px 44px -34px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.22)",
           }}
         >
           <Link href="#top" className="flex min-h-9 items-center gap-2.5 py-1">
@@ -155,6 +241,9 @@ export default function GlassDesign({ content, config }: DesignProps) {
         </div>
       </header>
 
+      {/* These designs exposed no `main` landmark, which axe reports as
+          `landmark-one-main`. The content sections now sit inside one. */}
+      <main className="relative">
       {/* ── Hero ─────────────────────────────────────── */}
       <section id="top" className="relative px-4 pt-16 sm:px-6 sm:pt-24">
         <div className="mx-auto max-w-3xl text-center">
@@ -209,16 +298,23 @@ export default function GlassDesign({ content, config }: DesignProps) {
         <Reveal config={config} delay={0.25}>
           <div className="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              { label: "Years", value: content.profile?.yearsOfExperience ?? 0 },
-              { label: "Projects", value: content.projects.length },
-              { label: "Skills", value: skillTotal },
-              { label: "Clients", value: content.profile?.happyClients ?? 0 },
+              { label: "Years", value: content.profile?.yearsOfExperience ?? 0, suffix: "+" },
+              { label: "Projects", value: content.projects.length, suffix: "" },
+              { label: "Skills", value: skillTotal, suffix: "" },
+              { label: "Clients", value: content.profile?.happyClients ?? 0, suffix: "" },
             ].map((stat) => (
-              <Glass key={stat.label} className="px-4 py-5 text-center">
-                <p className="text-2xl font-semibold text-white">{stat.value}</p>
-                <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.24em] text-white/40">
+              <Glass key={stat.label} className="relative px-4 py-5 text-center">
+                <p className="font-mono text-2xl font-semibold tabular-nums text-white">
+                  <CountUp to={stat.value} suffix={stat.suffix} duration={1.5} />
+                </p>
+                <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.24em] text-white/55">
                   {stat.label}
                 </p>
+                <span
+                  aria-hidden
+                  className="absolute inset-x-6 bottom-0 h-px"
+                  style={{ background: "linear-gradient(90deg, transparent, var(--pf-accent-line), transparent)" }}
+                />
               </Glass>
             ))}
           </div>
@@ -234,7 +330,7 @@ export default function GlassDesign({ content, config }: DesignProps) {
               {copy.work.title}
             </h2>
             {copy.work.subtitle && (
-              <p className="mx-auto mt-2 max-w-lg text-xs text-white/45">{copy.work.subtitle}</p>
+              <p className="mx-auto mt-2 max-w-lg text-xs text-white/65">{copy.work.subtitle}</p>
             )}
           </div>
 
@@ -245,7 +341,7 @@ export default function GlassDesign({ content, config }: DesignProps) {
               return (
                 <Reveal key={project.id} config={config} delay={index * 0.04}>
                   <Link href={`/projects/${project.slug}`} className="group block">
-                    <Glass className="h-full overflow-hidden transition-colors group-hover:border-[var(--pf-accent-line)]">
+                    <Glass className="h-full overflow-hidden" interactive>
                       <div className="relative h-44 overflow-hidden" style={{ borderTopLeftRadius: "var(--pf-radius)", borderTopRightRadius: "var(--pf-radius)" }}>
                         {image ? (
                           // eslint-disable-next-line @next/next/no-img-element
@@ -256,20 +352,20 @@ export default function GlassDesign({ content, config }: DesignProps) {
                             className="h-full w-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105"
                           />
                         ) : (
-                          <div className="flex h-full items-center justify-center text-2xl font-semibold text-white/25" style={{ background: "var(--pf-accent-soft)" }}>
+                          <div className="flex h-full items-center justify-center text-2xl font-semibold text-white/65" style={{ background: "var(--pf-accent-soft)" }}>
                             {initials(project.title)}
                           </div>
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                       </div>
                       <div className="p-5">
-                        <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/35">
+                        <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/60">
                           {project.category || "Case study"}
                         </p>
                         <h3 className="mt-2 text-base font-semibold text-white group-hover:text-[var(--pf-accent)]">
                           {project.title}
                         </h3>
-                        <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-white/50">
+                        <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-white/65">
                           {project.shortDescription || project.description}
                         </p>
                         <div className="mt-4 flex flex-wrap items-center gap-1.5">
@@ -322,7 +418,7 @@ export default function GlassDesign({ content, config }: DesignProps) {
                   <Award className="mt-0.5 size-4 shrink-0" style={{ color: "var(--pf-accent)" }} />
                   <div>
                     <p className="text-xs font-medium leading-relaxed text-white/85">{item.title}</p>
-                    <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-white/30">
+                    <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-white/55">
                       {item.detail}
                     </p>
                   </div>
@@ -330,7 +426,7 @@ export default function GlassDesign({ content, config }: DesignProps) {
               </Reveal>
             ))}
             {achievements.length === 0 && (
-              <Glass className="p-6 text-xs text-white/40">
+              <Glass className="p-6 text-xs text-white/60">
                 Achievements appear here once they are added to experience entries in the CMS.
               </Glass>
             )}
@@ -347,7 +443,7 @@ export default function GlassDesign({ content, config }: DesignProps) {
               {copy.skills.title}
             </h2>
             {copy.skills.subtitle && (
-              <p className="mx-auto mt-2 max-w-lg text-xs text-white/45">{copy.skills.subtitle}</p>
+              <p className="mx-auto mt-2 max-w-lg text-xs text-white/65">{copy.skills.subtitle}</p>
             )}
           </div>
 
@@ -357,7 +453,7 @@ export default function GlassDesign({ content, config }: DesignProps) {
                 <Glass className="p-5">
                   <div className="flex items-baseline justify-between">
                     <h3 className="text-sm font-semibold text-white/90">{category.name}</h3>
-                    <span className="font-mono text-[10px] text-white/30">
+                    <span className="font-mono text-[10px] text-white/55">
                       {category.skills?.length ?? 0}
                     </span>
                   </div>
@@ -366,7 +462,7 @@ export default function GlassDesign({ content, config }: DesignProps) {
                       <div key={skill.id}>
                         <div className="flex items-center justify-between text-[11px]">
                           <span className="text-white/65">{skill.name}</span>
-                          <span className="font-mono text-white/30">{skill.level}%</span>
+                          <span className="font-mono text-white/55">{skill.level}%</span>
                         </div>
                         <div className="mt-1.5 h-[3px] overflow-hidden rounded-full bg-white/10">
                           <div
@@ -399,15 +495,15 @@ export default function GlassDesign({ content, config }: DesignProps) {
               {content.experiences.map((exp, index) => (
                 <Reveal key={exp.id} config={config} delay={index * 0.04}>
                   <Glass className="p-5">
-                    <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-white/35">
+                    <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-white/60">
                       <CalendarDays className="size-3" />
                       {experienceRange(exp)}
                     </div>
                     <h3 className="mt-2 text-sm font-semibold text-white">
-                      {exp.position} <span className="text-white/40">· {exp.company}</span>
+                      {exp.position} <span className="text-white/60">· {exp.company}</span>
                     </h3>
                     {exp.description && (
-                      <p className="mt-2 text-xs leading-relaxed text-white/50">{exp.description}</p>
+                      <p className="mt-2 text-xs leading-relaxed text-white/65">{exp.description}</p>
                     )}
                     {((exp.achievements as string[] | null) ?? []).length > 0 && (
                       <ul className="mt-3 space-y-1.5">
@@ -426,15 +522,15 @@ export default function GlassDesign({ content, config }: DesignProps) {
 
             <div className="space-y-4">
               <Glass className="p-5">
-                <h3 className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/35">
+                <h3 className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/60">
                   Education
                 </h3>
                 <ul className="mt-4 space-y-4">
                   {content.education.map((item) => (
                     <li key={item.id}>
                       <p className="text-xs font-semibold text-white/90">{item.degree}</p>
-                      <p className="mt-0.5 text-[11px] text-white/45">{item.institution}</p>
-                      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-white/30">
+                      <p className="mt-0.5 text-[11px] text-white/65">{item.institution}</p>
+                      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-white/55">
                         {educationRange(item)}
                       </p>
                     </li>
@@ -443,7 +539,7 @@ export default function GlassDesign({ content, config }: DesignProps) {
               </Glass>
 
               <Glass className="p-5">
-                <h3 className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/35">
+                <h3 className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/60">
                   Certifications
                 </h3>
                 <ul className="mt-4 space-y-3">
@@ -452,7 +548,7 @@ export default function GlassDesign({ content, config }: DesignProps) {
                       <BadgeCheck className="mt-0.5 size-3.5 shrink-0" style={{ color: "var(--pf-accent)" }} />
                       <div>
                         <p className="text-[11px] font-medium text-white/85">{cert.name}</p>
-                        <p className="text-[10px] text-white/40">{cert.issuer}</p>
+                        <p className="text-[10px] text-white/60">{cert.issuer}</p>
                       </div>
                     </li>
                   ))}
@@ -478,7 +574,7 @@ export default function GlassDesign({ content, config }: DesignProps) {
                 <Reveal key={service.id} config={config} delay={index * 0.04}>
                   <Glass className="h-full p-5">
                     <h3 className="text-sm font-semibold text-white">{service.title}</h3>
-                    <p className="mt-2 text-xs leading-relaxed text-white/50">
+                    <p className="mt-2 text-xs leading-relaxed text-white/65">
                       {service.shortDescription || service.description}
                     </p>
                     {service.price && (
@@ -519,7 +615,7 @@ export default function GlassDesign({ content, config }: DesignProps) {
                       </span>
                       <div>
                         <p className="text-[11px] font-semibold text-white/85">{testimonial.name}</p>
-                        <p className="text-[10px] text-white/40">
+                        <p className="text-[10px] text-white/60">
                           {[testimonial.title, testimonial.company].filter(Boolean).join(" · ")}
                         </p>
                       </div>
@@ -541,11 +637,11 @@ export default function GlassDesign({ content, config }: DesignProps) {
               <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 {copy.contact.title}
               </h2>
-              <p className="mx-auto mt-3 max-w-md text-xs leading-relaxed text-white/50">
+              <p className="mx-auto mt-3 max-w-md text-xs leading-relaxed text-white/65">
                 {copy.contact.subtitle}
               </p>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <div className="mx-auto mt-8 grid max-w-xl gap-3 sm:grid-cols-2">
                 {channels.map((channel) => (
                   <a
                     key={channel.label}
@@ -566,7 +662,7 @@ export default function GlassDesign({ content, config }: DesignProps) {
                       )}
                     </span>
                     <span className="min-w-0">
-                      <span className="block font-mono text-[9px] uppercase tracking-[0.2em] text-white/35">
+                      <span className="block font-mono text-[9px] uppercase tracking-[0.2em] text-white/60">
                         {channel.label}
                       </span>
                       <span className="block truncate text-[11px] text-white/80">{channel.value}</span>
@@ -596,12 +692,14 @@ export default function GlassDesign({ content, config }: DesignProps) {
         </div>
       </section>
 
+      </main>
+
       <footer className="relative border-t border-white/[0.07] px-4 py-8 sm:px-6">
         <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 text-center sm:flex-row sm:text-left">
-          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/30">
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/55">
             Design 03 · Glassmorphism Experience
           </p>
-          <p className="text-[10px] text-white/30">
+          <p className="text-[10px] text-white/55">
             © {new Date().getFullYear()} {name}
           </p>
         </div>
