@@ -20,6 +20,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TiltCard } from "@/components/ui/tilt-card";
+import GradientText from "@/components/GradientText";
 import { useLanguage } from "@/context/languageContext";
 import type { Service } from "@/types";
 
@@ -78,8 +79,13 @@ export function ServicesSection({ services = [] }: ServicesSectionProps) {
               <Workflow className="h-3.5 w-3.5" />
               <span>{t("services.badge", "Engagements & Expertise")}</span>
             </Badge>
-            <h2 className="font-display text-balance text-2xl font-extrabold tracking-tight text-foreground sm:text-4xl">
-              {t("services.title", "Services engineered around outcomes")}
+            <h2 className="font-display text-balance text-2xl font-extrabold tracking-tight sm:text-4xl">
+              <GradientText
+                colors={["var(--primary)", "var(--accent)", "var(--primary)"]}
+                animationSpeed={7}
+              >
+                {t("services.title", "Services engineered around outcomes")}
+              </GradientText>
             </h2>
             <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
               {t(

@@ -6,6 +6,7 @@ import { useLanguage } from "@/context/languageContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StaggerGroup, StaggerItem } from "@/components/motion/reveal";
+import SplitText from "@/components/SplitText";
 import type { SkillCategory, Skill } from "@/types";
 
 export type CategoryWithSkills = SkillCategory & { skills: Skill[] };
@@ -45,9 +46,13 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
             <Cpu className="w-3.5 h-3.5" />
             <span>{t("skills.badge", "Technical Capabilities")}</span>
           </Badge>
-          <h2 className="font-display text-balance text-2xl font-extrabold tracking-tight text-foreground sm:text-4xl">
-            {t("skills.title", "Interactive Skills Constellation")}
-          </h2>
+          <SplitText
+            tag="h2"
+            text={t("skills.title", "Interactive Skills Constellation")}
+            effect="rise"
+            staggerFrom="start"
+            className="font-display text-balance text-2xl font-extrabold tracking-tight text-foreground sm:text-4xl"
+          />
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
             {t("skills.subtitle", "Explore domain clusters across frontend, backend, database systems, and cloud infrastructure.")}
           </p>

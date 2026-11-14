@@ -2,6 +2,7 @@
 
 import { Terminal, ShieldCheck, Zap, Layers, Sparkles, Database, Globe2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import GradientText from "@/components/GradientText";
 import { useLanguage } from "@/context/languageContext";
 import type { Profile } from "@/types";
 
@@ -51,8 +52,13 @@ export function AboutSection({ profile }: AboutSectionProps) {
             <Terminal className="h-3.5 w-3.5" />
             <span>{t("about.badge", "Engineering Perspective")}</span>
           </Badge>
-          <h2 className="font-display text-balance text-2xl font-extrabold tracking-tight text-foreground sm:text-4xl">
-            {t("about.title", "Architecting Scalable Real-World Systems")}
+          <h2 className="font-display text-balance text-2xl font-extrabold tracking-tight sm:text-4xl">
+            <GradientText
+              colors={["var(--primary)", "var(--accent)", "var(--primary)"]}
+              animationSpeed={7}
+            >
+              {t("about.title", "Architecting Scalable Real-World Systems")}
+            </GradientText>
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
             {t("about.description", "Bridging the gap between cutting-edge visual aesthetics and rock-solid enterprise backend engineering.")}

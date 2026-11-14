@@ -2,7 +2,7 @@ import "./globals.css";
 import type { CSSProperties } from "react";
 import { ThemeProvider } from "@/context/themeProvider";
 import { ThemeStudio } from "@/components/theme/theme-studio";
-import { getActiveTheme } from "@/lib/theme";
+import { getThemePreferences } from "@/lib/theme";
 import { LanguageProvider } from "@/context/languageContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
@@ -37,10 +37,14 @@ const arabic = Noto_Sans_Arabic({
   subsets: ["arabic"],
   display: "swap",
   variable: "--font-arabic",
+  // The document ships as lang="en"; Arabic is only fetched after the visitor
+  // switches language, so preloading this (large) subset only competes with
+  // the fonts that are actually needed for the first paint.
+  preload: false,
 });
 
 export const viewport: Viewport = {
-  colorScheme: "dark",
+  colorScheme: "dark light",
   themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#070912" }],
   width: "device-width",
   initialScale: 1,
@@ -171,7 +175,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const theme = await getActiveTheme();
+  const { theme, pickerEnabled } = await getThemePreferences();
 
   return (
     <html
@@ -179,10 +183,11 @@ export default async function RootLayout({
       dir="ltr"
       suppressHydrationWarning
       data-theme={theme.id}
+      data-mode={theme.mode}
       data-scene-primary={theme.scene.primary}
       data-scene-accent={theme.scene.accent}
       style={theme.vars as CSSProperties}
-      className={`dark h-full antialiased font-sans scroll-smooth ${jakarta.variable} ${sora.variable} ${jetbrains.variable} ${arabic.variable}`}
+      className={`${theme.mode === "dark" ? "dark" : "light"} h-full antialiased font-sans scroll-smooth ${jakarta.variable} ${sora.variable} ${jetbrains.variable} ${arabic.variable}`}
     >
       <head>
         <script
@@ -198,11 +203,15 @@ export default async function RootLayout({
       <body className="min-h-full bg-background text-foreground selection:bg-primary/25 selection:text-foreground">
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme={theme.mode}
           enableSystem={false}
           disableTransitionOnChange
         >
-          <ThemeStudio initialThemeId={theme.id}>
+          <ThemeStudio
+            initialThemeId={theme.id}
+            initialMode={theme.mode}
+            pickerEnabled={pickerEnabled}
+          >
             <LanguageProvider>
               <TooltipProvider>
                 <PageViewTracker />

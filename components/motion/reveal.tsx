@@ -1,7 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { motion, useReducedMotion, type Variants } from "motion/react";
+// Import from `framer-motion` (not `motion/react`): the project already ships
+// framer-motion everywhere else, and mixing both package entry points pulls a
+// second copy of the animation engine into the client bundle.
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 
@@ -36,6 +39,13 @@ interface RevealProps {
   y?: number;
   /** Fraction of the element that must be visible before triggering. */
   amount?: number;
+  /**
+   * Keep the first frame painted at full opacity (slide-only entrance). Use for
+   * above-the-fold content: a fade from `opacity: 0` makes the element
+   * invisible until hydration finishes, which pushes Largest Contentful Paint
+   * out to whenever the client bundle executes.
+   */
+  eager?: boolean;
 }
 
 /**
@@ -48,6 +58,7 @@ export function Reveal({
   delay = 0,
   y = 24,
   amount = 0.15,
+  eager = false,
 }: RevealProps) {
   const prefersReducedMotion = useReducedMotion();
 
@@ -58,7 +69,7 @@ export function Reveal({
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y }}
+      initial={eager ? { opacity: 1, y: y / 2 } : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount }}
       transition={{ ...REVEAL_TRANSITION, delay }}

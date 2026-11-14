@@ -163,9 +163,10 @@ export function CookieConsent() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowPreferences(true)}
+                aria-label={language === "ar" ? "تخصيص تفضيلات ملفات الارتباط" : "Customise cookie preferences"}
                 className="text-xs h-9 rounded-xl text-primary hover:text-primary/80"
               >
-                <Settings2 className="w-4 h-4" />
+                <Settings2 className="w-4 h-4" aria-hidden="true" />
               </Button>
             </>
           )}

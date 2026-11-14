@@ -25,7 +25,6 @@ import {
   Edit2,
   ArrowUp,
   ArrowDown,
-  Eye,
   CheckCircle2,
   Check,
   Globe,
@@ -284,9 +283,6 @@ export function SocialLinksClient({ initialData }: { initialData: SocialLink[] }
     router.refresh();
   };
 
-  // Preview filtering (published + active)
-  const activeLinks = links.filter((l) => l.isActive && l.status !== "unpublished");
-
   return (
     <div className="space-y-6">
       {/* Action Bar */}
@@ -307,10 +303,9 @@ export function SocialLinksClient({ initialData }: { initialData: SocialLink[] }
         </Button>
       </div>
 
-      {/* Grid: Management List (7 cols) + Live Previews (5 cols) */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-        {/* Left: Accounts List */}
-        <div className="xl:col-span-7 space-y-4">
+      {/* Accounts List */}
+      <div className="max-w-6xl">
+        <div className="space-y-4">
           <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
             <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -443,123 +438,6 @@ export function SocialLinksClient({ initialData }: { initialData: SocialLink[] }
                 })}
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Right: Real-time Live Placements Preview (5 cols) */}
-        <div className="xl:col-span-5 space-y-4 sticky top-6">
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-border">
-              <div className="flex items-center gap-2">
-                <Eye className="w-4 h-4 text-sky-400" />
-                <span className="text-xs font-semibold text-foreground">Placements Live Preview</span>
-              </div>
-              <span className="text-[10px] font-mono text-muted-foreground">REALTIME</span>
-            </div>
-
-            {/* Preview 1: In Navbar Bar */}
-            <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white space-y-2">
-              <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400">
-                <span>[NAVBAR PLACEMENT]</span>
-                <span>Active: {activeLinks.filter((l) => (l.placements as string[] | undefined)?.includes("navbar")).length}</span>
-              </div>
-
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-zinc-900/80 border border-zinc-800">
-                <span className="text-xs font-bold text-white mr-auto">ARUN M</span>
-                <div className="flex items-center gap-1.5">
-                  {activeLinks
-                    .filter((l) => (l.placements as string[] | undefined)?.includes("navbar"))
-                    .map((l) => {
-                      const Icon = getSocialIconComponent(l.icon);
-                      return (
-                        <div
-                          key={l.id}
-                          className="w-6 h-6 rounded-md flex items-center justify-center transition-transform hover:scale-110"
-                          style={{ backgroundColor: `${l.color || "#fff"}20`, color: l.color || "#fff" }}
-                          title={l.label || l.platform}
-                        >
-                          <Icon className="w-3 h-3" />
-                        </div>
-                      );
-                    })}
-                </div>
-              </div>
-            </div>
-
-            {/* Preview 2: In Profile & Contact Card */}
-            <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white space-y-2">
-              <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400">
-                <span>[PROFILE & CONTACT CARD PLACEMENT]</span>
-                <span>Active: {activeLinks.filter((l) => (l.placements as string[] | undefined)?.includes("contact") || (l.placements as string[] | undefined)?.includes("profile")).length}</span>
-              </div>
-
-              <div className="p-3 rounded-lg bg-zinc-900/80 border border-zinc-800 space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center font-bold text-xs">
-                    AM
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold block">Arun M</span>
-                    <span className="text-[10px] text-zinc-400 block font-mono">Senior Architect</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 pt-2 border-t border-zinc-800">
-                  {activeLinks
-                    .filter((l) => (l.placements as string[] | undefined)?.includes("contact") || (l.placements as string[] | undefined)?.includes("profile"))
-                    .map((l) => {
-                      const Icon = getSocialIconComponent(l.icon);
-                      const isPill = l.style === "glass-pill";
-                      const isNeon = l.style === "neon-glow";
-
-                      return (
-                        <div
-                          key={l.id}
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-medium border transition-transform ${
-                            isNeon
-                              ? "border-emerald-500/40 bg-emerald-500/10 shadow-xs"
-                              : isPill
-                              ? "rounded-full bg-white/10 backdrop-blur border-white/20"
-                              : "bg-zinc-800 border-zinc-700"
-                          }`}
-                          style={{ color: l.color || "#fff" }}
-                        >
-                          <Icon className="w-3 h-3" />
-                          <span>{l.label || l.platform}</span>
-                        </div>
-                      );
-                    })}
-                </div>
-              </div>
-            </div>
-
-            {/* Preview 3: Footer Placement */}
-            <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white space-y-2">
-              <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400">
-                <span>[FOOTER BAR PLACEMENT]</span>
-                <span>Active: {activeLinks.filter((l) => (l.placements as string[] | undefined)?.includes("footer")).length}</span>
-              </div>
-
-              <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-900/80 border border-zinc-800">
-                <span className="text-[10px] text-zinc-400">© 2026 Arun M (arun-m.in)</span>
-                <div className="flex items-center gap-1.5">
-                  {activeLinks
-                    .filter((l) => (l.placements as string[] | undefined)?.includes("footer"))
-                    .map((l) => {
-                      const Icon = getSocialIconComponent(l.icon);
-                      return (
-                        <div
-                          key={l.id}
-                          className="w-6 h-6 rounded-full flex items-center justify-center bg-zinc-800 border border-zinc-700 hover:scale-110 transition-transform"
-                          style={{ color: l.color || "#fff" }}
-                        >
-                          <Icon className="w-3 h-3" />
-                        </div>
-                      );
-                    })}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
