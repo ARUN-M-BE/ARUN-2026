@@ -10,7 +10,6 @@ async function runNeonEndToEndTests() {
 
   let allPassed = true;
 
-  // 1. TEST NEON POSTGRESQL
   console.log("[1/4] Testing Neon PostgreSQL Database...");
   try {
     const dbUrl = process.env.DATABASE_URL;
