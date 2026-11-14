@@ -7,6 +7,7 @@ import {
   Mail,
   Sparkles,
   User,
+  Workflow,
   type LucideIcon,
 } from "lucide-react";
 
@@ -80,6 +81,15 @@ export const SITE_SECTIONS: readonly SiteSectionModule[] = [
     href: "#skills",
     icon: Cpu,
     tone: "accent",
+  },
+  {
+    key: "services",
+    labelKey: "nav.services",
+    label: "Services",
+    href: "#services",
+    icon: Workflow,
+    tone: "warning",
+    showInNavbar: false,
   },
   {
     key: "analytics",

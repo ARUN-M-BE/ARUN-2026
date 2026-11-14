@@ -54,7 +54,7 @@ export function TiltCard({ children, className = "", maxTilt = 10, ...props }: T
       {/* Glare effect */}
       {isHovered && (
         <div
-          className="pointer-events-none absolute inset-0 rounded-3xl opacity-20 bg-gradient-to-tr from-cyan-400 to-transparent transition-opacity"
+          className="pointer-events-none absolute inset-0 rounded-3xl opacity-20 bg-gradient-to-tr from-primary to-transparent transition-opacity"
           style={{ mixBlendMode: "overlay" }}
         />
       )}

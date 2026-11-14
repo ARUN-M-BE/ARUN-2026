@@ -5,6 +5,7 @@ import {
   getPublicExperience,
   getPublicEducation,
   getPublicCertifications,
+  getPublicServices,
   getPublicTestimonials,
   getPublicSocialLinks,
   getPublicNavigation,
@@ -19,6 +20,7 @@ import { HeroSection } from "@/components/portfolio/hero-section";
 import { AboutSection } from "@/components/portfolio/about-section";
 import { ProjectsSection } from "@/components/portfolio/projects-section";
 import { SkillsSection } from "@/components/portfolio/skills-section";
+import { ServicesSection } from "@/components/portfolio/services-section";
 import { RealtimeTelemetry } from "@/components/portfolio/realtime-telemetry";
 import { ExperienceSection } from "@/components/portfolio/experience-section";
 import { EducationSection } from "@/components/portfolio/education-section";
@@ -26,6 +28,7 @@ import { TestimonialsSection } from "@/components/portfolio/testimonials-section
 import { ContactSection } from "@/components/portfolio/contact-section";
 import { PortfolioFooter } from "@/components/portfolio/footer";
 import { CookieConsent } from "@/components/portfolio/cookie-consent";
+import { resolveHomepageSections } from "@/lib/homepage-sections";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -41,7 +44,8 @@ export default async function HomePage() {
     testimonials,
     socialLinks,
     navigation,
-    sections,
+    publishedSections,
+    services,
   ] = await Promise.all([
     getPublicProfile(),
     getPublicProjects(),
@@ -53,7 +57,10 @@ export default async function HomePage() {
     getPublicSocialLinks(),
     getPublicNavigation(),
     getPublicSections(),
+    getPublicServices(),
   ]);
+
+  const sections = resolveHomepageSections(publishedSections);
 
   return (
     <div className="min-h-screen bg-background text-foreground relative selection:bg-primary/20 selection:text-primary transition-colors duration-300 overflow-x-hidden">
@@ -90,6 +97,12 @@ export default async function HomePage() {
               return (
                 <Reveal key={section.id}>
                   <SkillsSection categoriesWithSkills={categoriesWithSkills} />
+                </Reveal>
+              );
+            case "services":
+              return (
+                <Reveal key={section.id} amount={0.08}>
+                  <ServicesSection services={services} />
                 </Reveal>
               );
             case "telemetry":

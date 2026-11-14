@@ -12,7 +12,8 @@ Admin route files are lightweight entry points that render feature Server Compon
 
 ## 🌟 Visual Identity & Core Architecture
 
-- **Visual Direction:** Midnight/charcoal theme (`#08090e`) with electric cyan (`#06b6d4`), cosmic violet (`#8b5cf6`), and subtle amber (`#f59e0b`) accents.
+- **Visual Direction:** Dark-only experience — deep black, graphite and charcoal surfaces with metallic borders. Three switchable dark universes ship in `config/themes.ts`: **Midnight Aurora** (default, unchanged original palette: `#070912` base, indigo `#818cf8` / cyan `#22d3ee`), **Obsidian Forge** (champagne `#d9b179` / copper `#e0825a`), and **Monolith Steel** (silver `#c3ced6` / mint `#6fd8be`).
+- **Theme Engine:** The active universe is resolved server-side (`lib/theme.ts`: visitor cookie `pf_theme` → `site_settings["theme.active"]` → default) and written as inline CSS custom properties on `<html>`, so there is no flash of the wrong theme. Visitors switch from the navbar, mobile sheet or command palette; admins publish the global default from **Admin → Settings → Visual Universe Theme**.
 - **3D Interactive Engine:** React Three Fiber (`@react-three/fiber`), Drei (`@react-three/drei`), and custom GLSL lighting/geometry shaders.
 - **Micro-Interactions & Transitions:** Smooth camera parallax, glassmorphism (`backdrop-filter: blur(16px)`), and accessibility-first motion reduction.
 - **Dynamic CMS:** Complete CRUD operations powered by PostgreSQL with automatic Next.js cache revalidation.
@@ -25,15 +26,17 @@ Admin route files are lightweight entry points that render feature Server Compon
 ### 1. Public Interactive Universe
 1. **Cinematic 3D Hero:** Custom animated geometric identity sculpture reacting to mouse orbit, with volumetric lighting and stardust particles.
 2. **Guided Portfolio Tour:** Step-by-step interactive walk-through with Next, Previous, and Skip controls.
-3. **Project Universe:** Interactive project showcase with category filters, full case-study modals, live links, and repository access.
-4. **Skills Constellation:** Grouped technical proficiency clusters with progress bars and featured mastery badges.
-5. **Career Milestones Timeline:** Vertical chronological trajectory showcasing leadership, achievements, and tech stacks.
-6. **Education & Certifications Archive:** Academic degrees and verified credentials with one-click verification links.
-7. **Personal Story & Philosophy:** Narrative bio with technical DNA pillars (Architecture, 3D WebGL, Security, Performance).
-8. **Direct Contact Nexus:** Contact form with spam protection and mandatory DPDP 2023 consent capture.
-9. **Command Palette (`Ctrl+K`):** Fast keyboard-driven universe navigation.
-10. **Audio Ambience Toggle:** Optional synth chime (disabled by default).
-11. **Cookie Preference Manager:** Granular essential vs. optional controls with consent audit recording.
+3. **Project Universe:** Interactive project showcase with category filters, 3D tilt cards, full case-study modals, live links and repository access — each project also has its own immersive route at `/projects/[slug]` with a frame gallery (keyboard `←`/`→`/`Esc`), architecture notes, stack sidecar and previous/next navigation.
+4. **Services & Expertise:** Expandable engagement cards with icon-driven identities and a direct pipeline to the contact section.
+5. **Skills Constellation:** Grouped technical proficiency clusters with progress bars and featured mastery badges.
+6. **Career Milestones Timeline:** Vertical chronological trajectory showcasing leadership, achievements, and tech stacks.
+7. **Education & Certifications Archive:** Academic degrees and verified credentials with one-click verification links.
+8. **Personal Story & Philosophy:** Narrative bio with technical DNA pillars (Architecture, 3D WebGL, Security, Performance) and downloadable resume.
+9. **Direct Contact Nexus:** Contact form with spam protection and mandatory DPDP 2023 consent capture.
+10. **360° Hero Canvas:** Drag-to-orbit scene with scroll-driven camera drift, damped auto-rotation and a graceful static fallback when WebGL is unavailable or the visitor prefers reduced motion.
+11. **Command Palette (`Ctrl+K`):** Fast keyboard-driven universe navigation, including theme switching.
+12. **Audio Ambience Toggle:** Optional synth chime (disabled by default).
+13. **Cookie Preference Manager:** Granular essential vs. optional controls with consent audit recording.
 
 ### 2. Comprehensive Admin CMS (`/admin`)
 - **Secure Authentication:** NextAuth JWT sessions with bcrypt credential verification.
@@ -49,7 +52,7 @@ Admin route files are lightweight entry points that render feature Server Compon
   - 🔗 **Social Links:** GitHub, LinkedIn, Twitter/X, Discord, and portfolio handles.
   - 📬 **Messages:** Inbound lead management (unread, read, replied, archived, spam) with DPDP consent proof.
   - 🧭 **Site Navigation:** Header links, quick jumps, and section anchor targets.
-  - ⚙️ **Settings & Themes:** Real-time hex color pickers, retention days, site metadata.
+  - ⚙️ **Settings & Themes:** Visual Universe Theme publisher (preview instantly, publish as the global default — the visitor override cookie is cleared on publish so every visitor sees the new default), real-time hex color pickers, retention days, site metadata.
   - 🔍 **SEO & Open Graph:** Meta titles, descriptions, social preview cards, robots no-index.
   - ⚖️ **Legal Documents:** Markdown editor with automatic version tracking and review banners.
   - 🖼️ **Media Assets:** Asset library with WCAG alt descriptions and copyright notices.

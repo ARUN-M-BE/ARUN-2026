@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -23,8 +22,7 @@ import {
   ArrowUpRight,
   Maximize2,
   Minimize2,
-  Sun,
-  Moon,
+  Check,
   Languages,
   Settings2,
   FolderGit2,
@@ -41,6 +39,8 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 import { NAVBAR_SECTIONS } from "@/config/site-sections";
+import { THEMES } from "@/config/themes";
+import { useThemeStudio, UniverseSwitcher, ThemeSwatches } from "@/components/theme/theme-studio";
 import type { NavigationItem, SocialLink } from "@/types";
 
 interface PortfolioNavbarProps {
@@ -67,7 +67,7 @@ function resolveIcon(name?: string | null) {
 }
 
 export function PortfolioNavbar({ navigation = [], socialLinks = [] }: PortfolioNavbarProps) {
-  const { theme, setTheme } = useTheme();
+  const { themeId, setThemeId } = useThemeStudio();
   const { language, toggleLanguage, t } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
@@ -218,6 +218,8 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
 
         {/* Right Action Cluster */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Visual Universe Switcher */}
+          <UniverseSwitcher compact className="hidden sm:inline-flex" />
 
           {/* Command Palette */}
           <CommandPalette />
@@ -252,19 +254,22 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
                 <Languages className="size-4 text-primary" />
                 <span>{language === "en" ? "Switch to Arabic (العربية)" : "التبديل إلى الإنجليزية"}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem
-                className="gap-2.5 text-xs py-2.5 cursor-pointer"
-                onSelect={() => { playChime(700, 0.1); setTheme(theme === "dark" ? "light" : "dark"); }}
-              >
-                {theme === "dark"
-                  ? <Sun className="size-4 text-amber-500" />
-                  : <Moon className="size-4 text-indigo-500" />}
-                <span>
-                  {language === "ar"
-                    ? (theme === "dark" ? "المظهر الفاتح" : "المظهر الداكن")
-                    : (theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode")}
-                </span>
-              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                Visual Universe
+              </DropdownMenuLabel>
+              {THEMES.map((item) => (
+                <DropdownMenuItem
+                  key={item.id}
+                  className="gap-2.5 text-xs py-2.5 cursor-pointer"
+                  onSelect={() => { playChime(700, 0.1); setThemeId(item.id); }}
+                >
+                  <ThemeSwatches theme={item} />
+                  <span className="flex-1 truncate">{item.name}</span>
+                  {themeId === item.id && <Check className="size-3.5 text-primary" />}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="gap-2.5 text-xs py-2.5 cursor-pointer"
                 onSelect={toggleFullscreen}
@@ -385,16 +390,7 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
                     <span>{language === "en" ? "العربية" : "English"}</span>
                   </Button>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    aria-label="Toggle color theme"
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                    className="h-11 rounded-xl text-xs gap-1.5 justify-center"
-                  >
-                    {theme === "dark" ? <Sun className="size-4 text-amber-500" /> : <Moon className="size-4 text-indigo-500" />}
-                    <span>{theme === "dark" ? "Light" : "Dark"}</span>
-                  </Button>
+                  <UniverseSwitcher compact className="h-11 w-full" label="Visual Universe" />
                 </div>
 
                 <SheetClose asChild>

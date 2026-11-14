@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import {
   CommandDialog,
   CommandEmpty,
@@ -14,19 +13,20 @@ import {
 } from "@/components/ui/command";
 import {
   Shield,
-  Sun,
-  Moon,
   Languages,
   Command as CommandIcon,
+  Palette,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 import { PALETTE_SECTIONS, SECTION_TONE_CLASS } from "@/config/site-sections";
+import { THEMES } from "@/config/themes";
+import { useThemeStudio, ThemeSwatches } from "@/components/theme/theme-studio";
 import { Button } from "@/components/ui/button";
 
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
+  const { themeId, setThemeId } = useThemeStudio();
   const { toggleLanguage, language, t } = useLanguage();
 
   useEffect(() => {
@@ -91,24 +91,23 @@ export function CommandPalette() {
             <CommandSeparator />
 
             <CommandGroup heading={language === "ar" ? "التفضيلات والمظهر" : "Preferences & Appearance"}>
-              <CommandItem
-                onSelect={() => {
-                  setTheme(theme === "dark" ? "light" : "dark");
-                  setOpen(false);
-                }}
-              >
-                {theme === "dark" ? (
-                  <>
-                    <Sun className="w-4 h-4 mr-2 text-amber-500" />
-                    <span>{language === "ar" ? "التبديل إلى الوضع الفاتح" : "Switch to Light Theme"}</span>
-                  </>
-                ) : (
-                  <>
-                    <Moon className="w-4 h-4 mr-2 text-indigo-500" />
-                    <span>{language === "ar" ? "التبديل إلى الوضع الداكن" : "Switch to Dark Theme"}</span>
-                  </>
-                )}
-              </CommandItem>
+              {THEMES.map((item) => (
+                <CommandItem
+                  key={item.id}
+                  value={`universe ${item.name} ${item.tagline}`}
+                  onSelect={() => {
+                    setThemeId(item.id);
+                    setOpen(false);
+                  }}
+                >
+                  <ThemeSwatches theme={item} className="mr-2" />
+                  <span className="flex-1">
+                    {language === "ar" ? "الكون البصري: " : "Visual Universe: "}
+                    {item.name}
+                  </span>
+                  {themeId === item.id && <Palette className="w-3.5 h-3.5 text-primary" />}
+                </CommandItem>
+              ))}
 
               <CommandItem
                 onSelect={() => {
