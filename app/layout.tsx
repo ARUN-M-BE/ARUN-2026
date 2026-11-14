@@ -1,5 +1,8 @@
 import "./globals.css";
+import type { CSSProperties } from "react";
 import { ThemeProvider } from "@/context/themeProvider";
+import { ThemeStudio } from "@/components/theme/theme-studio";
+import { getActiveTheme } from "@/lib/theme";
 import { LanguageProvider } from "@/context/languageContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
@@ -37,15 +40,20 @@ const arabic = Noto_Sans_Arabic({
 });
 
 export const viewport: Viewport = {
-  colorScheme: "light dark",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F7F8FC" },
-    { media: "(prefers-color-scheme: dark)", color: "#070912" },
-  ],
+  colorScheme: "dark",
+  themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#070912" }],
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
 };
+
+/**
+ * The published universe theme lives in the database (site_settings). Reading it
+ * per request keeps the public portfolio in sync the moment an admin publishes
+ * a theme, and SSR writes the tokens so there is never a flash of the wrong
+ * palette.
+ */
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: {
@@ -158,16 +166,23 @@ const jsonLdData = {
   ]
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const theme = await getActiveTheme();
+
   return (
     <html
       lang="en"
+      dir="ltr"
       suppressHydrationWarning
-      className={`h-full antialiased font-sans scroll-smooth ${jakarta.variable} ${sora.variable} ${jetbrains.variable} ${arabic.variable}`}
+      data-theme={theme.id}
+      data-scene-primary={theme.scene.primary}
+      data-scene-accent={theme.scene.accent}
+      style={theme.vars as CSSProperties}
+      className={`dark h-full antialiased font-sans scroll-smooth ${jakarta.variable} ${sora.variable} ${jetbrains.variable} ${arabic.variable}`}
     >
       <head>
         <script
@@ -184,16 +199,18 @@ export default function RootLayout({
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem
+          enableSystem={false}
           disableTransitionOnChange
         >
-          <LanguageProvider>
-            <TooltipProvider>
-              <PageViewTracker />
-              {children}
-              <Toaster richColors position="top-right" closeButton />
-            </TooltipProvider>
-          </LanguageProvider>
+          <ThemeStudio initialThemeId={theme.id}>
+            <LanguageProvider>
+              <TooltipProvider>
+                <PageViewTracker />
+                {children}
+                <Toaster richColors position="top-right" closeButton />
+              </TooltipProvider>
+            </LanguageProvider>
+          </ThemeStudio>
         </ThemeProvider>
       </body>
     </html>

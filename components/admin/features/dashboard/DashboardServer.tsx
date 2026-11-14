@@ -54,7 +54,7 @@ export default async function AdminDashboardPage() {
       value: stats.projects,
       desc: `${stats.publishedProjects ?? stats.projects} live in universe`,
       icon: FolderGit2,
-      color: "from-cyan-500/20 to-cyan-500/5 text-cyan-400 border-cyan-500/20",
+      color: "from-primary/20 to-primary/5 text-primary border-primary/20",
       href: "/admin/projects",
     },
     {
@@ -62,7 +62,7 @@ export default async function AdminDashboardPage() {
       value: stats.skills,
       desc: "Tech skills in constellation",
       icon: Cpu,
-      color: "from-violet-500/20 to-violet-500/5 text-violet-400 border-violet-500/20",
+      color: "from-violet-500/20 to-accent/5 text-violet-400 border-violet-500/20",
       href: "/admin/skills",
     },
     {
@@ -102,7 +102,7 @@ export default async function AdminDashboardPage() {
       value: stats.testimonials,
       desc: "Client recommendations",
       icon: MessageSquareQuote,
-      color: "from-indigo-500/20 to-indigo-500/5 text-indigo-400 border-indigo-500/20",
+      color: "from-accent/20 to-accent/5 text-accent border-accent/20",
       href: "/admin/testimonials",
     },
   ];
@@ -134,12 +134,12 @@ export default async function AdminDashboardPage() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <SlidersHorizontal className="w-4 h-4 text-cyan-400" />
+              <SlidersHorizontal className="w-4 h-4 text-primary" />
               <CardTitle className="text-xs uppercase tracking-wider text-muted-foreground font-mono">
                 Website Management Quick Actions
               </CardTitle>
             </div>
-            <span className="text-[11px] font-mono text-cyan-400">v2.4 Control Suite</span>
+            <span className="text-[11px] font-mono text-primary">v2.4 Control Suite</span>
           </div>
         </CardHeader>
         <CardContent>
@@ -151,14 +151,14 @@ export default async function AdminDashboardPage() {
               </Button>
             </Link>
             <Link href="/admin/projects/new">
-              <Button variant="outline" className="w-full justify-start text-xs border-border hover:border-cyan-500/40 hover:bg-cyan-500/10 h-10 px-3">
-                <Plus className="w-3.5 h-3.5 mr-2 text-cyan-400 shrink-0" />
+              <Button variant="outline" className="w-full justify-start text-xs border-border hover:border-cyan-500/40 hover:bg-primary/10 h-10 px-3">
+                <Plus className="w-3.5 h-3.5 mr-2 text-primary shrink-0" />
                 <span className="truncate">Add Project</span>
               </Button>
             </Link>
             <Link href="/admin/navigation">
               <Button variant="outline" className="w-full justify-start text-xs border-border hover:border-indigo-500/40 hover:bg-indigo-500/10 h-10 px-3">
-                <Compass className="w-3.5 h-3.5 mr-2 text-indigo-400 shrink-0" />
+                <Compass className="w-3.5 h-3.5 mr-2 text-accent shrink-0" />
                 <span className="truncate">Customize Navbar</span>
               </Button>
             </Link>
@@ -229,7 +229,7 @@ export default async function AdminDashboardPage() {
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-sm font-semibold text-white flex items-center gap-2">
-                <FolderGit2 className="w-4 h-4 text-cyan-400" />
+                <FolderGit2 className="w-4 h-4 text-primary" />
                 Projects Showcase Status
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground mt-0.5">
@@ -237,7 +237,7 @@ export default async function AdminDashboardPage() {
               </CardDescription>
             </div>
             <Link href="/admin/projects">
-              <Button variant="ghost" size="sm" className="text-xs text-cyan-400 hover:text-cyan-300 h-8">
+              <Button variant="ghost" size="sm" className="text-xs text-primary hover:text-primary h-8">
                 View All
                 <ArrowRight className="w-3 h-3 ml-1" />
               </Button>
@@ -249,9 +249,9 @@ export default async function AdminDashboardPage() {
                 <div className="text-xl font-bold text-white font-mono">{stats.projects}</div>
                 <div className="text-[10px] uppercase font-mono text-muted-foreground mt-1">Total</div>
               </div>
-              <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
-                <div className="text-xl font-bold text-cyan-400 font-mono">{stats.publishedProjects ?? stats.projects}</div>
-                <div className="text-[10px] uppercase font-mono text-cyan-400/80 mt-1">Published</div>
+              <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
+                <div className="text-xl font-bold text-primary font-mono">{stats.publishedProjects ?? stats.projects}</div>
+                <div className="text-[10px] uppercase font-mono text-primary/80 mt-1">Published</div>
               </div>
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
                 <div className="text-xl font-bold text-amber-400 font-mono">{stats.draftProjects ?? 0}</div>
@@ -345,10 +345,10 @@ export default async function AdminDashboardPage() {
 
       {/* Profile quick banner */}
       <Card className="bg-gradient-to-r from-card to-card/60 border-border/80 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-cyan-500/10 via-violet-500/5 to-transparent pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-primary/10 via-accent/5 to-transparent pointer-events-none" />
         <CardContent className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 mb-1">
+            <div className="flex items-center gap-2 text-xs font-mono text-primary mb-1">
               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
               SYSTEM IDENTITY READY
             </div>
@@ -360,7 +360,7 @@ export default async function AdminDashboardPage() {
             </p>
           </div>
           <Link href="/admin/profile">
-            <Button variant="outline" size="sm" className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 text-xs">
+            <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/10 text-xs">
               Configure Identity & Bio
               <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
             </Button>
@@ -374,7 +374,7 @@ export default async function AdminDashboardPage() {
           const Icon = card.icon;
           return (
             <Link key={card.title} href={card.href} className="group">
-              <Card className="bg-card hover:bg-card/80 border-border hover:border-cyan-500/30 transition-all duration-200">
+              <Card className="bg-card hover:bg-card/80 border-border hover:border-primary/30 transition-all duration-200">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {card.title}
@@ -387,7 +387,7 @@ export default async function AdminDashboardPage() {
                   <div className="text-2xl font-bold text-white tracking-tight">{card.value}</div>
                   <p className="text-[11px] text-muted-foreground mt-1 flex items-center justify-between">
                     <span>{card.desc}</span>
-                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-cyan-400" />
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-primary" />
                   </p>
                 </CardContent>
               </Card>
@@ -410,7 +410,7 @@ export default async function AdminDashboardPage() {
               </CardDescription>
             </div>
             <Link href="/admin/messages">
-              <Button variant="ghost" size="sm" className="text-xs text-cyan-400 hover:text-cyan-300">
+              <Button variant="ghost" size="sm" className="text-xs text-primary hover:text-primary">
                 View All Messages
               </Button>
             </Link>
@@ -467,7 +467,7 @@ export default async function AdminDashboardPage() {
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 3D Visual Layer
               </span>
-              <span className="font-mono text-cyan-400">R3F + Three.js</span>
+              <span className="font-mono text-primary">R3F + Three.js</span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground flex items-center gap-1.5">

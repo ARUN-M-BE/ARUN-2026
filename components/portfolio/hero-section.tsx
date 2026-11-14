@@ -168,7 +168,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
             <a href="#projects">
               <Button
                 size="lg"
-                className="group h-11 rounded-full bg-gradient-to-r from-primary to-indigo-600 px-6 text-xs font-semibold text-white shadow-md shadow-primary/25 transition-all hover:from-indigo-500 hover:to-violet-500 sm:h-12 sm:text-sm"
+                className="group h-11 rounded-full bg-brand-gradient px-6 text-xs font-semibold text-primary-foreground shadow-md shadow-primary/25 transition-all hover:brightness-110 sm:h-12 sm:text-sm"
               >
                 <span>{t("hero.explore", "View Selected Works")}</span>
                 <ArrowRight className="w-4 h-4 ml-2 rtl:rotate-180 group-hover:translate-x-1 transition-transform" />

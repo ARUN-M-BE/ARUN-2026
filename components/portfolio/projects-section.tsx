@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,7 @@ import {
   LayoutGrid,
   List,
   Images,
+  ArrowUpRight,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
 import type { Project } from "@/types";
@@ -507,10 +509,16 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
               </div>
 
               <div className="flex items-center justify-between pt-4 border-t border-border">
-                <div className="flex gap-2.5">
+                <div className="flex flex-wrap gap-2.5">
+                  <Button asChild size="sm" className="h-9 px-4 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-xs">
+                    <Link href={`/projects/${activeProject.slug}`}>
+                      <ArrowUpRight className="w-3.5 h-3.5 mr-1.5" />
+                      {language === "ar" ? "فتح دراسة الحالة" : "Open immersive case study"}
+                    </Link>
+                  </Button>
                   {activeProject.liveUrl && (
                     <a href={activeProject.liveUrl} target="_blank" rel="noopener noreferrer">
-                      <Button size="sm" className="h-9 px-4 rounded-xl bg-gradient-to-r from-primary to-indigo-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-xs shadow-xs">
+                      <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl text-xs border-border">
                         <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
                         {t("projects.liveDemo", "Live Production")}
                       </Button>

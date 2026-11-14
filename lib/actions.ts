@@ -21,11 +21,12 @@ import {
   MessageRepository,
 } from "@/server/repositories";
 import { AnalyticsService } from "@/server/services";
-import { fallbackSocialLinks, fallbackWebsiteSections } from "@/server/repositories/fallback-data";
+import { fallbackSocialLinks, fallbackWebsiteSections, fallbackProjects } from "@/server/repositories/fallback-data";
 import { db } from "@/server/config/database";
 import * as schema from "@/server/models/schema";
 import { count, eq, and, ilike } from "drizzle-orm";
 import { isUUID } from "@/lib/utils";
+import { normalizeThemeId, THEMES, THEME_SETTING_KEY } from "@/config/themes";
 import { requireAdmin } from "@/server/middleware/auth-guard";
 import { revalidatePath } from "next/cache";
 import type {
@@ -34,7 +35,7 @@ import type {
   SectionFormData,
   SeoMetadataFormData,
 } from "@/lib/validations";
-import type { SocialLink, NavigationItem, WebsiteSection, MessageStatus } from "@/types";
+import type { SocialLink, NavigationItem, WebsiteSection, MessageStatus, Project } from "@/types";
 
 // ─── Profile ──────────────────────────────────────────────
 export async function getProfile() {
@@ -53,6 +54,26 @@ export async function getProjects(opts?: { search?: string; status?: string; pag
 }
 export async function getPublicProjects() {
   return ProjectController.getPublicProjects();
+}
+
+/**
+ * Single published project resolved by slug. Used by the immersive case-study
+ * route. Falls back to the bundled demo catalogue when the database is cold so
+ * the route still renders in offline previews.
+ */
+export async function getPublicProjectBySlug(slug: string): Promise<Project | null> {
+  try {
+    const [project] = await db
+      .select()
+      .from(schema.projects)
+      .where(and(eq(schema.projects.slug, slug), eq(schema.projects.status, "published")))
+      .limit(1);
+    if (project) return project as Project;
+  } catch (err) {
+    console.warn("[actions.getPublicProjectBySlug] DB query failed, using fallback:", err);
+  }
+
+  return (fallbackProjects as Project[]).find((project) => project.slug === slug) ?? null;
 }
 export async function getProjectById(id: string) {
   return ProjectController.getProjectById(id);
@@ -490,6 +511,33 @@ export async function getSiteSettings() {
 }
 export async function updateSiteSetting(key: string, value: unknown) {
   return SettingsController.updateSiteSetting(key, value);
+}
+
+/**
+ * Publishes a visual universe globally. The public layout reads this value on
+ * every request, so the showcased theme flips for all visitors immediately.
+ */
+export async function setActiveTheme(themeId: string): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+  const theme = THEMES.find((item) => item.id === normalizeThemeId(themeId));
+  if (!theme) {
+    return { success: false, error: "Unknown visual universe" };
+  }
+
+  const result = await SettingsController.updateSiteSetting(THEME_SETTING_KEY, theme.id);
+  if (result.success) {
+    try {
+      // Clear the per-visitor override so the freshly published universe is the
+      // one this admin (and every uncookied visitor) sees immediately.
+      const { cookies } = await import("next/headers");
+      const store = await cookies();
+      store.delete("pf_theme");
+    } catch {
+      // Cookie store is read-only in some render contexts — safe to ignore.
+    }
+    revalidatePath("/", "layout");
+  }
+  return result;
 }
 
 // ─── SEO Metadata ─────────────────────────────────────────
