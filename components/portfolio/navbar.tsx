@@ -40,6 +40,7 @@ import {
   Globe,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+import { NAVBAR_SECTIONS } from "@/config/site-sections";
 import type { NavigationItem, SocialLink } from "@/types";
 
 interface PortfolioNavbarProps {
@@ -148,15 +149,14 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
         style: item.style,
         color: item.color,
       }))
-    : [
-        { label: t("nav.universe", "Universe"), href: "#hero", icon: Sparkles, badge: null, style: "default", color: "sky" },
-        { label: t("nav.projects", "Projects"), href: "#projects", icon: FolderGit2, badge: null, style: "default", color: "indigo" },
-        { label: t("nav.skills", "Skills"), href: "#skills", icon: Cpu, badge: null, style: "default", color: "violet" },
-        { label: t("nav.experience", "Experience"), href: "#experience", icon: Briefcase, badge: null, style: "default", color: "emerald" },
-        { label: t("nav.credentials", "Credentials"), href: "#education", icon: GraduationCap, badge: null, style: "default", color: "blue" },
-        { label: t("nav.analytics", "Live Telemetry"), href: "#analytics", icon: Activity, badge: "LIVE", style: "glow", color: "emerald" },
-        { label: t("nav.contact", "Contact"), href: "#contact", icon: Mail, badge: null, style: "pill", color: "amber" },
-      ];
+    : NAVBAR_SECTIONS.map((section) => ({
+        label: t(section.labelKey, section.label),
+        href: section.href,
+        icon: section.icon,
+        badge: section.badge ?? null,
+        style: section.style ?? "default",
+        color: "primary",
+      }));
 
   return (
     <header
@@ -174,12 +174,12 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
             onClick={() => playChime(780)}
             className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
           >
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-primary to-indigo-600 text-white shadow-md shadow-primary/25 transition-transform group-hover:scale-105 sm:h-9 sm:w-9">
               <Layers className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </div>
             <div>
-              <span className="font-extrabold tracking-tight text-foreground text-sm sm:text-base">ARUN M</span>
-              <span className="block text-[10px] text-sky-600 dark:text-sky-400 font-mono tracking-wider uppercase font-semibold">
+              <span className="font-display text-sm font-extrabold tracking-tight text-foreground sm:text-base">ARUN M</span>
+              <span className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-primary">
                 {language === "ar" ? "معمار برمجيات 3D" : "3D Architect"}
               </span>
             </div>
@@ -208,7 +208,7 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
             >
               <span>{link.label}</span>
               {link.badge && (
-                <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30">
+                <span className="rounded-full border border-primary/30 bg-primary/20 px-1.5 py-0.2 font-mono text-[9px] font-bold text-primary">
                   {link.badge}
                 </span>
               )}
@@ -249,7 +249,7 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
                 className="gap-2.5 text-xs py-2.5 cursor-pointer"
                 onSelect={() => { playChime(600, 0.1); toggleLanguage(); }}
               >
-                <Languages className="size-4 text-sky-500" />
+                <Languages className="size-4 text-primary" />
                 <span>{language === "en" ? "Switch to Arabic (العربية)" : "التبديل إلى الإنجليزية"}</span>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -269,7 +269,7 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
                 className="gap-2.5 text-xs py-2.5 cursor-pointer"
                 onSelect={toggleFullscreen}
               >
-                {isFullscreen ? <Minimize2 className="size-4 text-sky-500" /> : <Maximize2 className="size-4 text-sky-500" />}
+                {isFullscreen ? <Minimize2 className="size-4 text-primary" /> : <Maximize2 className="size-4 text-primary" />}
                 <span>
                   {language === "ar"
                     ? (isFullscreen ? "إنهاء العرض الغامر" : "شاشة كاملة غامرة")
@@ -300,7 +300,7 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
             className="hidden sm:inline-flex h-9 sm:h-10 rounded-xl border-border bg-card/60 px-3.5 text-xs font-semibold text-foreground shadow-xs hover:border-primary/40 hover:bg-primary/5"
           >
             <Link href="/admin">
-              <Shield className="w-3.5 h-3.5 mr-1.5 text-sky-500" />
+              <Shield className="mr-1.5 w-3.5 h-3.5 text-primary" />
               <span>{t("nav.admin", "CMS Portal")}</span>
             </Link>
           </Button>
@@ -320,12 +320,12 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
             <SheetContent side="right" className="w-[min(22rem,85vw)] border-border bg-card/95 text-foreground backdrop-blur-2xl p-6 flex flex-col justify-between">
               <div className="space-y-6">
                 <div className="flex items-center gap-3 pb-4 border-b border-border">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-md shadow-sky-500/20">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-primary to-indigo-600 font-bold text-white shadow-md shadow-primary/25">
                     <Layers className="w-4.5 h-4.5" />
                   </div>
                   <div>
-                    <span className="font-extrabold tracking-tight text-foreground text-base">ARUN M</span>
-                    <span className="block text-[10px] text-sky-500 font-mono tracking-wider uppercase font-semibold">
+                    <span className="font-display text-base font-extrabold tracking-tight text-foreground">ARUN M</span>
+                    <span className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-primary">
                       {language === "ar" ? "معمار برمجيات 3D" : "3D Architect"}
                     </span>
                   </div>
@@ -340,7 +340,7 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
                           href={link.href}
                           className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                         >
-                          <Icon className="size-4 text-sky-500 shrink-0" />
+                          <Icon className="size-4 shrink-0 text-primary" />
                           <span>{link.label}</span>
                         </a>
                       </SheetClose>
@@ -381,7 +381,7 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
                     onClick={toggleLanguage}
                     className="h-11 rounded-xl text-xs gap-1.5 justify-center"
                   >
-                    <Languages className="size-4 text-sky-500" />
+                    <Languages className="size-4 text-primary" />
                     <span>{language === "en" ? "العربية" : "English"}</span>
                   </Button>
 
@@ -398,7 +398,7 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
                 </div>
 
                 <SheetClose asChild>
-                  <Button asChild variant="default" className="h-11 w-full justify-between rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs shadow-md shadow-sky-500/20">
+                  <Button asChild variant="default" className="h-11 w-full justify-between rounded-xl bg-gradient-to-r from-primary to-indigo-600 text-xs font-semibold text-white shadow-md shadow-primary/25 hover:from-indigo-500 hover:to-violet-500">
                     <Link href="/admin">
                       <span className="flex items-center gap-2">
                         <Shield className="size-4" />

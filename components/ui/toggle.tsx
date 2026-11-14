@@ -34,7 +34,7 @@ const toggleVariants = cva(
         destructive:
           "border border-destructive/20 bg-destructive/5 hover:bg-destructive/15 text-destructive data-[state=on]:border-destructive data-[state=on]:bg-destructive data-[state=on]:text-destructive-foreground",
         glass:
-          "border border-border/60 bg-card/60 backdrop-blur-md hover:bg-card/90 text-foreground data-[state=on]:border-sky-500/50 data-[state=on]:bg-sky-500/15 data-[state=on]:text-sky-400 shadow-xs",
+          "border border-border/60 bg-card/60 backdrop-blur-md hover:bg-card/90 text-foreground data-[state=on]:border-primary/50 data-[state=on]:bg-primary/15 data-[state=on]:text-primary shadow-xs",
       },
       size: {
         default: "h-9 px-3 min-w-9",

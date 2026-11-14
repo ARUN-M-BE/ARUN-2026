@@ -1,6 +1,7 @@
 "use client";
 
 import { Terminal, ShieldCheck, Zap, Layers, Sparkles, Database, Globe2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/context/languageContext";
 import type { Profile } from "@/types";
 
@@ -16,13 +17,13 @@ export function AboutSection({ profile }: AboutSectionProps) {
       title: t("about.pillar1Title", "Distributed Systems & Cloud"),
       desc: t("about.pillar1Desc", "High-concurrency microservices, event-driven streaming, and PostgreSQL/Drizzle database optimization."),
       icon: Layers,
-      color: "text-sky-500 bg-sky-500/10 border-sky-500/25",
+      color: "text-primary bg-primary/10 border-primary/25",
     },
     {
       title: t("about.pillar2Title", "Hardware-Accelerated 3D"),
       desc: t("about.pillar2Desc", "Cinematic Three.js and React Three Fiber shaders with 60 FPS mobile-first performance budgets."),
       icon: Sparkles,
-      color: "text-indigo-500 bg-indigo-500/10 border-indigo-500/25",
+      color: "text-accent bg-accent/10 border-accent/25",
     },
     {
       title: t("about.pillar3Title", "Security & DPDP Act 2023"),
@@ -43,11 +44,14 @@ export function AboutSection({ profile }: AboutSectionProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
         <div className="text-center max-w-2xl mx-auto mb-14 sm:mb-18 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/25 text-xs font-mono text-sky-600 dark:text-sky-400">
-            <Terminal className="w-3.5 h-3.5" />
+          <Badge
+            variant="outline"
+            className="h-auto gap-1.5 rounded-full border-primary/25 bg-primary/10 px-3.5 py-1.5 text-xs font-mono text-primary"
+          >
+            <Terminal className="h-3.5 w-3.5" />
             <span>{t("about.badge", "Engineering Perspective")}</span>
-          </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
+          </Badge>
+          <h2 className="font-display text-balance text-2xl font-extrabold tracking-tight text-foreground sm:text-4xl">
             {t("about.title", "Architecting Scalable Real-World Systems")}
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
@@ -59,9 +63,9 @@ export function AboutSection({ profile }: AboutSectionProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Main Story Card */}
           <div className="lg:col-span-7 glass-panel rounded-3xl p-6 sm:p-10 space-y-6 relative overflow-hidden border border-border shadow-lg">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 
-            <h3 className="text-lg sm:text-2xl font-bold text-foreground tracking-tight">
+            <h3 className="font-display text-balance text-lg font-bold tracking-tight text-foreground sm:text-2xl">
               {language === "ar"
                 ? "عقد من الزمن في بناء منصات رقمية تؤثر وتتطور باستمرار"
                 : "A decade of building software that moves industries forward"}
@@ -85,14 +89,14 @@ export function AboutSection({ profile }: AboutSectionProps) {
             <div className="pt-6 border-t border-border grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs font-mono">
               <div className="p-3 rounded-xl bg-card/60 border border-border">
                 <span className="text-muted-foreground text-[11px] mb-1 flex items-center gap-1">
-                  <Terminal className="w-3 h-3 text-sky-500" />
+                  <Terminal className="w-3 h-3 text-primary" />
                   {language === "ar" ? "اللغات الأساسية" : "Primary Stack"}
                 </span>
-                <span className="text-sky-600 dark:text-sky-400 font-bold">TypeScript & Go</span>
+                <span className="text-primary font-bold">TypeScript & Go</span>
               </div>
               <div className="p-3 rounded-xl bg-card/60 border border-border">
                 <span className="text-muted-foreground text-[11px] mb-1 flex items-center gap-1">
-                  <Database className="w-3 h-3 text-indigo-500" />
+                  <Database className="w-3 h-3 text-accent" />
                   {language === "ar" ? "قواعد البيانات" : "Database Engine"}
                 </span>
                 <span className="text-foreground font-bold">PostgreSQL & Drizzle</span>
@@ -102,7 +106,7 @@ export function AboutSection({ profile }: AboutSectionProps) {
                   <Globe2 className="w-3 h-3 text-emerald-500" />
                   {language === "ar" ? "محرك الجرافيكس" : "3D Graphics"}
                 </span>
-                <span className="text-indigo-600 dark:text-indigo-400 font-bold">Three.js / WebGL</span>
+                <span className="text-accent font-bold">Three.js / WebGL</span>
               </div>
             </div>
           </div>
@@ -114,14 +118,14 @@ export function AboutSection({ profile }: AboutSectionProps) {
               return (
                 <div
                   key={pillar.title}
-                  className="glass-panel hover:border-sky-500/40 rounded-2xl p-5 transition-all duration-300 group border border-border shadow-xs"
+                  className="glass-panel hover:border-primary/40 rounded-2xl p-5 transition-all duration-300 group border border-border shadow-xs"
                 >
                   <div className="flex items-start gap-4">
                     <div className={`p-2.5 rounded-xl border ${pillar.color} shrink-0`}>
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-foreground group-hover:text-sky-500 transition-colors">
+                      <h4 className="font-display text-sm font-bold text-foreground group-hover:text-primary transition-colors">
                         {pillar.title}
                       </h4>
                       <p className="text-xs text-muted-foreground mt-1 leading-relaxed">

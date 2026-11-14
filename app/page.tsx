@@ -13,6 +13,8 @@ import {
 
 import { PortfolioNavbar } from "@/components/portfolio/navbar";
 import { MouseGlow } from "@/components/portfolio/mouse-glow";
+import { Reveal } from "@/components/motion/reveal";
+import { ScrollProgress } from "@/components/motion/scroll-progress";
 import { HeroSection } from "@/components/portfolio/hero-section";
 import { AboutSection } from "@/components/portfolio/about-section";
 import { ProjectsSection } from "@/components/portfolio/projects-section";
@@ -57,6 +59,7 @@ export default async function HomePage() {
     <div className="min-h-screen bg-background text-foreground relative selection:bg-primary/20 selection:text-primary transition-colors duration-300 overflow-x-hidden">
       {/* Ambient Interactive Cursor Glow */}
       <MouseGlow />
+      <ScrollProgress />
 
       {/* Global Fixed Floating Glass Navbar */}
       <PortfolioNavbar navigation={navigation} socialLinks={socialLinks} />
@@ -66,72 +69,102 @@ export default async function HomePage() {
         {sections.map((section) => {
           switch (section.sectionKey) {
             case "hero":
-              return <HeroSection key={section.id} profile={profile} />;
+              return (
+                <Reveal key={section.id} amount={0.05}>
+                  <HeroSection profile={profile} />
+                </Reveal>
+              );
             case "about":
-              return <AboutSection key={section.id} profile={profile} />;
+              return (
+                <Reveal key={section.id}>
+                  <AboutSection profile={profile} />
+                </Reveal>
+              );
             case "projects":
-              return <ProjectsSection key={section.id} projects={projects} />;
+              return (
+                <Reveal key={section.id}>
+                  <ProjectsSection projects={projects} />
+                </Reveal>
+              );
             case "skills":
-              return <SkillsSection key={section.id} categoriesWithSkills={categoriesWithSkills} />;
+              return (
+                <Reveal key={section.id}>
+                  <SkillsSection categoriesWithSkills={categoriesWithSkills} />
+                </Reveal>
+              );
             case "telemetry":
-              return <RealtimeTelemetry key={section.id} />;
+              return (
+                <Reveal key={section.id}>
+                  <RealtimeTelemetry />
+                </Reveal>
+              );
             case "experience":
-              return <ExperienceSection key={section.id} experiences={experiences} />;
+              return (
+                <Reveal key={section.id}>
+                  <ExperienceSection experiences={experiences} />
+                </Reveal>
+              );
             case "education":
               return (
-                <EducationSection
-                  key={section.id}
-                  education={education}
-                  certifications={certifications}
-                />
+                <Reveal key={section.id}>
+                  <EducationSection
+                    education={education}
+                    certifications={certifications}
+                  />
+                </Reveal>
               );
             case "testimonials":
-              return <TestimonialsSection key={section.id} testimonials={testimonials} />;
+              return (
+                <Reveal key={section.id}>
+                  <TestimonialsSection testimonials={testimonials} />
+                </Reveal>
+              );
             case "contact":
               return (
-                <ContactSection
-                  key={section.id}
-                  profile={profile}
-                  socialLinks={socialLinks}
-                />
+                <Reveal key={section.id}>
+                  <ContactSection profile={profile} socialLinks={socialLinks} />
+                </Reveal>
               );
             default:
               return (
-                <section
-                  key={section.id}
-                  id={section.sectionKey}
-                  className="py-16 sm:py-20 relative overflow-hidden"
-                >
-                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="space-y-3 mb-8">
-                      {section.badge && (
-                        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/25 text-xs font-mono text-sky-600 dark:text-sky-400">
-                          <span>{section.badge}</span>
+                <Reveal key={section.id}>
+                  <section
+                    id={section.sectionKey}
+                    className="py-16 sm:py-20 relative overflow-hidden"
+                  >
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                      <div className="space-y-3 mb-8">
+                        {section.badge && (
+                          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/25 text-xs font-mono text-primary">
+                            <span>{section.badge}</span>
+                          </div>
+                        )}
+                        <h2 className="font-display text-balance text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
+                          {section.title}
+                        </h2>
+                        {section.subtitle && (
+                          <p className="text-xs sm:text-sm text-muted-foreground max-w-xl">
+                            {section.subtitle}
+                          </p>
+                        )}
+                      </div>
+                      {section.content && (
+                        <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                          {section.content}
                         </div>
                       )}
-                      <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
-                        {section.title}
-                      </h2>
-                      {section.subtitle && (
-                        <p className="text-xs sm:text-sm text-muted-foreground max-w-xl">
-                          {section.subtitle}
-                        </p>
-                      )}
                     </div>
-                    {section.content && (
-                      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                        {section.content}
-                      </div>
-                    )}
-                  </div>
-                </section>
+                  </section>
+                </Reveal>
               );
           }
         })}
       </main>
 
       {/* Footer & Compliance Notice with Social Links Placement */}
-      <PortfolioFooter socialLinks={socialLinks} />
+      <Reveal amount={0.05}>
+        <PortfolioFooter socialLinks={socialLinks} />
+      </Reveal>
 
       {/* DPDP Act 2023 Compliant Cookie Consent Banner */}
       <CookieConsent />

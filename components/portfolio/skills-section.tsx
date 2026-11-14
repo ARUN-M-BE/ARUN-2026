@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { Cpu, Star, SlidersHorizontal, Sparkles, Server, ShieldCheck, Layers } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { StaggerGroup, StaggerItem } from "@/components/motion/reveal";
 import type { SkillCategory, Skill } from "@/types";
 
 export type CategoryWithSkills = SkillCategory & { skills: Skill[] };
@@ -36,11 +38,14 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-14 sm:mb-18 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/25 text-xs font-mono text-sky-600 dark:text-sky-400">
+          <Badge
+            variant="outline"
+            className="h-auto gap-1.5 rounded-full border-primary/25 bg-primary/10 px-3.5 py-1.5 text-xs font-mono text-primary"
+          >
             <Cpu className="w-3.5 h-3.5" />
             <span>{t("skills.badge", "Technical Capabilities")}</span>
-          </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
+          </Badge>
+          <h2 className="font-display text-balance text-2xl font-extrabold tracking-tight text-foreground sm:text-4xl">
             {t("skills.title", "Interactive Skills Constellation")}
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
@@ -57,7 +62,7 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
               onClick={() => setActiveCluster("All")}
               className={`h-9 rounded-xl px-4 text-xs transition-all ${
                 activeCluster === "All"
-                  ? "bg-gradient-to-r from-sky-500 to-indigo-600 font-semibold text-white shadow-md shadow-sky-500/15 hover:from-sky-400 hover:to-indigo-500"
+                  ? "bg-gradient-to-r from-primary to-indigo-600 font-semibold text-white shadow-md shadow-primary/20 hover:from-indigo-500 hover:to-violet-500"
                   : "bg-secondary/60 text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -73,7 +78,7 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
                 onClick={() => setActiveCluster(cat.name)}
                 className={`h-9 rounded-xl px-4 text-xs font-medium transition-all ${
                   activeCluster === cat.name
-                    ? "bg-gradient-to-r from-sky-500 to-indigo-600 font-semibold text-white shadow-md shadow-sky-500/15 hover:from-sky-400 hover:to-indigo-500"
+                    ? "bg-gradient-to-r from-primary to-indigo-600 font-semibold text-white shadow-md shadow-primary/20 hover:from-indigo-500 hover:to-violet-500"
                     : "bg-secondary/60 text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -84,7 +89,7 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
 
           {/* Proficiency Threshold Slider */}
           <div className="flex items-center justify-center gap-3 pt-3 text-xs font-mono text-muted-foreground">
-            <SlidersHorizontal className="w-3.5 h-3.5 text-sky-500" />
+            <SlidersHorizontal className="w-3.5 h-3.5 text-primary" />
             <span>{t("skills.sliderLabel", "Minimum Proficiency")}:</span>
             <input
               type="range"
@@ -94,9 +99,9 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
               value={minProficiency}
               onChange={(e) => setMinProficiency(Number(e.target.value))}
               aria-label="Filter minimum proficiency percentage"
-              className="w-28 sm:w-36 accent-sky-500 cursor-pointer"
+              className="w-28 cursor-pointer accent-primary sm:w-36"
             />
-            <span className="text-sky-600 dark:text-sky-400 font-bold min-w-8">{minProficiency}%</span>
+            <span className="min-w-8 font-bold text-primary">{minProficiency}%</span>
           </div>
         </div>
 
@@ -123,20 +128,20 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <StaggerGroup className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredClusters.map((cluster) => {
               const ClusterIcon = getCategoryIcon(cluster.name);
               return (
+                <StaggerItem key={cluster.id}>
                 <div
-                  key={cluster.id}
-                  className="glass-panel rounded-3xl p-6 sm:p-7 space-y-5 border border-border hover:border-sky-500/40 transition-colors shadow-xs"
+                  className="glass-panel space-y-5 rounded-3xl border border-border p-6 shadow-xs transition-colors hover:border-primary/40 sm:p-7"
                 >
                   <div className="flex items-center justify-between pb-3 border-b border-border">
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500 border border-sky-500/20">
+                      <div className="rounded-lg border border-primary/20 bg-primary/10 p-1.5 text-primary">
                         <ClusterIcon className="w-4 h-4" />
                       </div>
-                      <h3 className="font-bold text-sm sm:text-base text-foreground tracking-tight">
+                      <h3 className="font-display text-sm font-bold tracking-tight text-foreground sm:text-base">
                         {cluster.name}
                       </h3>
                     </div>
@@ -152,14 +157,14 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
                           ? `No skills matching ≥ ${minProficiency}% proficiency.`
                           : "No skills in this category yet."}
                       </p>
-                      <span className="text-[10px] font-mono text-sky-500/80">Active Constellation Expansion</span>
+                      <span className="font-mono text-[10px] text-primary/80">Active Constellation Expansion</span>
                     </div>
                   ) : (
                     <div className="space-y-4">
                       {cluster.skills.map((skill) => (
                         <div key={skill.id} className="space-y-1.5 group">
                           <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1.5 font-medium text-foreground group-hover:text-sky-500 transition-colors">
+                            <div className="flex items-center gap-1.5 font-medium text-foreground transition-colors group-hover:text-primary">
                               <span>{skill.name}</span>
                               {skill.isFeatured && (
                                 <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
@@ -171,7 +176,7 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
                           {/* Progress Bar with Gradient */}
                           <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 transition-all duration-700"
+                              className="h-full rounded-full bg-gradient-to-r from-primary to-indigo-600 transition-all duration-700"
                               style={{ width: `${skill.level}%` }}
                             />
                           </div>
@@ -180,9 +185,10 @@ export function SkillsSection({ categoriesWithSkills = [] }: SkillsSectionProps)
                     </div>
                   )}
                 </div>
+                </StaggerItem>
               );
             })}
-          </div>
+          </StaggerGroup>
         )}
       </div>
     </section>

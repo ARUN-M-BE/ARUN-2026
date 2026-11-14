@@ -5,11 +5,42 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
 import { PageViewTracker } from "@/components/portfolio/page-view-tracker";
 import type { Metadata, Viewport } from "next";
+import {
+  JetBrains_Mono,
+  Noto_Sans_Arabic,
+  Plus_Jakarta_Sans,
+  Sora,
+} from "next/font/google";
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-jakarta",
+});
+
+const sora = Sora({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sora",
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-jetbrains",
+});
+
+const arabic = Noto_Sans_Arabic({
+  subsets: ["arabic"],
+  display: "swap",
+  variable: "--font-arabic",
+});
 
 export const viewport: Viewport = {
+  colorScheme: "light dark",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
-    { media: "(prefers-color-scheme: dark)", color: "#04060b" },
+    { media: "(prefers-color-scheme: light)", color: "#F7F8FC" },
+    { media: "(prefers-color-scheme: dark)", color: "#070912" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -38,6 +69,12 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Arun M", url: "https://arun-m.in" }],
   creator: "Arun M",
+  applicationName: "Arun M Portfolio",
+  category: "technology",
+  classification: "Portfolio",
+  referrer: "strict-origin-when-cross-origin",
+  formatDetection: { email: false, address: false, telephone: false },
+  appleWebApp: { capable: true, title: "Arun M", statusBarStyle: "black-translucent" },
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://arun-m.in"),
   alternates: {
     canonical: "/",
@@ -127,7 +164,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className="h-full antialiased font-sans scroll-smooth">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`h-full antialiased font-sans scroll-smooth ${jakarta.variable} ${sora.variable} ${jetbrains.variable} ${arabic.variable}`}
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -139,7 +180,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
         />
       </head>
-      <body className="min-h-full bg-background text-foreground selection:bg-cyan-500/30 selection:text-cyan-200">
+      <body className="min-h-full bg-background text-foreground selection:bg-primary/25 selection:text-foreground">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

@@ -25,17 +25,17 @@ import type { Profile } from "@/types";
 function HeroFallbackSculpture() {
   return (
     <div className="w-full h-full flex items-center justify-center relative overflow-hidden select-none">
-      <div className="w-64 h-64 rounded-full bg-gradient-to-tr from-sky-500/20 via-indigo-500/15 to-transparent blur-2xl animate-pulse pointer-events-none" />
+      <div className="w-64 h-64 rounded-full bg-gradient-to-tr from-primary/25 via-accent/15 to-transparent blur-2xl animate-pulse pointer-events-none" />
       <div className="relative flex items-center justify-center">
         {/* Outer Gyroscope Ring */}
-        <div className="w-64 h-64 rounded-full border border-sky-500/25 animate-[spin_12s_linear_infinite]" />
+        <div className="w-64 h-64 rounded-full border border-primary/25 animate-[spin_12s_linear_infinite] motion-reduce:animate-none" />
         {/* Inner Orbital Ring */}
-        <div className="absolute w-48 h-48 rounded-full border border-dashed border-indigo-400/30 animate-[spin_8s_linear_infinite_reverse]" />
+        <div className="absolute w-48 h-48 rounded-full border border-dashed border-accent/30 animate-[spin_8s_linear_infinite_reverse] motion-reduce:animate-none" />
         {/* Core Geometric Diamond */}
-        <div className="absolute w-28 h-28 rounded-2xl border border-sky-400/40 bg-card/60 backdrop-blur-md rotate-45 flex items-center justify-center shadow-lg shadow-sky-500/10">
-          <div className="w-16 h-16 rounded-xl border border-indigo-400/50 -rotate-12 flex items-center justify-center bg-sky-950/30">
-            <div className="w-8 h-8 rounded-lg bg-sky-400/20 border border-sky-400/80 flex items-center justify-center">
-              <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
+        <div className="absolute w-28 h-28 rounded-2xl border border-primary/40 bg-card/60 backdrop-blur-md rotate-45 flex items-center justify-center shadow-lg shadow-primary/10">
+          <div className="w-16 h-16 rounded-xl border border-accent/50 -rotate-12 flex items-center justify-center bg-background/40">
+            <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/80 flex items-center justify-center">
+              <span className="w-2 h-2 rounded-full bg-primary animate-ping motion-reduce:animate-none" />
             </div>
           </div>
         </div>
@@ -132,26 +132,29 @@ export function HeroSection({ profile }: HeroSectionProps) {
   return (
     <section id="hero" className="min-h-[92vh] relative flex items-center justify-center pt-24 pb-16 sm:py-28 overflow-hidden">
       {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-sky-500/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-10 sm:gap-14 items-center relative z-10">
         {/* Left Column: Typography & CTAs */}
         <div className="lg:col-span-7 space-y-6 text-center lg:text-left rtl:lg:text-right">
           {/* Availability pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/25 text-xs font-mono text-sky-600 dark:text-sky-400 shadow-xs">
+          <Badge
+            variant="outline"
+            className="h-auto gap-2 rounded-full border-primary/25 bg-primary/10 px-3.5 py-1.5 font-mono text-xs text-primary shadow-xs"
+          >
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75 motion-reduce:animate-none" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
             </span>
             <span>{profile?.availability || t("hero.available", "Available for architectural advisory & engineering")}</span>
-          </div>
+          </Badge>
 
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground leading-[1.1]">
+          <h1 className="font-display text-balance text-3xl font-extrabold leading-[1.1] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
             <span className="block">
               {profile?.fullName || "Arun M"}
             </span>
-            <span className="block text-xl sm:text-3xl lg:text-4xl font-bold mt-2 text-gradient-brand">
+            <span className="mt-2 block text-balance font-display text-xl font-bold text-gradient-brand sm:text-3xl lg:text-4xl">
               {profile?.title || t("hero.role", "Senior Full-Stack Architect & 3D Engineer")}
             </span>
           </h1>
@@ -165,7 +168,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
             <a href="#projects">
               <Button
                 size="lg"
-                className="h-11 sm:h-12 px-6 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs sm:text-sm shadow-md shadow-sky-500/20 group transition-all"
+                className="group h-11 rounded-full bg-gradient-to-r from-primary to-indigo-600 px-6 text-xs font-semibold text-white shadow-md shadow-primary/25 transition-all hover:from-indigo-500 hover:to-violet-500 sm:h-12 sm:text-sm"
               >
                 <span>{t("hero.explore", "View Selected Works")}</span>
                 <ArrowRight className="w-4 h-4 ml-2 rtl:rotate-180 group-hover:translate-x-1 transition-transform" />
@@ -178,7 +181,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
               onClick={startTour}
               className="h-11 sm:h-12 px-6 rounded-full border-border bg-card/70 hover:bg-card text-foreground text-xs sm:text-sm font-semibold shadow-xs"
             >
-              <Compass className="w-4 h-4 mr-2 text-sky-500" />
+              <Compass className="w-4 h-4 mr-2 text-primary" />
               <span>{t("hero.guidedTour", "Interactive Tour")}</span>
             </Button>
 
@@ -200,7 +203,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
           <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-border max-w-lg mx-auto lg:mx-0">
             <div className="p-3 sm:p-4 rounded-2xl bg-card/50 border border-border/80">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                <Clock className="w-3.5 h-3.5 text-sky-500" />
+                <Clock className="w-3.5 h-3.5 text-primary" />
                 <span>{t("hero.statYears", "Experience")}</span>
               </div>
               <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground">
@@ -210,10 +213,10 @@ export function HeroSection({ profile }: HeroSectionProps) {
 
             <div className="p-3 sm:p-4 rounded-2xl bg-card/50 border border-border/80">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                <Layers className="w-3.5 h-3.5 text-indigo-500" />
+                <Layers className="w-3.5 h-3.5 text-accent" />
                 <span>{t("hero.statProjects", "Projects")}</span>
               </div>
-              <div className="text-xl sm:text-3xl font-extrabold font-mono text-sky-500">
+              <div className="text-xl sm:text-3xl font-extrabold font-mono text-primary">
                 {profile?.projectsCompleted || 35}+
               </div>
             </div>
@@ -236,7 +239,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
             <HeroCanvas />
             {/* Interactive hint pill */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-background/80 backdrop-blur-md border border-border text-[11px] text-muted-foreground font-mono pointer-events-none flex items-center gap-1.5 shadow-xs">
-              <Orbit className="w-3.5 h-3.5 text-sky-500 animate-spin" />
+              <Orbit className="w-3.5 h-3.5 text-primary animate-spin motion-reduce:animate-none" />
               <span>{language === "ar" ? "اسحب • دوّر • استكشف" : "Drag • Orbit • Explore"}</span>
             </div>
           </div>
@@ -248,12 +251,12 @@ export function HeroSection({ profile }: HeroSectionProps) {
         <DialogContent className="max-w-md bg-card/95 border-border backdrop-blur-xl p-6 rounded-2xl">
           <DialogHeader className="space-y-2">
             <div className="flex items-center justify-between">
-              <Badge variant="outline" className="text-xs font-mono border-sky-500/30 text-sky-500 bg-sky-500/10">
+              <Badge variant="outline" className="font-mono text-xs border-primary/30 text-primary bg-primary/10">
                 {language === "ar" ? `المحطة ${tourStep + 1} من ${tourSteps.length}` : `Orbit ${tourStep + 1} of ${tourSteps.length}`}
               </Badge>
-              <Sparkles className="w-4 h-4 text-sky-500" />
+              <Sparkles className="w-4 h-4 text-primary" />
             </div>
-            <DialogTitle className="text-lg font-bold text-foreground">
+            <DialogTitle className="font-display text-lg font-bold text-foreground">
               {tourSteps[tourStep].title}
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground leading-relaxed pt-1">
@@ -278,7 +281,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
                 <div
                   key={i}
                   className={`h-1.5 rounded-full transition-all ${
-                    i === tourStep ? "w-6 bg-sky-500" : "w-1.5 bg-border"
+                    i === tourStep ? "w-6 bg-primary" : "w-1.5 bg-border"
                   }`}
                 />
               ))}
@@ -287,7 +290,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
             <Button
               size="sm"
               onClick={handleNextStep}
-              className="text-xs h-9 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-semibold"
+              className="text-xs h-9 rounded-xl bg-gradient-to-r from-primary to-indigo-600 text-white font-semibold hover:from-indigo-500 hover:to-violet-500 transition-all"
             >
               <span>{tourStep === tourSteps.length - 1 ? (language === "ar" ? "إنهاء الجولة" : "Done") : (language === "ar" ? "التالي" : "Next")}</span>
               <ChevronRight className="w-4 h-4 ml-1 rtl:rotate-180" />

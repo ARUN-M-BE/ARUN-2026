@@ -13,21 +13,14 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import {
-  Sparkles,
-  User,
-  FolderGit2,
-  Cpu,
-  Briefcase,
-  GraduationCap,
-  Mail,
   Shield,
-  Activity,
   Sun,
   Moon,
   Languages,
   Command as CommandIcon,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+import { PALETTE_SECTIONS, SECTION_TONE_CLASS } from "@/config/site-sections";
 import { Button } from "@/components/ui/button";
 
 export function CommandPalette() {
@@ -79,38 +72,20 @@ export function CommandPalette() {
             <CommandEmpty>{language === "ar" ? "لم يتم العثور على نتائج" : "No results found."}</CommandEmpty>
             
             <CommandGroup heading={language === "ar" ? "أقسام الموقع" : "Portfolio Navigation"}>
-              <CommandItem onSelect={() => scrollToSection("hero")}>
-                <Sparkles className="w-4 h-4 mr-2 text-sky-500" />
-                {t("nav.universe", "Hero & 3D Core")}
-              </CommandItem>
-              <CommandItem onSelect={() => scrollToSection("about")}>
-                <User className="w-4 h-4 mr-2 text-indigo-500" />
-                {language === "ar" ? "القصة والهوية" : "Architect Story & Vision"}
-              </CommandItem>
-              <CommandItem onSelect={() => scrollToSection("projects")}>
-                <FolderGit2 className="w-4 h-4 mr-2 text-sky-500" />
-                {t("nav.projects", "Project Universe")}
-              </CommandItem>
-              <CommandItem onSelect={() => scrollToSection("skills")}>
-                <Cpu className="w-4 h-4 mr-2 text-indigo-500" />
-                {t("nav.skills", "Skills Constellation")}
-              </CommandItem>
-              <CommandItem onSelect={() => scrollToSection("analytics")}>
-                <Activity className="w-4 h-4 mr-2 text-emerald-500" />
-                {t("nav.analytics", "Live Telemetry & Observability")}
-              </CommandItem>
-              <CommandItem onSelect={() => scrollToSection("experience")}>
-                <Briefcase className="w-4 h-4 mr-2 text-sky-500" />
-                {t("nav.experience", "Career Milestones Timeline")}
-              </CommandItem>
-              <CommandItem onSelect={() => scrollToSection("education")}>
-                <GraduationCap className="w-4 h-4 mr-2 text-indigo-500" />
-                {t("nav.credentials", "Education & Certifications")}
-              </CommandItem>
-              <CommandItem onSelect={() => scrollToSection("contact")}>
-                <Mail className="w-4 h-4 mr-2 text-sky-500" />
-                {t("nav.contact", "Contact Gateway")}
-              </CommandItem>
+              {PALETTE_SECTIONS.map((section) => {
+                const SectionIcon = section.icon;
+                return (
+                  <CommandItem
+                    key={section.key}
+                    onSelect={() => scrollToSection(section.key)}
+                  >
+                    <SectionIcon
+                      className={`mr-2 h-4 w-4 ${SECTION_TONE_CLASS[section.tone ?? "primary"]}`}
+                    />
+                    {t(section.labelKey, section.label)}
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
 
             <CommandSeparator />
@@ -141,7 +116,7 @@ export function CommandPalette() {
                   setOpen(false);
                 }}
               >
-                <Languages className="w-4 h-4 mr-2 text-sky-500" />
+                <Languages className="w-4 h-4 mr-2 text-primary" />
                 <span>{language === "en" ? "تبديل الواجهة إلى العربية" : "Switch to English"}</span>
               </CommandItem>
 

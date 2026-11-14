@@ -79,11 +79,14 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/25 text-xs font-mono text-sky-600 dark:text-sky-400">
-              <FolderGit2 className="w-3.5 h-3.5" />
+            <Badge
+              variant="outline"
+              className="h-auto gap-1.5 rounded-full border-primary/25 bg-primary/10 px-3.5 py-1.5 text-xs font-mono text-primary"
+            >
+              <FolderGit2 className="h-3.5 w-3.5" />
               <span>{t("projects.badge", "Selected Works")}</span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
+            </Badge>
+            <h2 className="font-display text-balance text-2xl font-extrabold tracking-tight text-foreground sm:text-4xl">
               {t("projects.title", "Featured Projects & Case Studies")}
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground max-w-xl">
@@ -98,7 +101,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsCompareOpen(true)}
-                className="border-indigo-500/40 text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 text-xs rounded-xl font-mono h-10 px-3.5"
+                className="h-10 rounded-xl border-primary/40 bg-primary/10 px-3.5 font-mono text-xs text-primary hover:bg-primary/20"
               >
                 <GitCompare className="w-3.5 h-3.5 mr-1.5" />
                 <span>{t("projects.compareButton", "Compare Architecture")} ({compareIds.length}/2)</span>
@@ -158,7 +161,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
               onClick={() => setSelectedCategory(cat)}
               className={`h-9 rounded-xl px-4 text-xs font-medium transition-all ${
                 selectedCategory === cat
-                  ? "bg-gradient-to-r from-sky-500 to-indigo-600 font-semibold text-white shadow-md shadow-sky-500/15 hover:from-sky-400 hover:to-indigo-500"
+                  ? "bg-gradient-to-r from-primary to-indigo-600 font-semibold text-white shadow-md shadow-primary/20 hover:from-indigo-500 hover:to-violet-500"
                   : "bg-secondary/60 text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -188,7 +191,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                 <TiltCard
                   key={project.id}
                   maxTilt={8}
-                  className="rounded-3xl glass-panel hover:border-sky-500/40 transition-colors flex flex-col justify-between overflow-hidden relative cursor-pointer border border-border shadow-xs group"
+                  className="rounded-3xl glass-panel hover:border-primary/40 transition-colors flex flex-col justify-between overflow-hidden relative cursor-pointer border border-border shadow-xs group"
                   onClick={() => openProjectModal(project)}
                 >
                   {/* Visual Thumbnail */}
@@ -197,11 +200,13 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                       <img
                         src={projectThumbnail}
                         alt={project.title}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-tr from-sky-500/10 via-indigo-500/10 to-card flex items-center justify-center">
-                        <FolderGit2 className="w-12 h-12 text-sky-500/40" />
+                      <div className="w-full h-full bg-gradient-to-tr from-primary/10 via-accent/10 to-card flex items-center justify-center">
+                        <FolderGit2 className="w-12 h-12 text-primary/40" />
                       </div>
                     )}
 
@@ -230,7 +235,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                       onClick={(e) => toggleCompare(project.id, e)}
                       className={`absolute bottom-3 right-3 h-8 rounded-xl px-2.5 text-[10px] font-mono backdrop-blur-md transition-all ${
                         isSelectedForCompare
-                          ? "border-indigo-400 bg-indigo-600 font-bold text-white hover:bg-indigo-500"
+                          ? "border-primary bg-primary font-bold text-primary-foreground hover:bg-primary/90"
                           : "border-border bg-card/85 text-foreground hover:bg-card"
                       }`}
                       title="Compare with another architecture"
@@ -244,7 +249,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                   <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono text-sky-600 dark:text-sky-400 uppercase tracking-wider font-semibold">
+                        <span className="text-[10px] font-mono text-primary uppercase tracking-wider font-semibold">
                           {project.category || "Full-Stack"}
                         </span>
                         {project.client && (
@@ -253,7 +258,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                           </span>
                         )}
                       </div>
-                      <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-sky-500 transition-colors">
+                      <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors">
                         {project.title}
                       </h3>
                       <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
@@ -280,7 +285,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
 
                     {/* Actions Bar */}
                     <div className="pt-4 border-t border-border flex items-center justify-between">
-                      <span className="text-xs text-sky-600 dark:text-sky-400 flex items-center gap-1 font-semibold">
+                      <span className="text-xs text-primary flex items-center gap-1 font-semibold">
                         <Eye className="w-3.5 h-3.5" />
                         {t("projects.caseStudy", "Case Study")}
                       </span>
@@ -305,7 +310,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                             rel="noopener noreferrer"
                             title="Live Demo"
                           >
-                            <Button size="icon" className="h-8 w-8 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white shadow-xs">
+                            <Button size="icon" className="h-8 w-8 rounded-full bg-gradient-to-r from-primary to-indigo-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-xs">
                               <ExternalLink className="w-3.5 h-3.5" />
                             </Button>
                           </a>
@@ -327,12 +332,12 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                 <div
                   key={project.id}
                   onClick={() => openProjectModal(project)}
-                  className="rounded-2xl bg-card border border-border hover:border-sky-500/40 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-all cursor-pointer group shadow-xs"
+                  className="rounded-2xl bg-card border border-border hover:border-primary/40 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-all cursor-pointer group shadow-xs"
                 >
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 min-w-0 flex-1">
                     <div className="w-full sm:w-36 h-24 rounded-xl overflow-hidden bg-muted shrink-0 relative">
                       {projectThumbnail ? (
-                        <img src={projectThumbnail} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        <img src={projectThumbnail} alt={project.title} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                       ) : (
                         <div className="w-full h-full bg-secondary flex items-center justify-center">
                           <FolderGit2 className="w-6 h-6 text-muted-foreground" />
@@ -347,14 +352,14 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
 
                     <div className="min-w-0 space-y-1.5 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono text-sky-500 uppercase font-semibold">
+                        <span className="text-[10px] font-mono text-primary uppercase font-semibold">
                           {project.category || "General"}
                         </span>
                         {project.client && (
                           <span className="text-[10px] text-muted-foreground">• {project.client}</span>
                         )}
                       </div>
-                      <h3 className="font-bold text-base text-foreground group-hover:text-sky-500 transition-colors">
+                      <h3 className="font-bold text-base text-foreground group-hover:text-primary transition-colors">
                         {project.title}
                       </h3>
                       <p className="text-xs text-muted-foreground line-clamp-2 max-w-2xl">
@@ -377,7 +382,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                       variant={isSelectedForCompare ? "default" : "outline"}
                       onClick={(e) => toggleCompare(project.id, e)}
                       className={`h-9 rounded-xl px-3 text-xs font-mono ${
-                        isSelectedForCompare ? "bg-indigo-600 text-white" : "border-border text-foreground"
+                        isSelectedForCompare ? "bg-primary text-primary-foreground" : "border-border text-foreground"
                       }`}
                     >
                       {isSelectedForCompare ? <Check className="w-3.5 h-3.5 mr-1" /> : <GitCompare className="w-3.5 h-3.5 mr-1" />}
@@ -392,7 +397,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                     )}
                     {project.liveUrl && (
                       <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-                        <Button size="icon" className="h-9 w-9 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 text-white">
+                        <Button size="icon" className="h-9 w-9 rounded-xl bg-gradient-to-r from-primary to-indigo-600 text-white">
                           <ExternalLink className="w-4 h-4" />
                         </Button>
                       </a>
@@ -411,8 +416,8 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
           {activeProject && (
             <div className="space-y-6">
               <DialogHeader className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-mono text-sky-600 dark:text-sky-400">
-                  <Badge variant="outline" className="text-[10px] border-sky-500/30 text-sky-500 bg-sky-500/10">
+                <div className="flex items-center gap-2 text-xs font-mono text-primary">
+                  <Badge variant="outline" className="text-[10px] border-primary/30 text-primary bg-primary/10">
                     {activeProject.category || "CASE STUDY"}
                   </Badge>
                   {activeProject.client && <span>• Client: {activeProject.client}</span>}
@@ -448,11 +453,11 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                   <div className="space-y-3">
                     {currentImg ? (
                       <div className="aspect-video rounded-2xl overflow-hidden border border-border bg-black/40">
-                        <img src={currentImg} alt={activeProject.title} className="w-full h-full object-cover" />
+                        <img src={currentImg} alt={activeProject.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                       </div>
                     ) : (
-                      <div className="aspect-video rounded-2xl overflow-hidden border border-border bg-gradient-to-tr from-sky-950/40 to-indigo-950/40 flex items-center justify-center">
-                        <FolderGit2 className="w-14 h-14 text-sky-500/40" />
+                      <div className="aspect-video rounded-2xl overflow-hidden border border-border bg-gradient-to-tr from-primary/10 to-accent/10 flex items-center justify-center">
+                        <FolderGit2 className="w-14 h-14 text-primary/40" />
                       </div>
                     )}
 
@@ -465,10 +470,10 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                             type="button"
                             onClick={() => setActiveImageIndex(idx)}
                             className={`w-16 h-12 rounded-lg overflow-hidden border-2 transition-all shrink-0 ${
-                              activeImageIndex === idx ? "border-sky-500 scale-105" : "border-border/60 opacity-60 hover:opacity-100"
+                              activeImageIndex === idx ? "border-primary scale-105" : "border-border/60 opacity-60 hover:opacity-100"
                             }`}
                           >
-                            <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
+                            <img src={img} alt="Thumbnail" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                           </button>
                         ))}
                       </div>
@@ -479,7 +484,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
 
               <div className="space-y-3">
                 <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-sky-500" />
+                  <Layers className="w-3.5 h-3.5 text-primary" />
                   Architecture Overview & Highlights
                 </h4>
                 <div className="p-4 sm:p-5 rounded-2xl bg-secondary/60 border border-border text-xs sm:text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap font-sans">
@@ -488,8 +493,8 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
               </div>
 
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                <h4 className="flex items-center gap-1.5 font-display text-xs font-bold uppercase tracking-wider text-foreground">
+                  <Sparkles className="w-3.5 h-3.5 text-accent" />
                   Complete Tech Stack
                 </h4>
                 <div className="flex flex-wrap gap-2">
@@ -505,7 +510,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                 <div className="flex gap-2.5">
                   {activeProject.liveUrl && (
                     <a href={activeProject.liveUrl} target="_blank" rel="noopener noreferrer">
-                      <Button size="sm" className="h-9 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs shadow-xs">
+                      <Button size="sm" className="h-9 px-4 rounded-xl bg-gradient-to-r from-primary to-indigo-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-xs shadow-xs">
                         <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
                         {t("projects.liveDemo", "Live Production")}
                       </Button>
@@ -533,8 +538,8 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
       <Dialog open={isCompareOpen} onOpenChange={setIsCompareOpen}>
         <DialogContent className="bg-card/95 border-border backdrop-blur-xl max-w-4xl max-h-[85vh] overflow-y-auto rounded-2xl p-6">
           <DialogHeader>
-            <DialogTitle className="text-foreground flex items-center gap-2">
-              <GitCompare className="w-5 h-5 text-indigo-500" />
+            <DialogTitle className="flex items-center gap-2 font-display text-base text-foreground">
+              <GitCompare className="w-5 h-5 text-accent" />
               {t("projects.compareButton", "Architecture Comparison Matrix")}
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
@@ -551,7 +556,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
               {comparedProjects.slice(0, 2).map((p) => (
                 <div key={p.id} className="p-5 rounded-2xl bg-secondary/60 border border-border space-y-4">
                   <div>
-                    <span className="text-[10px] font-mono text-sky-600 dark:text-sky-400 uppercase font-semibold">{p.category}</span>
+                    <span className="text-[10px] font-mono text-primary uppercase font-semibold">{p.category}</span>
                     <h3 className="font-bold text-sm text-foreground mt-0.5">{p.title}</h3>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{p.shortDescription}</p>
                   </div>
@@ -575,7 +580,7 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                   <div className="space-y-1.5 pt-3 border-t border-border/50 text-xs">
                     <span className="text-muted-foreground font-semibold block">Production URL:</span>
                     {p.liveUrl ? (
-                      <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 font-mono text-[11px]">
+                      <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1 font-mono text-[11px]">
                         {p.liveUrl} <ExternalLink className="w-3 h-3" />
                       </a>
                     ) : (

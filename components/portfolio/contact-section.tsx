@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { contactFormSchema, type ContactFormData } from "@/lib/validations";
 import { submitContactForm } from "@/lib/actions";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -73,18 +74,21 @@ export function ContactSection({ profile, socialLinks = [] }: ContactSectionProp
   return (
     <section id="contact" className="py-20 sm:py-28 relative overflow-hidden">
       {/* Background glow */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-sky-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/2 h-[300px] w-[600px] -translate-x-1/2 rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 sm:gap-14 items-start">
           {/* Left Column: Direct Info */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/25 text-xs font-mono text-sky-600 dark:text-sky-400">
+            <Badge
+              variant="outline"
+              className="h-auto gap-1.5 rounded-full border-primary/25 bg-primary/10 px-3.5 py-1.5 text-xs font-mono text-primary"
+            >
               <Mail className="w-3.5 h-3.5" />
               <span>{t("contact.badge", "Get In Touch")}</span>
-            </div>
+            </Badge>
 
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
+            <h2 className="font-display text-balance text-2xl font-extrabold tracking-tight text-foreground sm:text-4xl">
               {t("contact.title", "Let's Build Something Exceptional")}
             </h2>
 
@@ -95,11 +99,11 @@ export function ContactSection({ profile, socialLinks = [] }: ContactSectionProp
             {/* Quick Contact Info */}
             <div className="space-y-3 pt-4 border-t border-border text-xs">
               <div className="flex items-center gap-3 text-foreground/90 p-2.5 rounded-xl bg-card/60 border border-border">
-                <Mail className="w-4 h-4 text-sky-500 shrink-0" />
+                <Mail className="w-4 h-4 text-primary shrink-0" />
                 <span className="font-mono">{profile?.email || "arun@arun-m.in"}</span>
               </div>
               <div className="flex items-center gap-3 text-foreground/90 p-2.5 rounded-xl bg-card/60 border border-border">
-                <MapPin className="w-4 h-4 text-indigo-500 shrink-0" />
+                <MapPin className="w-4 h-4 text-accent shrink-0" />
                 <span>{profile?.location || "Bangalore, India (Available Worldwide Remote)"}</span>
               </div>
               <div className="flex items-center gap-3 text-foreground/90 p-2.5 rounded-xl bg-card/60 border border-border">
@@ -149,7 +153,7 @@ export function ContactSection({ profile, socialLinks = [] }: ContactSectionProp
                 <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-7 h-7" />
                 </div>
-                <h3 className="text-lg font-bold text-foreground">
+                <h3 className="font-display text-lg font-bold text-foreground">
                   {t("contact.successHeading", "Communication Link Established")}
                 </h3>
                 <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
@@ -241,14 +245,14 @@ export function ContactSection({ profile, socialLinks = [] }: ContactSectionProp
                   <input
                     id="consentGiven"
                     type="checkbox"
-                    className="mt-0.5 size-4 rounded accent-sky-500 cursor-pointer"
+                    className="mt-0.5 size-4 cursor-pointer rounded accent-primary"
                     {...register("consentGiven")}
                   />
                   <label htmlFor="consentGiven" className="text-[11px] text-muted-foreground leading-snug cursor-pointer">
                     {language === "ar"
                       ? "أوافق على معالجة بيانات الاتصال هذه للرد على طلبي، وفقًا لسياسة الخصوصية وقانون حماية البيانات الرقمية DPDP Act 2023."
                       : "I consent to the collection and cryptographic logging of this message strictly for correspondence purposes in compliance with India's DPDP Act 2023."}{" "}
-                    <Link href="/legal/privacy-policy" className="text-sky-600 dark:text-sky-400 underline font-medium">
+                    <Link href="/legal/privacy-policy" className="font-medium text-primary underline underline-offset-4">
                       {t("contact.privacyLink", "Privacy Policy")}
                     </Link>
                   </label>
@@ -260,7 +264,7 @@ export function ContactSection({ profile, socialLinks = [] }: ContactSectionProp
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full h-11 sm:h-12 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs sm:text-sm shadow-md shadow-sky-500/20 mt-2 transition-all"
+                  className="mt-2 h-11 w-full rounded-xl bg-gradient-to-r from-primary to-indigo-600 text-xs font-semibold text-white shadow-md shadow-primary/25 transition-all hover:from-indigo-500 hover:to-violet-500 sm:h-12 sm:text-sm"
                 >
                   {isSubmitting ? (
                     <>

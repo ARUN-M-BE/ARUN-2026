@@ -1,58 +1,58 @@
 {
-  "name": "Obsidian Cyber Cosmic Dark",
+  "name": "Midnight Aurora Dark",
   "id": "dark",
   "colors": {
-    "background": "#04060b",
-    "foreground": "#f8fafc",
-    "card": "#0b101c",
-    "cardForeground": "#f8fafc",
-    "popover": "#0b101c",
-    "popoverForeground": "#f8fafc",
-    "primary": "#00f0ff",
-    "primaryForeground": "#04060b",
-    "secondary": "#101626",
-    "secondaryForeground": "#e2e8f0",
-    "muted": "#121a2d",
-    "mutedForeground": "#8ea1b8",
-    "accent": "#8b5cf6",
-    "accentForeground": "#ffffff",
-    "destructive": "#f43f5e",
-    "destructiveForeground": "#ffffff",
+    "background": "#070912",
+    "foreground": "#e9edf9",
+    "card": "#0c1020",
+    "cardForeground": "#f3f6ff",
+    "popover": "#0c1020",
+    "popoverForeground": "#f3f6ff",
+    "primary": "#818cf8",
+    "primaryForeground": "#070912",
+    "secondary": "#121830",
+    "secondaryForeground": "#dde4f5",
+    "muted": "#101528",
+    "mutedForeground": "#98a2ba",
+    "accent": "#22d3ee",
+    "accentForeground": "#04121a",
+    "destructive": "#fb7185",
+    "destructiveForeground": "#0b1020",
     "border": "rgba(255, 255, 255, 0.09)",
     "input": "rgba(255, 255, 255, 0.12)",
-    "ring": "#00f0ff"
+    "ring": "#818cf8"
   },
   "neon": {
-    "cyan": "#00f0ff",
-    "violet": "#8b5cf6",
+    "cyan": "#22d3ee",
+    "violet": "#818cf8",
     "amber": "#f59e0b",
-    "pink": "#ff007f",
-    "emerald": "#10b981",
-    "glowCyan": "0 0 25px rgba(0, 240, 255, 0.5)",
-    "glowViolet": "0 0 25px rgba(139, 92, 246, 0.5)",
+    "pink": "#f472b6",
+    "emerald": "#34d399",
+    "glowCyan": "0 0 25px rgba(34, 211, 238, 0.5)",
+    "glowViolet": "0 0 25px rgba(129, 140, 248, 0.5)",
     "glowAmber": "0 0 25px rgba(245, 158, 11, 0.5)"
   },
   "triGradients": {
-    "cyberAurora": {
-      "stops": ["#00f0ff", "#8b5cf6", "#f59e0b"],
-      "css": "linear-gradient(135deg, #00f0ff 0%, #8b5cf6 52%, #f59e0b 100%)",
-      "description": "Luminous Electric Cyan to Cyber Violet to Pulsar Amber"
+    "aurora": {
+      "stops": ["#818cf8", "#a78bfa", "#22d3ee"],
+      "css": "linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #22d3ee 100%)",
+      "description": "Soft Indigo to Lavender to Laser Cyan"
     },
     "electricNebula": {
-      "stops": ["#ff007f", "#8b5cf6", "#00f0ff"],
-      "css": "linear-gradient(135deg, #ff007f 0%, #8b5cf6 50%, #00f0ff 100%)",
-      "description": "Hyper Neon Pink to Deep Violet to Laser Cyan"
+      "stops": ["#f472b6", "#a78bfa", "#22d3ee"],
+      "css": "linear-gradient(135deg, #f472b6 0%, #a78bfa 50%, #22d3ee 100%)",
+      "description": "Neon Pink to Lavender to Laser Cyan"
     },
     "hyperMatrix": {
-      "stops": ["#10b981", "#00f0ff", "#8b5cf6"],
-      "css": "linear-gradient(135deg, #10b981 0%, #00f0ff 50%, #8b5cf6 100%)",
-      "description": "Emerald Dataflow to Electric Cyan to Royal Violet"
+      "stops": ["#34d399", "#22d3ee", "#818cf8"],
+      "css": "linear-gradient(135deg, #34d399 0%, #22d3ee 50%, #818cf8 100%)",
+      "description": "Emerald Dataflow to Laser Cyan to Soft Indigo"
     }
   },
   "glass": {
-    "background": "rgba(11, 16, 28, 0.74)",
-    "border": "rgba(0, 240, 255, 0.15)",
+    "background": "rgba(12, 16, 32, 0.74)",
+    "border": "rgba(129, 140, 248, 0.18)",
     "backdropBlur": "20px",
-    "shadow": "0 0 35px -5px rgba(0, 240, 255, 0.18)"
+    "shadow": "0 0 35px -5px rgba(129, 140, 248, 0.18)"
   }
 }

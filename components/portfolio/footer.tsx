@@ -24,17 +24,17 @@ export function PortfolioFooter({ socialLinks = [] }: PortfolioFooterProps) {
 
   return (
     <footer className="relative overflow-hidden border-t border-border bg-card/60 pb-8 pt-12 sm:pt-16 text-xs">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-500/40 to-transparent" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           {/* Brand */}
           <div className="space-y-2">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/15">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-primary to-indigo-600 text-white shadow-md shadow-primary/25">
                 <Layers className="w-4 h-4 text-white" />
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold tracking-tight text-foreground text-sm">ARUN M</span>
+                <span className="font-display text-sm font-extrabold tracking-tight text-foreground">ARUN M</span>
                 <Badge variant="outline" className="h-5 rounded-full border-emerald-500/20 bg-emerald-500/10 px-2 text-[9px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
                   ONLINE
                 </Badge>
@@ -78,7 +78,7 @@ export function PortfolioFooter({ socialLinks = [] }: PortfolioFooterProps) {
               <Link href="/legal/cookie-policy" className="hover:text-foreground transition-colors">
                 {t("footer.cookies", "Cookie Policy")}
               </Link>
-              <Link href="/admin" className="hover:text-sky-500 transition-colors flex items-center gap-1.5 text-sky-600 dark:text-sky-400 font-semibold">
+              <Link href="/admin" className="flex items-center gap-1.5 font-semibold text-primary transition-colors hover:text-primary/80">
                 <Shield className="w-3.5 h-3.5" />
                 <span>{t("nav.admin", "CMS Portal")}</span>
               </Link>
@@ -89,7 +89,7 @@ export function PortfolioFooter({ socialLinks = [] }: PortfolioFooterProps) {
               onClick={scrollToTop}
               variant="outline"
               size="sm"
-              className="h-10 rounded-xl border-border bg-card px-4 text-xs shadow-xs hover:border-sky-500/40 hover:bg-card"
+              className="h-10 rounded-xl border-border bg-card px-4 text-xs shadow-xs transition-colors hover:border-primary/40 hover:bg-card"
               aria-label={language === "ar" ? "العودة إلى الأعلى" : "Back to top"}
             >
               <span>{language === "ar" ? "أعلى الصفحة" : "Top of Page"}</span>
@@ -113,7 +113,7 @@ export function PortfolioFooter({ socialLinks = [] }: PortfolioFooterProps) {
           <div>
             © {new Date().getFullYear()} Arun M. {language === "ar" ? "جميع الحقوق محفوظة." : "All Rights Reserved."}
           </div>
-          <div className="font-mono text-sky-600 dark:text-sky-400 font-semibold">
+          <div className="font-mono font-semibold text-primary">
             {language === "ar" ? "نظام موزع • 60 FPS • محمي بالكامل" : "DISTRIBUTED SYSTEM • 60 FPS • SECURE"}
           </div>
         </div>

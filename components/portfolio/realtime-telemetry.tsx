@@ -10,6 +10,8 @@ import {
   Keyboard,
 } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface PageViewSummary {
   total: number;
@@ -128,18 +130,21 @@ export function RealtimeTelemetry() {
   return (
     <section id="analytics" className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
       {/* Background glow elements */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-primary/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-18">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-sky-500/25 bg-sky-500/10 text-sky-600 dark:text-sky-400 text-xs font-mono uppercase tracking-wider mb-4 shadow-xs">
+        <Badge
+          variant="outline"
+          className="mb-4 h-auto gap-2 rounded-full border-primary/25 bg-primary/10 px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider text-primary shadow-xs"
+        >
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75 motion-reduce:animate-none" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
           </span>
           <span>{t("analytics.badge", "System Telemetry")}</span>
-        </div>
-        <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
+        </Badge>
+        <h2 className="font-display text-balance text-2xl font-extrabold tracking-tight text-foreground sm:text-4xl md:text-5xl">
           {t("analytics.title", "Real-Time Telemetry & Observability")}
         </h2>
         <p className="mt-3 text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto">
@@ -156,10 +161,10 @@ export function RealtimeTelemetry() {
           <div className="p-4 sm:p-5 rounded-2xl bg-card/60 border border-border relative overflow-hidden group">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
               <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.totalViews", "Page Views")}</span>
-              <Eye className="w-4 h-4 text-sky-500" />
+              <Eye className="w-4 h-4 text-primary" />
             </div>
             <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground flex items-baseline gap-2">
-              {summary ? summary.total.toLocaleString() : "—"}
+              {summary ? summary.total.toLocaleString() : <Skeleton className="h-6 w-16 rounded-md" />}
             </div>
             <p className="text-[10px] text-muted-foreground mt-1">
               {summary ? `${summary.today.toLocaleString()} ${t("analytics.today", "today")}` : t("analytics.refreshInterval", "2s streaming heartbeat")}
@@ -170,10 +175,10 @@ export function RealtimeTelemetry() {
           <div className="p-4 sm:p-5 rounded-2xl bg-card/60 border border-border relative overflow-hidden group">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
               <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.uniqueVisitors", "Unique Visitors")}</span>
-              <Users className="w-4 h-4 text-indigo-500" />
+              <Users className="w-4 h-4 text-accent" />
             </div>
             <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground flex items-baseline gap-2">
-              {summary ? summary.uniqueVisitors.toLocaleString() : "—"}
+              {summary ? summary.uniqueVisitors.toLocaleString() : <Skeleton className="h-6 w-14 rounded-md" />}
               <span className="text-xs font-semibold text-emerald-500">● Live</span>
             </div>
             <p className="text-[10px] text-muted-foreground mt-1">Salted daily visitor hashes</p>
@@ -183,10 +188,10 @@ export function RealtimeTelemetry() {
           <div className="p-4 sm:p-5 rounded-2xl bg-card/60 border border-border relative overflow-hidden group">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
               <span className="text-[11px] font-mono uppercase font-semibold">{t("analytics.topRegion", "Top Region")}</span>
-              <Globe2 className="w-4 h-4 text-sky-500" />
+              <Globe2 className="w-4 h-4 text-primary" />
             </div>
             <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground flex items-baseline gap-2">
-              {summary?.topCountries?.[0]?.country || "—"}
+              {summary?.topCountries?.[0]?.country || <Skeleton className="h-6 w-20 rounded-md" />}
             </div>
             <p className="text-[10px] text-muted-foreground mt-1">
               {summary?.topCountries?.[0]
@@ -202,7 +207,7 @@ export function RealtimeTelemetry() {
               <Keyboard className="w-4 h-4 text-amber-500" />
             </div>
             <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground flex items-baseline gap-1.5">
-              {typing ? typing.wpm : "—"}
+              {typing ? typing.wpm : <Skeleton className="h-6 w-12 rounded-md" />}
               <span className="text-xs font-normal text-muted-foreground font-sans">WPM</span>
               {typing && typing.accuracy > 0 && (
                 <span className="text-xs font-semibold text-emerald-500 ml-1">{typing.accuracy}%</span>
@@ -216,8 +221,8 @@ export function RealtimeTelemetry() {
         <div className="p-5 sm:p-6 rounded-2xl bg-card/40 border border-border">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
-              <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
-                <Activity className="w-4 h-4 text-sky-500" />
+              <h3 className="font-display text-sm font-bold text-foreground flex items-center gap-2">
+                <Activity className="w-4 h-4 text-primary" />
                 {hasRealHistory
                   ? t("analytics.pageViewHistory", "Page Views — Last 7 Days")
                   : t("analytics.trafficChart", "Live Traffic Waveform (Req / sec)")}
@@ -229,11 +234,11 @@ export function RealtimeTelemetry() {
               </p>
             </div>
             <div className="flex items-center gap-3 text-xs font-mono">
-              <span className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400">
-                <span className="w-2 h-2 rounded-full bg-sky-500" /> {hasRealHistory ? "Recorded Views" : "Live Ingress"}
+              <span className="flex items-center gap-1.5 text-primary">
+                <span className="w-2 h-2 rounded-full bg-primary" /> {hasRealHistory ? "Recorded Views" : "Live Ingress"}
               </span>
               <span className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="w-2 h-2 rounded-full bg-indigo-500" /> 99.4% Cache Hit
+                <span className="w-2 h-2 rounded-full bg-accent" /> 99.4% Cache Hit
               </span>
             </div>
           </div>
@@ -247,8 +252,8 @@ export function RealtimeTelemetry() {
             >
               <defs>
                 <linearGradient id="telemetryGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0.0" />
+                  <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.32" />
+                  <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.0" />
                 </linearGradient>
               </defs>
 
@@ -261,7 +266,7 @@ export function RealtimeTelemetry() {
               {/* Glowing stroke */}
               <polyline
                 fill="none"
-                stroke="#38bdf8"
+                stroke="var(--primary)"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -275,9 +280,9 @@ export function RealtimeTelemetry() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Edge Latency Table */}
           <div className="p-5 rounded-2xl bg-card/40 border border-border space-y-4">
-            <h4 className="text-sm font-bold text-foreground flex items-center justify-between">
+            <h4 className="font-display text-sm font-bold text-foreground flex items-center justify-between">
               <span className="flex items-center gap-2">
-                <Globe2 className="w-4 h-4 text-sky-500" />
+                <Globe2 className="w-4 h-4 text-primary" />
                 {t("analytics.globalPings", "Global Edge Node Latency")}
               </span>
               <span className="text-xs font-mono text-emerald-500 font-semibold">All Clusters Optimal</span>
@@ -303,12 +308,12 @@ export function RealtimeTelemetry() {
 
           {/* Architecture Vitals */}
           <div className="p-5 rounded-2xl bg-card/40 border border-border space-y-4">
-            <h4 className="text-sm font-bold text-foreground flex items-center justify-between">
+            <h4 className="font-display text-sm font-bold text-foreground flex items-center justify-between">
               <span className="flex items-center gap-2">
-                <Cpu className="w-4 h-4 text-indigo-500" />
+                <Cpu className="w-4 h-4 text-accent" />
                 {t("analytics.coreWebVitals", "Core Web Vitals Telemetry")}
               </span>
-              <span className="text-xs font-mono text-sky-600 dark:text-sky-400 font-semibold">100/100 Lighthouse</span>
+              <span className="text-xs font-mono font-semibold text-primary">100/100 Lighthouse</span>
             </h4>
 
             <div className="grid grid-cols-2 gap-3">
@@ -332,7 +337,7 @@ export function RealtimeTelemetry() {
 
               <div className="p-3 rounded-xl bg-card/70 border border-border">
                 <div className="text-[11px] text-muted-foreground font-mono">Cache Hit Ratio</div>
-                <div className="text-base sm:text-lg font-bold font-mono text-sky-500 mt-1">99.4%</div>
+                <div className="text-base sm:text-lg font-bold font-mono text-primary mt-1">99.4%</div>
                 <div className="text-[10px] text-muted-foreground">Edge CDN Stored</div>
               </div>
             </div>

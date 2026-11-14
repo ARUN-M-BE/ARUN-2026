@@ -66,13 +66,13 @@ export function CookieConsent() {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
-      <div className="glass-panel rounded-2xl p-5 shadow-2xl border border-sky-500/20 space-y-4 text-xs">
+      <div className="glass-panel rounded-2xl p-5 shadow-2xl border border-primary/20 space-y-4 text-xs">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-sky-500/15 text-sky-500 border border-sky-500/25 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-primary/15 text-primary border border-primary/25 flex items-center justify-center">
               <Cookie className="w-4 h-4" />
             </div>
-            <h4 className="font-bold text-foreground text-sm">
+            <h4 className="font-display font-bold text-foreground text-sm">
               {language === "ar" ? "تفضيلات ملفات تعريف الارتباط والخصوصية" : "Privacy & Cookie Preferences"}
             </h4>
           </div>
@@ -122,7 +122,7 @@ export function CookieConsent() {
               </div>
               <Toggle
                 size="sm"
-                variant={analyticsConsent ? "sky" : "outline"}
+                variant={analyticsConsent ? "primary" : "outline"}
                 pressed={analyticsConsent}
                 onPressedChange={setAnalyticsConsent}
                 className="h-7 px-2.5 text-xs font-mono"
@@ -138,7 +138,7 @@ export function CookieConsent() {
             <Button
               size="sm"
               onClick={handleSaveCustom}
-              className="w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs h-9 rounded-xl"
+              className="w-full bg-gradient-to-r from-primary to-indigo-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-xs h-9 rounded-xl transition-all"
             >
               {language === "ar" ? "حفظ التفضيلات" : "Save My Preferences"}
             </Button>
@@ -147,7 +147,7 @@ export function CookieConsent() {
               <Button
                 size="sm"
                 onClick={handleAcceptAll}
-                className="w-full sm:w-auto flex-1 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs h-9 rounded-xl shadow-xs"
+                className="w-full sm:w-auto flex-1 bg-gradient-to-r from-primary to-indigo-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-xs h-9 rounded-xl shadow-xs transition-all"
               >
                 {language === "ar" ? "قبول الكل" : "Accept All"}
               </Button>
@@ -163,7 +163,7 @@ export function CookieConsent() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowPreferences(true)}
-                className="text-xs h-9 rounded-xl text-sky-500 hover:text-sky-600 dark:hover:text-sky-400"
+                className="text-xs h-9 rounded-xl text-primary hover:text-primary/80"
               >
                 <Settings2 className="w-4 h-4" />
               </Button>
@@ -172,11 +172,11 @@ export function CookieConsent() {
         </div>
 
         <div className="text-[10px] text-muted-foreground text-center pt-1 border-t border-border">
-          <Link href="/legal/cookie-policy" className="text-sky-500 hover:underline">
+          <Link href="/legal/cookie-policy" className="text-primary hover:underline">
             {language === "ar" ? "سياسة ملفات الارتباط" : "Cookie Policy"}
           </Link>{" "}
           &{" "}
-          <Link href="/legal/privacy-policy" className="text-sky-500 hover:underline">
+          <Link href="/legal/privacy-policy" className="text-primary hover:underline">
             {language === "ar" ? "سياسة الخصوصية" : "Privacy Policy"}
           </Link>
           .

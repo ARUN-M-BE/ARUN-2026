@@ -2,6 +2,7 @@
 
 import { MessageSquareQuote, Star, CheckCircle2, Quote } from "lucide-react";
 import { useLanguage } from "@/context/languageContext";
+import { Badge } from "@/components/ui/badge";
 import type { Testimonial } from "@/types";
 
 interface TestimonialsSectionProps {
@@ -17,11 +18,14 @@ export function TestimonialsSection({ testimonials = [] }: TestimonialsSectionPr
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-14 sm:mb-18 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-xs font-mono text-indigo-600 dark:text-indigo-400">
+          <Badge
+            variant="outline"
+            className="h-auto gap-1.5 rounded-full border-primary/25 bg-primary/10 px-3.5 py-1.5 font-mono text-xs text-primary"
+          >
             <MessageSquareQuote className="w-3.5 h-3.5" />
             <span>{t("testimonials.badge", "Verified Recommendations")}</span>
-          </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
+          </Badge>
+          <h2 className="font-display text-balance text-2xl font-extrabold tracking-tight text-foreground sm:text-4xl">
             {t("testimonials.title", "Client & Peer Testimonials")}
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
