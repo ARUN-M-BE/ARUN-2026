@@ -2,6 +2,7 @@
 # Copy this file to `.dev.vars` (git-ignored) for `npm run preview`, and use
 # the same keys for production via `npm run secrets:push` (wrangler secret bulk)
 # or `wrangler secret put <KEY>`.
+
 #
 # Public, non-secret values live in wrangler.jsonc `vars`. Everything below
 # is sensitive and must never be committed with real values.
