@@ -198,7 +198,7 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
               href={link.href}
               onMouseEnter={() => playChime(440, 0.08)}
               onClick={() => playChime(880, 0.12)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary inline-flex items-center gap-1.5 ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary inline-flex items-center gap-1.5 ${
                 link.style === "pill"
                   ? "bg-primary text-primary-foreground font-semibold shadow-xs"
                   : link.style === "glow"
@@ -208,7 +208,9 @@ export function PortfolioNavbar({ navigation = [], socialLinks = [] }: Portfolio
             >
               <span>{link.label}</span>
               {link.badge && (
-                <span className="rounded-full border border-primary/30 bg-primary/20 px-1.5 py-0.2 font-mono text-[9px] font-bold text-primary">
+                /* `bg-primary/20` left this 9px badge at 4.3:1 against the dark
+                   surface; a lighter wash keeps the chip look while clearing AA. */
+                <span className="rounded-full border border-primary/30 bg-primary/10 px-1.5 py-0.5 font-mono text-[9px] font-bold text-primary">
                   {link.badge}
                 </span>
               )}

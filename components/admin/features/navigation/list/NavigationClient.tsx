@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Toggle, ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle";
+import { Toggle } from "@/components/ui/toggle";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { DeleteDialog } from "@/components/admin/delete-dialog";
@@ -37,12 +37,7 @@ import {
   ArrowUp,
   ArrowDown,
   Edit2,
-  Eye,
   CheckCircle2,
-  Laptop,
-  Smartphone,
-  Sun,
-  Moon,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { NavigationItem, Status } from "@/types";
@@ -97,10 +92,6 @@ export function NavigationClient({ initialData }: { initialData: NavigationItem[
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  // Preview interactive states
-  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
-  const [previewTheme, setPreviewTheme] = useState<"dark" | "light">("dark");
 
   const openCreateDialog = () => {
     setEditingItem(null);
@@ -239,9 +230,6 @@ export function NavigationClient({ initialData }: { initialData: NavigationItem[
     router.refresh();
   };
 
-  // Preview filtering (published + active)
-  const previewItems = items.filter((i) => i.isActive && i.status === "published");
-
   return (
     <div className="space-y-6">
       {/* Action Bar */}
@@ -264,10 +252,9 @@ export function NavigationClient({ initialData }: { initialData: NavigationItem[
         </div>
       </div>
 
-      {/* Main Grid: Management Table + Live Preview */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-        {/* Left: Navigation Items List (7 cols) */}
-        <div className="xl:col-span-7 space-y-4">
+      {/* Navigation Items List */}
+      <div className="max-w-6xl">
+        <div className="space-y-4">
           <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
             <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -397,136 +384,6 @@ export function NavigationClient({ initialData }: { initialData: NavigationItem[
                 })}
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Right: Real-time Live Preview (5 cols) */}
-        <div className="xl:col-span-5 space-y-4 sticky top-6">
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-border">
-              <div className="flex items-center gap-2">
-                <Eye className="w-4 h-4 text-sky-400" />
-                <span className="text-xs font-semibold text-foreground">Live Navbar Preview</span>
-              </div>
-
-              {/* Viewport & Theme controls */}
-              <div className="flex items-center gap-1.5">
-                <ToggleGroup
-                  type="single"
-                  value={previewDevice}
-                  onValueChange={(val) => {
-                    if (val === "desktop" || val === "mobile") setPreviewDevice(val);
-                  }}
-                  className="bg-muted/40 p-0.5 rounded-lg border border-border/50"
-                >
-                  <ToggleGroupItem
-                    value="desktop"
-                    size="icon-sm"
-                    variant={previewDevice === "desktop" ? "primary" : "ghost"}
-                    title="Desktop Preview"
-                    aria-label="Desktop Preview"
-                  >
-                    <Laptop className="w-3.5 h-3.5" />
-                  </ToggleGroupItem>
-                  <ToggleGroupItem
-                    value="mobile"
-                    size="icon-sm"
-                    variant={previewDevice === "mobile" ? "primary" : "ghost"}
-                    title="Mobile Preview"
-                    aria-label="Mobile Preview"
-                  >
-                    <Smartphone className="w-3.5 h-3.5" />
-                  </ToggleGroupItem>
-                </ToggleGroup>
-
-                <div className="w-[1px] h-3 bg-border mx-0.5" />
-
-                <Toggle
-                  pressed={previewTheme === "dark"}
-                  onPressedChange={(pressed) => setPreviewTheme(pressed ? "dark" : "light")}
-                  size="icon-sm"
-                  variant="ghost"
-                  title="Toggle Light/Dark Theme"
-                >
-                  {previewTheme === "dark" ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5" />}
-                </Toggle>
-              </div>
-            </div>
-
-            {/* Simulated Frame */}
-            <div
-              className={`rounded-xl border transition-all p-3 overflow-hidden ${
-                previewTheme === "dark" ? "bg-black/90 border-zinc-800 text-white" : "bg-slate-50 border-slate-200 text-slate-900"
-              }`}
-            >
-              <div className="text-[10px] font-mono text-muted-foreground mb-2 flex items-center justify-between">
-                <span>https://arun-m.in</span>
-                <span>{previewDevice.toUpperCase()} VIEWPORT</span>
-              </div>
-
-              {/* Simulated Navigation Bar */}
-              <div
-                className={`rounded-2xl border px-3 py-2.5 flex items-center justify-between backdrop-blur-md transition-all ${
-                  previewTheme === "dark"
-                    ? "bg-zinc-950/80 border-zinc-800/80 shadow-md"
-                    : "bg-white/80 border-slate-200/80 shadow-md"
-                }`}
-              >
-                {/* Brand */}
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-xs">
-                    <Layers className="w-3.5 h-3.5" />
-                  </div>
-                  <div>
-                    <span className="font-extrabold text-xs block leading-none">ARUN M</span>
-                    <span className="text-[8px] font-mono text-sky-400 uppercase font-semibold">3D ARCHITECT</span>
-                  </div>
-                </div>
-
-                {/* Items */}
-                {previewDevice === "desktop" ? (
-                  <nav className="flex items-center gap-1 overflow-x-auto max-w-[280px] no-scrollbar">
-                    {previewItems.map((item) => {
-                      const IconComp = getNavIconComponent(item.icon);
-                      const isGlow = item.style === "glow";
-                      const isPill = item.style === "pill";
-
-                      return (
-                        <span
-                          key={item.id}
-                          className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium transition-all ${
-                            isPill
-                              ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                              : isGlow
-                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
-                              : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          <IconComp className="w-3 h-3" />
-                          <span>{item.label}</span>
-                          {item.badge && (
-                            <span className="text-[8px] px-1 py-0.2 rounded-full bg-sky-500/20 text-sky-400 font-mono font-bold">
-                              {item.badge}
-                            </span>
-                          )}
-                        </span>
-                      );
-                    })}
-                  </nav>
-                ) : (
-                  <div className="flex items-center gap-1">
-                    <span className="text-[10px] px-2 py-1 rounded-md bg-muted text-muted-foreground">Menu</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Viewport Description */}
-              <div className="mt-6 p-4 rounded-xl border border-dashed border-border/50 text-center">
-                <p className="text-[11px] text-muted-foreground">
-                  {previewItems.length} published targets visible on live website. Draft items remain hidden.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>

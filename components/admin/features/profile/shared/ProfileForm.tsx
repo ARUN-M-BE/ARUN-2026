@@ -11,13 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  Loader2,
-  Save,
-  MapPin,
-  FileText,
-  Eye,
-} from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Status } from "@/types";
 
@@ -57,8 +51,6 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
       status: (initialData?.status as Status) || "published",
     },
   });
-
-  const watchedValues = watch();
 
   const onSubmit = async (data: ProfileFormData) => {
     setIsSaving(true);
@@ -108,10 +100,9 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
         </Button>
       </div>
 
-      {/* Main Grid: Form Editor (7 cols) + Real-time Profile Preview (5 cols) */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-        {/* Left: Tabbed Form Editor */}
-        <div className="xl:col-span-7 space-y-4">
+      {/* Tabbed Form Editor */}
+      <div className="max-w-5xl">
+        <div className="space-y-4">
           {/* Tab Switcher */}
           <div className="flex flex-wrap gap-1.5 p-1 rounded-2xl bg-card border border-border shadow-xs">
             <button
@@ -287,93 +278,6 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
               )}
             </CardContent>
           </Card>
-        </div>
-
-        {/* Right: Live Real-Time Profile Card Preview (5 cols) */}
-        <div className="xl:col-span-5 space-y-4 sticky top-6">
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-border">
-              <div className="flex items-center gap-2">
-                <Eye className="w-4 h-4 text-sky-400" />
-                <span className="text-xs font-semibold text-foreground">Real-time Identity Preview</span>
-              </div>
-              <span className="text-[10px] font-mono text-muted-foreground uppercase">Live Mirror</span>
-            </div>
-
-            {/* Profile Preview Card */}
-            <div className="p-5 rounded-2xl bg-zinc-950 border border-zinc-800 text-white space-y-4 shadow-xl">
-              {/* Top Banner & Avatar */}
-              <div className="flex items-center gap-3.5">
-                <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-lg shadow-md shrink-0 border border-white/20">
-                  {watchedValues.avatar ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={watchedValues.avatar} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    "AM"
-                  )}
-                </div>
-
-                <div className="min-w-0">
-                  <h4 className="font-extrabold text-base text-white truncate">{watchedValues.fullName || "Arun M"}</h4>
-                  <p className="text-xs text-sky-400 font-medium truncate">{watchedValues.title || "Full-Stack Architect"}</p>
-                  {watchedValues.location && (
-                    <div className="flex items-center gap-1 text-[11px] text-zinc-400 mt-0.5">
-                      <MapPin className="w-3 h-3 text-zinc-500" />
-                      <span>{watchedValues.location}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Availability badge */}
-              {watchedValues.availability && (
-                <div className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center gap-2">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                  </span>
-                  <span className="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wide truncate">
-                    {watchedValues.availability}
-                  </span>
-                </div>
-              )}
-
-              {/* Subtitle & Bio */}
-              <div className="space-y-1.5 text-xs text-zinc-300 leading-relaxed border-t border-zinc-800/80 pt-3">
-                {watchedValues.subtitle && (
-                  <p className="font-medium text-white">{watchedValues.subtitle}</p>
-                )}
-                <p className="text-zinc-400">{watchedValues.shortBio || watchedValues.bio}</p>
-              </div>
-
-              {/* Career Stats Grid */}
-              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-zinc-800/80 text-center">
-                <div className="p-2 rounded-xl bg-zinc-900/60 border border-zinc-800">
-                  <span className="text-lg font-black text-sky-400 block">{watchedValues.yearsOfExperience}+</span>
-                  <span className="text-[9px] font-mono text-zinc-400 uppercase">Years Exp</span>
-                </div>
-                <div className="p-2 rounded-xl bg-zinc-900/60 border border-zinc-800">
-                  <span className="text-lg font-black text-indigo-400 block">{watchedValues.projectsCompleted}+</span>
-                  <span className="text-[9px] font-mono text-zinc-400 uppercase">Projects</span>
-                </div>
-                <div className="p-2 rounded-xl bg-zinc-900/60 border border-zinc-800">
-                  <span className="text-lg font-black text-emerald-400 block">{watchedValues.happyClients}+</span>
-                  <span className="text-[9px] font-mono text-zinc-400 uppercase">Clients</span>
-                </div>
-              </div>
-
-              {/* Contact Icons */}
-              <div className="flex items-center justify-between pt-3 border-t border-zinc-800/80 text-xs text-zinc-400">
-                <span className="truncate">{watchedValues.email}</span>
-                {watchedValues.resumeUrl && watchedValues.resumeUrl !== "#" && (
-                  <span className="text-sky-400 font-semibold text-[11px] flex items-center gap-1">
-                    <FileText className="w-3 h-3" />
-                    CV Ready
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </form>

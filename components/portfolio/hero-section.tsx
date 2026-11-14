@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,11 +13,19 @@ import {
   Clock,
   Layers,
   Zap,
-  Orbit,
+  MousePointer2,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/context/languageContext";
+
+// React Bits primitives. Every one of them already opts out of its animation
+// under `prefers-reduced-motion`, so no extra guard is needed here.
+import ShinyText from "@/components/ShinyText";
+import BlurText from "@/components/BlurText";
+import CountUp from "@/components/CountUp";
+import Magnet from "@/components/Magnet";
+import SpotlightCard from "@/components/SpotlightCard";
 
 import type { Profile } from "@/types";
 
@@ -49,6 +57,58 @@ const HeroCanvas = dynamic(() => import("@/components/3d/hero-canvas"), {
   ssr: false,
   loading: () => <HeroFallbackSculpture />,
 });
+
+/**
+ * Mounts the WebGL canvas only once the page has finished loading and the main
+ * thread is idle. The CSS sculpture paints immediately, so three.js never
+ * competes with the hero's paint, and the ~190 kB gzipped 3D bundle stays off
+ * the critical path entirely.
+ */
+function DeferredHeroCanvas() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const start = () => {
+      if (!cancelled) setReady(true);
+    };
+
+    // Honour data-saver and very slow connections: the static sculpture is a
+    // complete experience on its own.
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } })
+      .connection;
+    if (connection?.saveData || connection?.effectiveType === "2g" || connection?.effectiveType === "slow-2g") {
+      return;
+    }
+
+    const schedule = () => {
+      const idle = window.requestIdleCallback;
+      if (typeof idle === "function") {
+        const handle = idle(start, { timeout: 2000 });
+        cleanupIdle = () => window.cancelIdleCallback(handle);
+        return;
+      }
+      const timer = window.setTimeout(start, 1200);
+      cleanupIdle = () => window.clearTimeout(timer);
+    };
+
+    let cleanupIdle: (() => void) | undefined;
+
+    if (document.readyState === "complete") {
+      schedule();
+    } else {
+      window.addEventListener("load", schedule, { once: true });
+    }
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("load", schedule);
+      cleanupIdle?.();
+    };
+  }, []);
+
+  return ready ? <HeroCanvas /> : <HeroFallbackSculpture />;
+}
 
 interface HeroSectionProps {
   profile: Profile | null;
@@ -147,7 +207,12 @@ export function HeroSection({ profile }: HeroSectionProps) {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75 motion-reduce:animate-none" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
             </span>
-            <span>{profile?.availability || t("hero.available", "Available for architectural advisory & engineering")}</span>
+            <ShinyText
+              text={profile?.availability || t("hero.available", "Available for architectural advisory & engineering")}
+              color="var(--primary)"
+              shineColor="var(--foreground)"
+              glow={0.45}
+            />
           </Badge>
 
           <h1 className="font-display text-balance text-3xl font-extrabold leading-[1.1] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
@@ -159,12 +224,27 @@ export function HeroSection({ profile }: HeroSectionProps) {
             </span>
           </h1>
 
-          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
-            {profile?.subtitle || t("hero.tagline", "Architecting resilient cloud platforms, distributed systems, and cinematic 3D digital experiences for high-growth enterprises.")}
-          </p>
+          {/* Blur-in tagline. It sits below the <h1>, so the name stays the LCP
+              candidate and the entrance never delays the largest paint. */}
+          <BlurText
+            text={
+              profile?.subtitle ||
+              t("hero.tagline", "Architecting resilient cloud platforms, distributed systems, and cinematic 3D digital experiences for high-growth enterprises.")
+            }
+            color="var(--muted-foreground)"
+            effect="blur"
+            className="text-sm sm:text-base md:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal"
+          />
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center justify-center lg:justify-start rtl:lg:justify-end gap-3 sm:gap-4 pt-2">
+          {/* Action Buttons — magnetic pull, capped so it can never push the
+              row past the viewport edge. */}
+          <Magnet
+            magnetStrength={0.22}
+            maxOffset={14}
+            padding={28}
+            wrapperClassName="w-full"
+            innerClassName="flex flex-wrap items-center justify-center lg:justify-start rtl:lg:justify-end gap-3 sm:gap-4 pt-2"
+          >
             <a href="#projects">
               <Button
                 size="lg"
@@ -197,7 +277,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
                 </Button>
               </a>
             )}
-          </div>
+          </Magnet>
 
           {/* Stat counters */}
           <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-border max-w-lg mx-auto lg:mx-0">
@@ -207,7 +287,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
                 <span>{t("hero.statYears", "Experience")}</span>
               </div>
               <div className="text-xl sm:text-3xl font-extrabold font-mono text-foreground">
-                {profile?.yearsOfExperience || 8}+
+                <CountUp to={profile?.yearsOfExperience || 8} suffix="+" duration={1.4} />
               </div>
             </div>
 
@@ -217,7 +297,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
                 <span>{t("hero.statProjects", "Projects")}</span>
               </div>
               <div className="text-xl sm:text-3xl font-extrabold font-mono text-primary">
-                {profile?.projectsCompleted || 35}+
+                <CountUp to={profile?.projectsCompleted || 35} suffix="+" duration={1.6} delay={0.08} />
               </div>
             </div>
 
@@ -227,7 +307,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
                 <span>{t("hero.statPerformance", "Vitals")}</span>
               </div>
               <div className="text-xl sm:text-3xl font-extrabold font-mono text-emerald-500">
-                100%
+                <CountUp to={100} suffix="%" duration={1.8} delay={0.16} />
               </div>
             </div>
           </div>
@@ -235,14 +315,26 @@ export function HeroSection({ profile }: HeroSectionProps) {
 
         {/* Right Column: 3D Identity Sculpture */}
         <div className="lg:col-span-5 h-[340px] sm:h-[440px] lg:h-[520px] w-full relative">
-          <div className="w-full h-full glass-panel-glow rounded-3xl overflow-hidden relative border border-border shadow-xl">
-            <HeroCanvas />
+          <SpotlightCard
+            theme="dark"
+            spotlightColor="var(--primary)"
+            intensity={0.18}
+            className="w-full h-full glass-panel-glow rounded-3xl overflow-hidden relative border border-border shadow-xl"
+            style={
+              {
+                "--spotlight-card-surface": "transparent",
+                "--spotlight-card-border": "transparent",
+                "--spotlight-card-shadow": "none",
+              } as CSSProperties
+            }
+          >
+            <DeferredHeroCanvas />
             {/* Interactive hint pill */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-background/80 backdrop-blur-md border border-border text-[11px] text-muted-foreground font-mono pointer-events-none flex items-center gap-1.5 shadow-xs">
-              <Orbit className="w-3.5 h-3.5 text-primary animate-spin motion-reduce:animate-none" />
-              <span>{language === "ar" ? "اسحب • دوّر • استكشف" : "Drag • Orbit • Explore"}</span>
+              <MousePointer2 className="w-3.5 h-3.5 text-primary" />
+              <span>{language === "ar" ? "حرّك المؤشر • انظر كيف يميل" : "Move your cursor · it leans with you"}</span>
             </div>
-          </div>
+          </SpotlightCard>
         </div>
       </div>
 

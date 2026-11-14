@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import StarBorder from "@/components/StarBorder";
 import { Label } from "@/components/ui/label";
 import {
   Mail,
@@ -122,9 +123,11 @@ export function ContactSection({ profile, socialLinks = [] }: ContactSectionProp
               if (contactSocials.length === 0) return null;
               return (
                 <div className="pt-6 border-t border-border">
-                  <h4 className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-3">
+                  {/* h3 (not h4): the section heading before it is an h2, so heading
+                      levels must descend one step at a time. */}
+                  <h3 className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-3">
                     {language === "ar" ? "الشبكات المهنية وروابط المطور" : "Developer Handles & Networks"}
-                  </h4>
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {contactSocials.map((s) => (
                       <a
@@ -261,10 +264,17 @@ export function ContactSection({ profile, socialLinks = [] }: ContactSectionProp
                   <p className="text-[11px] text-destructive">{errors.consentGiven.message}</p>
                 )}
 
-                <Button
+                <StarBorder
+                  as="button"
                   type="submit"
                   disabled={isSubmitting}
-                  className="mt-2 h-11 w-full rounded-xl bg-gradient-to-r from-primary to-indigo-600 text-xs font-semibold text-white shadow-md shadow-primary/25 transition-all hover:from-indigo-500 hover:to-violet-500 sm:h-12 sm:text-sm"
+                  theme="dark"
+                  color="var(--primary)"
+                  backgroundColor="var(--primary)"
+                  textColor="#ffffff"
+                  radius={12}
+                  duration={5}
+                  className="mt-2 h-11 w-full text-xs font-semibold disabled:opacity-60 sm:h-12 sm:text-sm"
                 >
                   {isSubmitting ? (
                     <>
@@ -277,7 +287,7 @@ export function ContactSection({ profile, socialLinks = [] }: ContactSectionProp
                       {t("contact.submitButton", "Transmit Message")}
                     </>
                   )}
-                </Button>
+                </StarBorder>
               </form>
             )}
           </div>

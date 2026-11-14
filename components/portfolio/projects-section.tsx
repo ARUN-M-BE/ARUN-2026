@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { TiltCard } from "@/components/ui/tilt-card";
+import GlareHover from "@/components/GlareHover";
+import DecryptedText from "@/components/DecryptedText";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle";
 import {
   FolderGit2,
@@ -199,13 +201,22 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                   {/* Visual Thumbnail */}
                   <div className="aspect-[16/10] bg-muted relative overflow-hidden flex items-center justify-center">
                     {projectThumbnail ? (
-                      <img
-                        src={projectThumbnail}
-                        alt={project.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
+                      <GlareHover
+                        className="h-full w-full"
+                        glareColor="#ffffff"
+                        glareOpacity={0.28}
+                        glareAngle={-30}
+                        glareSize={320}
+                        transitionDuration={800}
+                      >
+                        <img
+                          src={projectThumbnail}
+                          alt={project.title}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </GlareHover>
                     ) : (
                       <div className="w-full h-full bg-gradient-to-tr from-primary/10 via-accent/10 to-card flex items-center justify-center">
                         <FolderGit2 className="w-12 h-12 text-primary/40" />
@@ -251,9 +262,13 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                   <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono text-primary uppercase tracking-wider font-semibold">
-                          {project.category || "Full-Stack"}
-                        </span>
+                        <DecryptedText
+                          text={project.category || "Full-Stack"}
+                          animateOn="view"
+                          speed={40}
+                          maxIterations={8}
+                          className="text-[10px] font-mono text-primary uppercase tracking-wider font-semibold"
+                        />
                         {project.client && (
                           <span className="text-[10px] font-mono text-muted-foreground">
                             {project.client}
@@ -293,29 +308,42 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                       </span>
 
                       <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        {/* Icon-only links must carry their own accessible name and stay a
+                            single interactive element (asChild), not <a><button>. */}
                         {project.githubUrl && (
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Source Code"
+                          <Button
+                            asChild
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground"
                           >
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full">
-                              <Code2 className="w-4 h-4" />
-                            </Button>
-                          </a>
+                            <a
+                              href={project.githubUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={t("projects.ariaSource", "View source code on GitHub")}
+                              aria-label={t("projects.ariaSource", "View source code on GitHub")}
+                            >
+                              <Code2 className="w-4 h-4" aria-hidden="true" />
+                            </a>
+                          </Button>
                         )}
                         {project.liveUrl && (
-                          <a
-                            href={project.liveUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Live Demo"
+                          <Button
+                            asChild
+                            size="icon"
+                            className="h-8 w-8 rounded-full bg-gradient-to-r from-primary to-indigo-600 text-white shadow-xs hover:from-indigo-500 hover:to-violet-500"
                           >
-                            <Button size="icon" className="h-8 w-8 rounded-full bg-gradient-to-r from-primary to-indigo-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-xs">
-                              <ExternalLink className="w-3.5 h-3.5" />
-                            </Button>
-                          </a>
+                            <a
+                              href={project.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={t("projects.ariaLive", "Open live project in a new tab")}
+                              aria-label={t("projects.ariaLive", "Open live project in a new tab")}
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+                            </a>
+                          </Button>
                         )}
                       </div>
                     </div>
@@ -390,19 +418,31 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                       {isSelectedForCompare ? <Check className="w-3.5 h-3.5 mr-1" /> : <GitCompare className="w-3.5 h-3.5 mr-1" />}
                       Compare
                     </Button>
+                    {/* asChild keeps a single interactive element (no <a><button> nesting);
+                        the icon-only link still needs an accessible name. */}
                     {project.githubUrl && (
-                      <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground">
-                          <Code2 className="w-4 h-4" />
-                        </Button>
-                      </a>
+                      <Button asChild variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground">
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={t("projects.ariaSource", "View source code on GitHub")}
+                        >
+                          <Code2 className="w-4 h-4" aria-hidden="true" />
+                        </a>
+                      </Button>
                     )}
                     {project.liveUrl && (
-                      <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-                        <Button size="icon" className="h-9 w-9 rounded-xl bg-gradient-to-r from-primary to-indigo-600 text-white">
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
-                      </a>
+                      <Button asChild size="icon" className="h-9 w-9 rounded-xl bg-gradient-to-r from-primary to-indigo-600 text-white">
+                        <a
+                          href={project.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={t("projects.ariaLive", "Open live project in a new tab")}
+                        >
+                          <ExternalLink className="w-4 h-4" aria-hidden="true" />
+                        </a>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -517,20 +557,20 @@ export function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
                     </Link>
                   </Button>
                   {activeProject.liveUrl && (
-                    <a href={activeProject.liveUrl} target="_blank" rel="noopener noreferrer">
-                      <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl text-xs border-border">
-                        <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
+                    <Button asChild variant="outline" size="sm" className="h-9 px-4 rounded-xl text-xs border-border">
+                      <a href={activeProject.liveUrl} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
                         {t("projects.liveDemo", "Live Production")}
-                      </Button>
-                    </a>
+                      </a>
+                    </Button>
                   )}
                   {activeProject.githubUrl && (
-                    <a href={activeProject.githubUrl} target="_blank" rel="noopener noreferrer">
-                      <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl text-xs border-border">
-                        <Code2 className="w-3.5 h-3.5 mr-1.5" />
+                    <Button asChild variant="outline" size="sm" className="h-9 px-4 rounded-xl text-xs border-border">
+                      <a href={activeProject.githubUrl} target="_blank" rel="noopener noreferrer">
+                        <Code2 className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
                         {t("projects.viewCode", "Source Code")}
-                      </Button>
-                    </a>
+                      </a>
+                    </Button>
                   )}
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => setActiveProject(null)} className="h-9 rounded-xl text-xs">
