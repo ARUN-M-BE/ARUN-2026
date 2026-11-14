@@ -45,7 +45,7 @@ async function runNeonEndToEndTests() {
     const authLatency = Date.now() - authStart;
 
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const jwks = await response.json();
+    const jwks = (await response.json()) as { keys?: Array<{ kid?: string; alg?: string; crv?: string }> };
 
     const jwksRemote = createRemoteJWKSet(new URL(jwksUrl));
     if (!jwksRemote) throw new Error("Could not instantiate remote JWKS");

@@ -39,19 +39,19 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     await requireAdmin();
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
 
     if (Array.isArray(body.orderedIds)) {
-      const res = await reorderSocialLinks(body.orderedIds);
+      const res = await reorderSocialLinks(body.orderedIds as string[]);
       return NextResponse.json(res);
     }
 
     const { id, ...data } = body;
-    if (!id) {
+    if (typeof id !== "string" || !id) {
       return NextResponse.json({ success: false, error: "Social link ID is required" }, { status: 400 });
     }
 
-    const res = await updateSocialLink(id, data);
+    const res = await updateSocialLink(id, data as Parameters<typeof updateSocialLink>[1]);
     return NextResponse.json(res);
   } catch (error: unknown) {
     return NextResponse.json(

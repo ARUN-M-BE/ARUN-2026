@@ -112,11 +112,11 @@ export async function checkNeonAuth(): Promise<{ status: "connected" | "error"; 
     if (!response.ok) {
       throw new Error(`JWKS endpoint returned HTTP ${response.status}`);
     }
-    const jwks = await response.json();
+    const jwks = (await response.json()) as { keys?: Array<{ kid?: string; alg?: string; crv?: string }> };
     return {
       status: "connected",
       latencyMs: Date.now() - start,
-      details: { keyCount: jwks.keys?.length || 0, keys: jwks.keys?.map((k: { kid?: string; alg?: string; crv?: string }) => ({ kid: k.kid, alg: k.alg, crv: k.crv })) },
+      details: { keyCount: jwks.keys?.length || 0, keys: jwks.keys?.map((k) => ({ kid: k.kid, alg: k.alg, crv: k.crv })) },
     };
   } catch (err: unknown) {
     return {

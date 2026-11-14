@@ -46,9 +46,9 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     await requireAdmin();
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     const { id, ...data } = body;
-    if (!id) {
+    if (typeof id !== "string" || !id) {
       return NextResponse.json({ success: false, error: "Project ID is required" }, { status: 400 });
     }
 

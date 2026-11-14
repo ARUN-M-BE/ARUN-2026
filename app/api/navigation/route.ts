@@ -42,18 +42,18 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     await requireAdmin();
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
 
     // Reorder check
     if (Array.isArray(body.orderedIds)) {
-      await NavigationRepository.reorder(body.orderedIds);
+      await NavigationRepository.reorder(body.orderedIds as string[]);
       revalidatePath("/");
       revalidatePath("/admin/navigation");
       return NextResponse.json({ success: true, message: "Reordered successfully" });
     }
 
     const { id, ...data } = body;
-    if (!id) {
+    if (typeof id !== "string" || !id) {
       return NextResponse.json({ success: false, error: "Navigation ID is required" }, { status: 400 });
     }
 
