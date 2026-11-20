@@ -37,6 +37,7 @@
   "env": {
     "dev": {
       "name": "arun-2026-dev",
+      "workers_dev": true,
       "routes": [
         {
           "pattern": "dev.arun-m.in",
