@@ -33,5 +33,21 @@
     "AWS_REGION": "ap-southeast-1",
     "RESEND_FROM_EMAIL": "Arun M <arun@arun-m.in>",
     "UPSTASH_REDIS_REST_URL": "https://divine-quail-200838.upstash.io"
+  },
+  "env": {
+    "dev": {
+      "name": "arun-2026-dev",
+      "routes": [
+        {
+          "pattern": "dev.arun-m.in",
+          "custom_domain": true
+        }
+      ],
+      "vars": {
+        "NEXT_PUBLIC_SITE_URL": "https://dev.arun-m.in",
+        "NEXTAUTH_URL": "https://dev.arun-m.in",
+        "NEON_BRANCH": "development"
+      }
+    }
   }
 }
