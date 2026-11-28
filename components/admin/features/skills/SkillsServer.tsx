@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getSkillCategories, getSkills } from "@/lib/actions";
+import { getSkillCategories, getSkills } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { SkillsClient } from "@/components/admin/features/skills/SkillsClient";
 

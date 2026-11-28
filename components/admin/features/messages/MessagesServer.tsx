@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getContactMessages } from "@/lib/actions";
+import { getContactMessages } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { MessagesClient } from "@/components/admin/features/messages/list/MessagesClient";
 

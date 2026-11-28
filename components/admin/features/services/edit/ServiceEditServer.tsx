@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getServices } from "@/lib/actions";
+import { getServices } from "@/lib/api/server-reads";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin/page-header";
 import { ServiceForm } from "@/components/admin/features/services/shared/ServiceForm";

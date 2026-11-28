@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getSeoMetadata } from "@/lib/actions";
+import { getSeoMetadata } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { SeoClient } from "@/components/admin/features/seo/SeoClient";
 

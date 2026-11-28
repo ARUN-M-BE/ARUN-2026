@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getNavigation } from "@/lib/actions";
+import { getNavigation } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { NavigationClient } from "@/components/admin/features/navigation/list/NavigationClient";
 

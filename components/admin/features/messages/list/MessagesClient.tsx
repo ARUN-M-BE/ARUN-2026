@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DeleteDialog } from "@/components/admin/delete-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
-import { updateMessageStatus, deleteMessage } from "@/lib/actions";
+import { updateMessageStatus, deleteMessage } from "@/lib/api/mutations";
 import { Mail, Trash2, Eye, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import type { ContactMessage, MessageStatus } from "@/types";

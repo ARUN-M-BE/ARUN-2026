@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getMediaAssets } from "@/lib/actions";
+import { getMediaAssets } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { MediaClient } from "@/components/admin/features/media/list/MediaClient";
 

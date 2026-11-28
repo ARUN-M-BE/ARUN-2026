@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getSiteSettings } from "@/lib/actions";
+import { getSiteSettings } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { SettingsClient } from "@/components/admin/features/settings/SettingsClient";
 

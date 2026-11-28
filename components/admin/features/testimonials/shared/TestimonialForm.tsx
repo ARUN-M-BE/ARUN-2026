@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { testimonialSchema, type TestimonialFormData } from "@/lib/validations";
-import { createTestimonial, updateTestimonial } from "@/lib/actions";
+import { createTestimonial, updateTestimonial } from "@/lib/api/mutations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

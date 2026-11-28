@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getCertifications } from "@/lib/actions";
+import { getCertifications } from "@/lib/api/server-reads";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin/page-header";
 import { CertificationForm } from "@/components/admin/features/certifications/shared/CertificationForm";

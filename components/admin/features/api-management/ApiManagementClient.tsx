@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useCallback } from "react";
 import { PageHeader } from "@/components/admin/page-header";
+import { apiUrl } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import {
@@ -175,8 +176,10 @@ export function ApiManagementClient() {
 
     const startTime = performance.now();
     try {
-      const res = await fetch(endpointConfig.endpoint, {
+      const res = await fetch(apiUrl(endpointConfig.endpoint), {
         method: endpointConfig.method,
+        credentials: "include",
+        headers: { "X-Requested-With": "fetch" },
         cache: "no-store",
       });
       const latencyMs = Math.round(performance.now() - startTime);

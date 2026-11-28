@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getLegalDocuments } from "@/lib/actions";
+import { getLegalDocuments } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { LegalClient } from "@/components/admin/features/legal/list/LegalClient";
 

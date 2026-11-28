@@ -18,7 +18,7 @@ import {
   type ThemeId,
 } from "@/config/themes";
 import { checkContrast, type ContrastCheck } from "@/lib/colors";
-import { SettingsRepository } from "@/server/repositories";
+import { getPublic } from "@/lib/api/public";
 
 export { THEME_COOKIE, THEME_MODE_COOKIE, THEME_SETTING_KEY } from "@/config/themes";
 
@@ -70,7 +70,14 @@ export const getThemePreferences = cache(async (): Promise<ThemePreferences> => 
   let pickerEnabled = true;
 
   try {
-    const settings = await SettingsRepository.findMany();
+    const settings =
+      (
+        await getPublic<{ settings?: Array<{ key: string; value: unknown }> }>(
+          "/api/public/bootstrap",
+          {},
+          { revalidate: 60, tags: ["settings"] }
+        )
+      ).settings ?? [];
     const find = (key: string) => settings?.find((item) => item.key === key);
 
     const themeRow = find(THEME_SETTING_KEY);

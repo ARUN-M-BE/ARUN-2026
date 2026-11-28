@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getTestimonials } from "@/lib/actions";
+import { getTestimonials } from "@/lib/api/server-reads";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin/page-header";
 import { TestimonialForm } from "@/components/admin/features/testimonials/shared/TestimonialForm";

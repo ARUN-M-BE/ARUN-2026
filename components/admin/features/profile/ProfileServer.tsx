@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getProfile } from "@/lib/actions";
+import { getProfile } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { ProfileForm } from "@/components/admin/features/profile/shared/ProfileForm";
 

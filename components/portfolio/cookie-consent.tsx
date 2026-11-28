@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { Cookie, Settings2, X } from "lucide-react";
 import Link from "next/link";
-import { recordConsent } from "@/lib/actions";
+import { apiFetch } from "@/lib/api/client";
 import { useLanguage } from "@/context/languageContext";
 
 export function CookieConsent() {
@@ -29,11 +29,22 @@ export function CookieConsent() {
     }
   }, []);
 
+  const submitConsent = async (payload: {
+    type: string;
+    consentGiven: boolean;
+    preferences: { essential: boolean; analytics: boolean };
+  }) => {
+    await apiFetch("/api/consent", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }).catch(() => {});
+  };
+
   const handleAcceptAll = async () => {
     const prefs = { essential: true, analytics: true };
     persistPreferences(prefs);
     setVisible(false);
-    await recordConsent({
+    await submitConsent({
       type: "cookie_all",
       consentGiven: true,
       preferences: prefs,
@@ -44,7 +55,7 @@ export function CookieConsent() {
     const prefs = { essential: true, analytics: false };
     persistPreferences(prefs);
     setVisible(false);
-    await recordConsent({
+    await submitConsent({
       type: "cookie_essential_only",
       consentGiven: true,
       preferences: prefs,
@@ -55,7 +66,7 @@ export function CookieConsent() {
     const prefs = { essential: true, analytics: analyticsConsent };
     persistPreferences(prefs);
     setVisible(false);
-    await recordConsent({
+    await submitConsent({
       type: "cookie_custom",
       consentGiven: true,
       preferences: prefs,

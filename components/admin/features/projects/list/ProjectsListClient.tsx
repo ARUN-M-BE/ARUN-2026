@@ -11,7 +11,7 @@ import { StatusBadge } from "@/components/admin/status-badge";
 import { DeleteDialog } from "@/components/admin/delete-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle";
-import { deleteProject } from "@/lib/actions";
+import { deleteProject } from "@/lib/api/mutations";
 import {
   Edit2,
   Trash2,

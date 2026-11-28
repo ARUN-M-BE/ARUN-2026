@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { DeleteDialog } from "@/components/admin/delete-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
-import { createMediaAsset, deleteMediaAsset } from "@/lib/actions";
+import { adminApi } from "@/lib/api/admin";
 import { Plus, Trash2, Image, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import type { MediaAsset } from "@/types";
@@ -19,6 +19,7 @@ export function MediaClient({ initialData }: { initialData: MediaAsset[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [filename, setFilename] = useState("");
   const [url, setUrl] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [altText, setAltText] = useState("");
   const [copyright, setCopyright] = useState("© 2026 Developer Portfolio. All Rights Reserved.");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,31 +28,64 @@ export function MediaClient({ initialData }: { initialData: MediaAsset[] }) {
 
   const handleAddAsset = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!filename || !url) return;
+    if ((!filename || !url) && !file) return;
     setIsSubmitting(true);
     try {
-      const res = await createMediaAsset({
-        filename,
-        originalFilename: filename,
-        mimeType: "image/webp",
-        size: 102400,
-        url,
+      let resolvedFilename = filename;
+      let resolvedUrl = url;
+      let resolvedMime = "image/webp";
+      let resolvedSize = 102400;
+
+      if (file) {
+        const presign = await adminApi.presignMediaUpload({
+          filename: file.name,
+          contentType: file.type || "application/octet-stream",
+          size: file.size,
+          folder: "general",
+        });
+        const putRes = await fetch(presign.uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type || "application/octet-stream" },
+          body: file,
+        });
+        if (!putRes.ok) {
+          throw new Error(`Direct upload failed (${putRes.status})`);
+        }
+        resolvedFilename = filename || file.name;
+        resolvedUrl = presign.publicUrl;
+        resolvedMime = file.type || "application/octet-stream";
+        resolvedSize = file.size;
+      }
+
+      const payload = {
+        filename: resolvedFilename,
+        originalFilename: file?.name || resolvedFilename,
+        mimeType: resolvedMime,
+        size: resolvedSize,
+        url: resolvedUrl,
         altText,
         copyright,
         folder: "general",
-      });
+      };
+
+      const res = await adminApi.createMediaAsset(payload);
 
       if (res.success && res.data) {
         toast.success("Media asset registered");
         setItems((prev) => [res.data as MediaAsset, ...prev]);
         setFilename("");
         setUrl("");
+        setFile(null);
         setAltText("");
         setIsOpen(false);
         router.refresh();
       } else {
         toast.error("Failed to register media", { description: res.error });
       }
+    } catch (err) {
+      toast.error("Failed to register media", {
+        description: err instanceof Error ? err.message : "Upload error",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -61,7 +95,7 @@ export function MediaClient({ initialData }: { initialData: MediaAsset[] }) {
     if (!deleteId) return;
     setIsDeleting(true);
     try {
-      const res = await deleteMediaAsset(deleteId);
+      const res = await adminApi.deleteMediaAsset(deleteId);
       if (res.success) {
         toast.success("Media asset removed");
         setItems((prev) => prev.filter((i) => i.id !== deleteId));
@@ -165,6 +199,19 @@ export function MediaClient({ initialData }: { initialData: MediaAsset[] }) {
             <DialogTitle className="text-white">Register Media Asset</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddAsset} className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-xs text-zinc-300">Direct S3 File Upload (optional)</Label>
+              <Input
+                type="file"
+                accept="image/*,video/*,.pdf,.glb,.gltf"
+                onChange={(e) => {
+                  const selected = e.target.files?.[0] ?? null;
+                  setFile(selected);
+                  if (selected && !filename) setFilename(selected.name);
+                }}
+              />
+            </div>
+
             <div className="space-y-2">
               <Label className="text-xs text-zinc-300">Asset Label / Filename *</Label>
               <Input

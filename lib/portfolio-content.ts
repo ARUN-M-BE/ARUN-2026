@@ -1,17 +1,17 @@
 import { cache } from "react";
+import { getPublic } from "@/lib/api/public";
 import {
-  getPublicCertifications,
-  getPublicEducation,
-  getPublicExperience,
-  getPublicNavigation,
-  getPublicProfile,
-  getPublicProjects,
-  getPublicSections,
-  getPublicServices,
-  getPublicSkills,
-  getPublicSocialLinks,
-  getPublicTestimonials,
-} from "@/lib/actions";
+  fallbackCertifications,
+  fallbackEducation,
+  fallbackExperiences,
+  fallbackNavigation,
+  fallbackProfile,
+  fallbackProjects,
+  fallbackSkillCategories,
+  fallbackSocialLinks,
+  fallbackTestimonials,
+  fallbackWebsiteSections,
+} from "@/lib/fallback-data";
 import type { PortfolioContent } from "@/themes/types";
 import type {
   Certification,
@@ -21,17 +21,28 @@ import type {
   Profile,
   Project,
   ServiceOffering,
+  Skill,
   SkillCategory,
   SocialLink,
   Testimonial,
   WebsiteSection,
 } from "@/types";
 
-function safe<T>(promise: Promise<T>, fallback: T): Promise<T> {
-  return promise.catch((error) => {
-    console.warn("[portfolio-content] query failed, using empty fallback:", error);
-    return fallback;
-  });
+type SkillCategoryWithSkills = SkillCategory & { skills: Skill[] };
+
+function mergeSkillCategories(
+  categories: SkillCategory[] | undefined,
+  skills: Skill[] | undefined
+): SkillCategoryWithSkills[] {
+  if (!categories || categories.length === 0) return fallbackSkillCategories;
+  const list = skills ?? [];
+  return categories.map((cat) => ({
+    ...cat,
+    skills:
+      "skills" in cat && Array.isArray((cat as SkillCategoryWithSkills).skills)
+        ? (cat as SkillCategoryWithSkills).skills
+        : list.filter((s) => s.categoryId === cat.id),
+  }));
 }
 
 /**
@@ -40,42 +51,43 @@ function safe<T>(promise: Promise<T>, fallback: T): Promise<T> {
  */
 export const getPortfolioContent = cache(async (): Promise<PortfolioContent> => {
   const [
-    profile,
-    projects,
-    skillCategories,
-    experiences,
-    education,
-    certifications,
-    services,
-    testimonials,
-    socialLinks,
-    navigation,
-    sections,
+    bootstrap,
+    profileRes,
+    projectsRes,
+    skillsRes,
+    experienceRes,
+    educationRes,
+    certificationsRes,
+    servicesRes,
+    testimonialsRes,
+    socialRes,
   ] = await Promise.all([
-    safe(getPublicProfile() as Promise<Profile | null>, null),
-    safe(getPublicProjects() as Promise<Project[]>, []),
-    safe(getPublicSkills() as Promise<SkillCategory[]>, []),
-    safe(getPublicExperience() as Promise<Experience[]>, []),
-    safe(getPublicEducation() as Promise<Education[]>, []),
-    safe(getPublicCertifications() as Promise<Certification[]>, []),
-    safe(getPublicServices() as Promise<ServiceOffering[]>, []),
-    safe(getPublicTestimonials() as Promise<Testimonial[]>, []),
-    safe(getPublicSocialLinks() as Promise<SocialLink[]>, []),
-    safe(getPublicNavigation() as Promise<NavigationItem[]>, []),
-    safe(getPublicSections() as Promise<WebsiteSection[]>, []),
+    getPublic<{
+      navigation?: NavigationItem[];
+      sections?: WebsiteSection[];
+    }>("/api/public/bootstrap", {}, { revalidate: 60, tags: ["navigation", "sections", "settings"] }),
+    getPublic<{ profile?: Profile | null }>("/api/public/profile", {}, { revalidate: 60, tags: ["profile"] }),
+    getPublic<{ projects?: Project[] }>("/api/public/projects", {}, { revalidate: 60, tags: ["projects"] }),
+    getPublic<{ categories?: SkillCategory[]; skills?: Skill[] }>("/api/public/skills", {}, { revalidate: 60, tags: ["skills"] }),
+    getPublic<{ experience?: Experience[] }>("/api/public/experience", {}, { revalidate: 60, tags: ["experience"] }),
+    getPublic<{ education?: Education[] }>("/api/public/education", {}, { revalidate: 60, tags: ["education"] }),
+    getPublic<{ certifications?: Certification[] }>("/api/public/certifications", {}, { revalidate: 60, tags: ["certifications"] }),
+    getPublic<{ services?: ServiceOffering[] }>("/api/public/services", {}, { revalidate: 60, tags: ["services"] }),
+    getPublic<{ testimonials?: Testimonial[] }>("/api/public/testimonials", {}, { revalidate: 60, tags: ["testimonials"] }),
+    getPublic<{ socialLinks?: SocialLink[] }>("/api/public/social-links", {}, { revalidate: 60, tags: ["social"] }),
   ]);
 
   return {
-    profile,
-    projects,
-    skillCategories,
-    experiences,
-    education,
-    certifications,
-    services,
-    testimonials,
-    socialLinks,
-    navigation,
-    sections,
+    profile: profileRes.profile ?? fallbackProfile,
+    projects: projectsRes.projects ?? fallbackProjects,
+    skillCategories: mergeSkillCategories(skillsRes.categories, skillsRes.skills),
+    experiences: experienceRes.experience ?? fallbackExperiences,
+    education: educationRes.education ?? fallbackEducation,
+    certifications: certificationsRes.certifications ?? fallbackCertifications,
+    services: servicesRes.services ?? [],
+    testimonials: testimonialsRes.testimonials ?? fallbackTestimonials,
+    socialLinks: socialRes.socialLinks ?? fallbackSocialLinks,
+    navigation: bootstrap.navigation ?? fallbackNavigation,
+    sections: bootstrap.sections ?? fallbackWebsiteSections,
   };
 });

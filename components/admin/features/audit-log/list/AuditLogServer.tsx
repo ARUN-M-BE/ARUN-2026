@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getAuditLogs } from "@/lib/actions";
+import { getAuditLogs } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { AuditLogClient } from "@/components/admin/features/audit-log/list/AuditLogClient";
 

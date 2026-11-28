@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getProjectById } from "@/lib/actions";
+import { getProjectById } from "@/lib/api/server-reads";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin/page-header";
 import { ProjectForm } from "@/components/admin/features/projects/shared/ProjectForm";

@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getSocialLinks } from "@/lib/actions";
+import { getSocialLinks } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { SocialLinksClient } from "@/components/admin/features/social-links/SocialLinksClient";
 

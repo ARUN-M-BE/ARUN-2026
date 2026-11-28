@@ -15,7 +15,7 @@ import {
   updateNavigation,
   deleteNavigation,
   reorderNavigation,
-} from "@/lib/actions";
+} from "@/lib/api/mutations";
 import {
   Plus,
   Trash2,

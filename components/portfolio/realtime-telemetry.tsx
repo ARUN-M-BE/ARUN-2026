@@ -12,6 +12,7 @@ import {
 import { useLanguage } from "@/context/languageContext";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { apiUrl } from "@/lib/api/client";
 
 interface PageViewSummary {
   total: number;
@@ -46,21 +47,24 @@ export function RealtimeTelemetry() {
     const loadMetrics = async () => {
       try {
         const [pvRes, mtRes] = await Promise.all([
-          fetch("/api/analytics/pageview", { cache: "no-store" }),
-          fetch("/api/integrations/monkeytype", { cache: "no-store" }),
-        ]);
-        if (!pvRes.ok || !mtRes.ok || cancelled) return;
-
-        const [pv, mt] = await Promise.all([
-          pvRes.json() as Promise<{ success?: boolean; data?: PageViewSummary }>,
-          mtRes.json() as Promise<{ data?: { stats?: { wpm?: number; accuracy?: number } } }>,
+          fetch(apiUrl("/api/analytics/pageview"), { cache: "no-store" }),
+          fetch(apiUrl("/api/integrations/monkeytype"), { cache: "no-store" }),
         ]);
         if (cancelled) return;
 
-        if (pv?.success && pv.data) setSummary(pv.data);
-        const stats = mt?.data?.stats;
-        if (stats) {
-          setTyping({ wpm: Number(stats.wpm) || 0, accuracy: Number(stats.accuracy) || 0 });
+        if (pvRes.ok) {
+          const pv = (await pvRes.json()) as { success?: boolean; data?: PageViewSummary };
+          if (!cancelled && pv?.success && pv.data) setSummary(pv.data);
+        }
+        if (mtRes.ok) {
+          const mt = (await mtRes.json()) as {
+            stats?: { wpm?: number; accuracy?: number };
+            data?: { stats?: { wpm?: number; accuracy?: number } };
+          };
+          const stats = mt?.data?.stats ?? mt?.stats;
+          if (!cancelled && stats) {
+            setTyping({ wpm: Number(stats.wpm) || 0, accuracy: Number(stats.accuracy) || 0 });
+          }
         }
       } catch {
         // Telemetry is decorative; a failed fetch must never break the page.

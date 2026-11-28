@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getExperiences } from "@/lib/actions";
+import { getExperiences } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";

@@ -1,115 +1,50 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
 
-const authSecret =
-  process.env.AUTH_SECRET ||
-  process.env.NEXTAUTH_SECRET ||
-  "dev-secret-change-in-production-openssl-rand-base64-32";
+function hasSessionCookie(request: NextRequest): boolean {
+  return request.cookies
+    .getAll()
+    .some(
+      (cookie) =>
+        cookie.value.length > 0 &&
+        /(session|auth|arun_admin|token)/i.test(cookie.name)
+    );
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Set request headers including x-pathname for server component & layout context
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-pathname", pathname);
 
-  // Skip static assets, favicon, API auth routes
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api/auth") ||
-    pathname.includes(".")
-  ) {
+  if (pathname.startsWith("/_next") || pathname.includes(".")) {
     return NextResponse.next();
   }
 
-  // Detect session cookies across all NextAuth / Auth.js formats
-  const hasAuthJsCookie =
-    request.cookies.has("authjs.session-token") ||
-    request.cookies.has("__Secure-authjs.session-token");
-  const hasNextAuthCookie =
-    request.cookies.has("next-auth.session-token") ||
-    request.cookies.has("__Secure-next-auth.session-token");
+  // Only check session cookie existence for UX redirects;
+  // real authorization is enforced by the API on every request.
+  const hasCookie = hasSessionCookie(request);
 
-  // Determine active cookie name to allow getToken to decode correctly
-  const cookieName = request.cookies.has("__Secure-authjs.session-token")
-    ? "__Secure-authjs.session-token"
-    : request.cookies.has("authjs.session-token")
-    ? "authjs.session-token"
-    : request.cookies.has("__Secure-next-auth.session-token")
-    ? "__Secure-next-auth.session-token"
-    : "next-auth.session-token";
-
-  const isSecureCookie = cookieName.startsWith("__Secure-");
-
-  // Decode token defensively
-  let token = null;
-  if (hasAuthJsCookie || hasNextAuthCookie) {
-    try {
-      token = await getToken({
-        req: request,
-        secret: authSecret,
-        cookieName,
-        secureCookie: isSecureCookie,
-      });
-
-      if (!token) {
-        token = await getToken({
-          req: request,
-          secret: authSecret,
-        });
-      }
-    } catch (tokenErr) {
-      console.warn("[proxy] Token verification failed:", tokenErr);
-    }
-  }
-
-  // Prevent authenticated user from re-accessing login page
   if (pathname === "/admin/login") {
-    if (token) {
+    if (hasCookie) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
-  // Protect all other admin routes
-  if (pathname.startsWith("/admin")) {
-    if (!token) {
-      const loginUrl = new URL("/admin/login", request.url);
-      loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
+  if (pathname.startsWith("/admin") && !hasCookie) {
+    const loginUrl = new URL("/admin/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
-  // Rate limiting headers for contact form
-  if (pathname === "/api/contact") {
-    const ip = request.headers.get("x-forwarded-for") || "unknown";
-    requestHeaders.set("X-Client-IP", ip);
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
-  }
-
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
-// Next.js 15/16 backward compatibility alias
 export const middleware = proxy;
 
 export const config = {
   matcher: [
-    // NOTE: /_next/static must never be matched — the proxy runs in front of the
-    // static handler and would swallow every stylesheet and chunk.
     "/((?!_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

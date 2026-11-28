@@ -15,7 +15,7 @@ import {
   updateSocialLink,
   deleteSocialLink,
   reorderSocialLinks,
-} from "@/lib/actions";
+} from "@/lib/api/mutations";
 import {
   Plus,
   Trash2,

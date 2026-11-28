@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { DeleteDialog } from "@/components/admin/delete-dialog";
 import { EmptyState } from "@/components/admin/empty-state";
-import { deleteExperience } from "@/lib/actions";
+import { deleteExperience } from "@/lib/api/mutations";
 import { Edit2, Trash2, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 import type { Experience } from "@/types";

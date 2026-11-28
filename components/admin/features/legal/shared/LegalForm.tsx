@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { legalDocumentSchema, type LegalDocumentFormData } from "@/lib/validations";
-import { updateLegalDocument } from "@/lib/actions";
+import { updateLegalDocument } from "@/lib/api/mutations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

@@ -1,5 +1,45 @@
 import type { NextConfig } from "next";
 
+const apiOrigin = (() => {
+  const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (!raw) return "";
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return "";
+  }
+})();
+
+const connectSrc = [
+  "'self'",
+  apiOrigin,
+  "https:",
+  "wss:",
+]
+  .filter(Boolean)
+  .join(" ");
+
+const imgSrc = [
+  "'self'",
+  "data:",
+  "blob:",
+  "https:",
+  apiOrigin,
+]
+  .filter(Boolean)
+  .join(" ");
+
+const cspHeader = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  `img-src ${imgSrc}`,
+  `connect-src ${connectSrc}`,
+  "worker-src 'self' blob:",
+  "frame-ancestors 'self'",
+].join("; ");
+
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
@@ -54,6 +94,10 @@ const nextConfig: NextConfig = {
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: cspHeader,
           },
         ],
       },

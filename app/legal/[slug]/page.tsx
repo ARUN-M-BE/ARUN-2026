@@ -1,10 +1,11 @@
-import { getLegalDocumentBySlug } from "@/lib/actions";
+import { getPublic } from "@/lib/api/public";
 import { notFound } from "next/navigation";
 import { PortfolioNavbar } from "@/components/portfolio/navbar";
 import { PortfolioFooter } from "@/components/portfolio/footer";
 import { AlertTriangle, ArrowLeft, Calendar } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import type { LegalDocument } from "@/types";
 
 export default async function LegalPage({
   params,
@@ -12,7 +13,15 @@ export default async function LegalPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const doc = await getLegalDocumentBySlug(slug);
+  const res = await getPublic<{ document?: LegalDocument | null } | LegalDocument | null>(
+    `/api/public/legal/${encodeURIComponent(slug)}`,
+    null,
+    { revalidate: 60, tags: ["legal"] }
+  );
+  const doc =
+    res && typeof res === "object" && "document" in res
+      ? (res.document ?? null)
+      : (res as LegalDocument | null);
 
   if (!doc || doc.status !== "published") {
     notFound();

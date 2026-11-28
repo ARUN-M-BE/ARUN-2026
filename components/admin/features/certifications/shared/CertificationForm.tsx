@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { certificationSchema, type CertificationFormData } from "@/lib/validations";
-import { createCertification, updateCertification } from "@/lib/actions";
+import { createCertification, updateCertification } from "@/lib/api/mutations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

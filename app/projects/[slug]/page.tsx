@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPublicProjectBySlug, getPublicProjects } from "@/lib/actions";
+import { getPublic } from "@/lib/api/public";
+import { fallbackProjects } from "@/lib/fallback-data";
 import { ProjectCaseStudy } from "@/components/portfolio/project-case-study";
 import type { Project } from "@/types";
 
@@ -10,9 +11,33 @@ interface ProjectPageProps {
   params: Promise<{ slug: string }>;
 }
 
+async function resolveProjectBySlug(slug: string): Promise<Project | null> {
+  const fallback = (fallbackProjects as Project[]).find((p) => p.slug === slug) ?? null;
+  const res = await getPublic<{ project?: Project | null } | Project | null>(
+    `/api/public/projects/${encodeURIComponent(slug)}`,
+    fallback ? { project: fallback } : null,
+    { revalidate: 60, tags: ["projects"] }
+  );
+  if (!res) return fallback;
+  if (typeof res === "object" && "project" in res) {
+    return res.project ?? fallback;
+  }
+  return res as Project;
+}
+
+async function resolveAllProjects(): Promise<Project[]> {
+  const res = await getPublic<{ projects?: Project[] } | Project[]>(
+    "/api/public/projects",
+    { projects: fallbackProjects as Project[] },
+    { revalidate: 60, tags: ["projects"] }
+  );
+  if (Array.isArray(res)) return res;
+  return res.projects ?? (fallbackProjects as Project[]);
+}
+
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = await getPublicProjectBySlug(slug);
+  const project = await resolveProjectBySlug(slug);
 
   if (!project) {
     return { title: "Case study not found" };
@@ -46,13 +71,13 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 
 export default async function ProjectDetailPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = await getPublicProjectBySlug(slug);
+  const project = await resolveProjectBySlug(slug);
 
   if (!project) {
     notFound();
   }
 
-  const allProjects = (await getPublicProjects()) as Project[];
+  const allProjects = await resolveAllProjects();
   const navigable = allProjects.filter((item) => item.slug !== project.slug);
   const currentIndex = allProjects.findIndex((item) => item.slug === project.slug);
 

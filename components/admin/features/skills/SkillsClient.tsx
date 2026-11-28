@@ -18,7 +18,7 @@ import {
   createSkillCategory,
   updateSkillCategory,
   deleteSkillCategory,
-} from "@/lib/actions";
+} from "@/lib/api/mutations";
 import { Plus, Trash2, Cpu, Sparkles, FolderPlus, Loader2, Star, Edit2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Skill, SkillCategory } from "@/types";

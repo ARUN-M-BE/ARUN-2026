@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getEducation } from "@/lib/actions";
+import { getEducation } from "@/lib/api/server-reads";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin/page-header";
 import { EducationForm } from "@/components/admin/features/education/shared/EducationForm";

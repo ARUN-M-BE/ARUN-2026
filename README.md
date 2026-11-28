@@ -86,42 +86,27 @@ npm install --legacy-peer-deps
 ```
 
 ### 2. Configure Environment (`.env.local`)
-Create a `.env.local` file with your database and authentication configuration:
+Create a `.env.local` file pointing to the `arun-api` backend:
 ```env
-# Database (PostgreSQL)
-DATABASE_URL=postgresql://postgres:admin@localhost:5432/portfolio
-
-# Authentication
-AUTH_SECRET=dev-secret-change-in-production-openssl-rand-base64-32
-NEXTAUTH_URL=http://localhost:3000
-
-# Seed Admin Credentials
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=ChangeMe123!
+# External API (local, dev, or prod)
+NEXT_PUBLIC_API_URL=http://localhost:4000/arun
 
 # Public Site URL
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Optional cache revalidation secret (shared with arun-api)
+REVALIDATE_SECRET=
 ```
 
-### 3. Initialize Database & Seed
+### 3. Run the Development Server
 ```bash
-# Push schema tables and indexes to PostgreSQL
-npm run db:push
-
-# Seed default profile, initial admin user, and sample portfolio content
-npm run db:seed
-```
-
-### 4. Run the Development Server
-```bash
+# Ensure arun-api is running on port 4000, then:
 npm run dev
 ```
 
 Visit:
 - **Public Portfolio:** `http://localhost:3000`
 - **Admin CMS Dashboard:** `http://localhost:3000/admin`
-  - **Login:** `admin@example.com`
-  - **Password:** `ChangeMe123!`
 
 ---
 
@@ -130,14 +115,14 @@ Visit:
 | Command | Action |
 |---|---|
 | `npm run dev` | Start local development server on port 3000 |
-| `npm run build` | Compile optimized production build & generate sitemaps |
+| `npm run build` | Compile optimized production build & Cloudflare OpenNext bundle + sitemaps |
 | `npm run start` | Run compiled production build |
+| `npm run preview` | Preview Cloudflare Worker locally |
+| `npm run deploy` | Deploy Cloudflare Worker to production |
 | `npm run typecheck` | Run TypeScript strict compiler verification (`tsc --noEmit`) |
-| `npm run db:push` | Synchronize Drizzle schema directly with PostgreSQL |
-| `npm run db:generate`| Generate migration files from Drizzle schema |
-| `npm run db:migrate` | Execute pending database migrations |
-| `npm run db:seed` | Seed database with initial admin and editable portfolio records |
-| `npm run db:studio` | Launch Drizzle visual web database browser |
+| `npm run lint` | Run ESLint |
+
+> Database (`db:*`) and API/integration test scripts live in the `arun-api` repository.
 
 ---
 

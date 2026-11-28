@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getProjects } from "@/lib/actions";
+import { getProjects } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";

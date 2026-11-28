@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getSections } from "@/lib/actions";
+import { getSections } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { SectionsClient } from "./list/SectionsClient";
 import type { WebsiteSection } from "@/types";

@@ -11,7 +11,7 @@ import {
   type DesignId,
   type DesignStatus,
 } from "@/config/designs";
-import { SettingsRepository } from "@/server/repositories";
+import { getPublic } from "@/lib/api/public";
 
 export interface DesignState {
   /** Design currently serving the public portfolio. */
@@ -92,7 +92,14 @@ function buildConfigs(
 export const getDesignState = cache(async (): Promise<DesignState> => {
   let rows: SettingRow[] = [];
   try {
-    const settings = await SettingsRepository.findMany();
+    const settings =
+      (
+        await getPublic<{ settings?: SettingRow[] }>(
+          "/api/public/bootstrap",
+          {},
+          { revalidate: 60, tags: ["settings"] }
+        )
+      ).settings ?? [];
     rows = (settings ?? []) as SettingRow[];
   } catch (error) {
     console.warn("[design-settings] unable to read design settings:", error);

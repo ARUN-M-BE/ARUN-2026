@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Toggle } from "@/components/ui/toggle";
-import { upsertSeoMetadata } from "@/lib/actions";
+import { upsertSeoMetadata } from "@/lib/api/mutations";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import type { SeoMetadata } from "@/types";

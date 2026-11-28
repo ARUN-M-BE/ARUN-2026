@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { signOut } from "next-auth/react";
+import { apiFetch } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -101,7 +101,15 @@ export function AdminHeader({ user }: AdminHeaderProps) {
               )}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => { void signOut({ callbackUrl: "/admin/login" }); }}>
+            <DropdownMenuItem
+              onSelect={() => {
+                void apiFetch("/api/auth/logout", { method: "POST" })
+                  .catch(() => {})
+                  .finally(() => {
+                    window.location.assign("/admin/login");
+                  });
+              }}
+            >
               <LogOut className="size-4 text-destructive" />
               <span>Sign out</span>
             </DropdownMenuItem>

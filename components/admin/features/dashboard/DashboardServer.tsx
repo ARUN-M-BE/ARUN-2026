@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getDashboardStats, getContactMessages, getProfile } from "@/lib/actions";
+import { getDashboardStats, getContactMessages, getProfile } from "@/lib/api/server-reads";
 import { PageHeader } from "@/components/admin/page-header";
 import { AdminAnalyticsChart } from "@/components/admin/analytics-chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

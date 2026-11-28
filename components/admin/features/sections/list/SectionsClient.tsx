@@ -17,7 +17,7 @@ import {
   duplicateSection,
   deleteSection,
   reorderSections,
-} from "@/lib/actions";
+} from "@/lib/api/mutations";
 import {
   Plus,
   Trash2,

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { contactFormSchema, type ContactFormData } from "@/lib/validations";
-import { submitContactForm } from "@/lib/actions";
+import { ApiError, apiFetch } from "@/lib/api/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,7 +55,10 @@ export function ContactSection({ profile, socialLinks = [] }: ContactSectionProp
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     try {
-      const res = await submitContactForm(data);
+      const res = await apiFetch<{ success: boolean; error?: string }>("/api/contact", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
       if (res.success) {
         setIsSuccess(true);
         toast.success(t("contact.successTitle", "Message Transmitted Successfully"), {
@@ -65,8 +68,17 @@ export function ContactSection({ profile, socialLinks = [] }: ContactSectionProp
       } else {
         toast.error("Transmission failed", { description: res.error });
       }
-    } catch {
-      toast.error("An unexpected error occurred while transmitting message.");
+    } catch (err) {
+      const directEmail = profile?.email || "arun@arun-m.in";
+      if (err instanceof ApiError && err.status === 429) {
+        toast.error("Too many requests", {
+          description: "Please wait a moment before sending another message.",
+        });
+      } else {
+        toast.error("Couldn't send message", {
+          description: `Please email me directly at ${directEmail}.`,
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }

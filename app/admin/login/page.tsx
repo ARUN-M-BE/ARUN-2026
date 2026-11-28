@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { ApiError, apiFetch } from "@/lib/api/client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormData } from "@/lib/validations";
@@ -31,19 +31,13 @@ export default function AdminLoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const res = await signIn("credentials", {
-        email: data.email.toLowerCase().trim(),
-        password: data.password,
-        redirect: false,
+      await apiFetch("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({
+          email: data.email.toLowerCase().trim(),
+          password: data.password,
+        }),
       });
-
-      if (res?.error) {
-        toast.error("Invalid credentials", {
-          description: "Please check your admin email and password.",
-        });
-        setIsLoading(false);
-        return;
-      }
 
       toast.success("Authentication successful", {
         description: "Entering 3D Developer CMS...",
@@ -52,10 +46,20 @@ export default function AdminLoginPage() {
       const params = new URLSearchParams(window.location.search);
       const destination = params.get("callbackUrl") || "/admin";
       window.location.assign(destination);
-    } catch {
-      toast.error("Authentication failed", {
-        description: "An unexpected error occurred during sign in.",
-      });
+    } catch (err) {
+      if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+        toast.error("Invalid credentials", {
+          description: "Please check your admin email and password.",
+        });
+      } else if (err instanceof ApiError && err.status === 429) {
+        toast.error("Too many login attempts", {
+          description: "Please wait a few minutes and try again.",
+        });
+      } else {
+        toast.error("Authentication failed", {
+          description: "An unexpected error occurred during sign in.",
+        });
+      }
       setIsLoading(false);
     }
   };

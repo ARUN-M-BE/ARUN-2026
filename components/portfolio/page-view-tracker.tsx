@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { apiUrl } from "@/lib/api/client";
 
 const CONSENT_KEY = "cookie_consent_preferences";
 const SESSION_KEY = "pv_visitor_id";
@@ -54,9 +55,13 @@ export function PageViewTracker() {
         consent: true,
       });
 
-      void fetch("/api/analytics/pageview", {
+      void fetch(apiUrl("/api/analytics/pageview"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "fetch",
+        },
         body: payload,
         keepalive: true,
         cache: "no-store",

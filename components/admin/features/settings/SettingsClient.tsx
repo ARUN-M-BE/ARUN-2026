@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Toggle } from "@/components/ui/toggle";
 import { UniverseTiles, useThemeStudio } from "@/components/theme/theme-studio";
 import { getTheme, normalizeThemeId, type ThemeId } from "@/config/themes";
-import { updateSiteSetting, setActiveTheme } from "@/lib/actions";
+import { updateSiteSetting, setActiveTheme } from "@/lib/api/mutations";
 import { Loader2, Save, Palette, Shield, Globe, Bell, Radio, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 

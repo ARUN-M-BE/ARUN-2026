@@ -34,7 +34,7 @@ import {
   savePaletteTheme,
   setDesignViewerToggle,
   setPalettePickerEnabled,
-} from "@/lib/design-actions";
+} from "@/lib/api/design-mutations";
 import type { ContrastCheck } from "@/lib/colors";
 import type { ColorMode, ThemeId } from "@/config/themes";
 import type { DesignId, DesignStatus } from "@/config/designs";
