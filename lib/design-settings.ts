@@ -92,15 +92,18 @@ function buildConfigs(
 export const getDesignState = cache(async (): Promise<DesignState> => {
   let rows: SettingRow[] = [];
   try {
-    const settings =
-      (
-        await getPublic<{ settings?: SettingRow[] }>(
-          "/api/public/bootstrap",
-          {},
-          { revalidate: 60, tags: ["settings"] }
-        )
-      ).settings ?? [];
-    rows = (settings ?? []) as SettingRow[];
+    const rawSettings = (
+      await getPublic<{ settings?: SettingRow[] | Record<string, unknown> }>(
+        "/api/public/bootstrap",
+        {},
+        { revalidate: 60, tags: ["settings"] }
+      )
+    ).settings;
+    rows = Array.isArray(rawSettings)
+      ? rawSettings
+      : rawSettings && typeof rawSettings === "object"
+        ? Object.entries(rawSettings).map(([key, value]) => ({ key, value }))
+        : [];
   } catch (error) {
     console.warn("[design-settings] unable to read design settings:", error);
   }

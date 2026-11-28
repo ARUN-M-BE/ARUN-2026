@@ -70,15 +70,19 @@ export const getThemePreferences = cache(async (): Promise<ThemePreferences> => 
   let pickerEnabled = true;
 
   try {
-    const settings =
-      (
-        await getPublic<{ settings?: Array<{ key: string; value: unknown }> }>(
-          "/api/public/bootstrap",
-          {},
-          { revalidate: 60, tags: ["settings"] }
-        )
-      ).settings ?? [];
-    const find = (key: string) => settings?.find((item) => item.key === key);
+    const rawSettings = (
+      await getPublic<{ settings?: Array<{ key: string; value: unknown }> | Record<string, unknown> }>(
+        "/api/public/bootstrap",
+        {},
+        { revalidate: 60, tags: ["settings"] }
+      )
+    ).settings;
+    const settings = Array.isArray(rawSettings)
+      ? rawSettings
+      : rawSettings && typeof rawSettings === "object"
+        ? Object.entries(rawSettings).map(([key, value]) => ({ key, value }))
+        : [];
+    const find = (key: string) => settings.find((item) => item.key === key);
 
     const themeRow = find(THEME_SETTING_KEY);
     const rawTheme = readSettingString(themeRow?.value);
